@@ -25,7 +25,7 @@ export type Background = {
 
 export const site = {
   name: "LÉON",
-  url: "https://itsleonmusic.com",
+  url: "https://leon.site",
   description: "LÉON. New music, updates and links.",
   ogImage: "/release/dirt.jpg",
 
