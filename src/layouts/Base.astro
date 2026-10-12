@@ -1,0 +1,171 @@
+---
+import { site } from "../site";
+import Background from "../components/Background.astro";
+
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImage = new URL(site.ogImage, site.url).href;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "MusicGroup",
+  name: site.name,
+  url: site.url,
+  image: ogImage,
+  sameAs: [...site.socials, ...site.streaming].map((l) => l.href),
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{site.name}</title>
+    <meta name="description" content={site.description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={site.name} />
+    <meta property="og:description" content={site.description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={site.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={site.name} />
+    <meta name="twitter:description" content={site.description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <Background />
+    <header class="top">
+      <a href="/" class="name">{site.name}</a>
+    </header>
+    <main>
+      <h1 class="visually-hidden">{site.name}</h1>
+      <slot />
+    </main>
+    <slot name="footer" />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --fg: #fff;
+    --bg: #000;
+    --overlay: #00000073;
+    --font-sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    --font-display: "Times New Roman", Times, Georgia, serif;
+    --gutter: clamp(16px, 4vw, 40px);
+    --caps-tracking: 0.04em;
+    color-scheme: dark;
+  }
+  *,
+  :before,
+  :after {
+    box-sizing: border-box;
+  }
+  html {
+    background: var(--bg);
+  }
+  body {
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+  a {
+    color: inherit;
+  }
+  img,
+  video {
+    max-width: 100%;
+    display: block;
+  }
+  .visually-hidden {
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    overflow: hidden;
+  }
+  .caps-label {
+    text-transform: uppercase;
+    letter-spacing: var(--caps-tracking);
+  }
+  :focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  body > header,
+  main > *,
+  body > footer {
+    animation: 2.6s both fade-in;
+  }
+  body > header {
+    animation-delay: 0.6s;
+  }
+  main > :first-child {
+    animation-delay: 1s;
+  }
+  main > :nth-child(2) {
+    animation-delay: 1.3s;
+  }
+  main > :nth-child(n + 3) {
+    animation-delay: 1.6s;
+  }
+  body > footer {
+    animation-delay: 2s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body > header,
+    main > *,
+    body > footer {
+      animation: none;
+    }
+  }
+  main {
+    flex: 1;
+    min-height: 0;
+    padding: 0 var(--gutter);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 40px;
+  }
+  @media (width <= 600px) {
+    main {
+      gap: 22px;
+    }
+  }
+</style>
+
+<style>
+  .top {
+    padding: var(--gutter);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .name {
+    text-transform: uppercase;
+    letter-spacing: var(--caps-tracking);
+    font-weight: 700;
+    text-decoration: none;
+  }
+</style>

@@ -1,0 +1,150 @@
+---
+import { site } from "../site";
+
+const { title, success, consent } = site.newsletter;
+---
+
+<section id="newsletter" class="newsletter" aria-labelledby="newsletter-title" data-success={success}>
+  <h2 id="newsletter-title" class="caps-label">{title}</h2>
+  <form method="post" action="/api/subscribe" data-newsletter>
+    <input type="hidden" name="source" value="website" />
+    <!-- Honeypot -->
+    <label class="visually-hidden" aria-hidden="true">
+      Company <input type="text" name="company" tabindex="-1" autocomplete="off" />
+    </label>
+    <div class="fields">
+      <label>
+        <span class="visually-hidden">Email</span>
+        <input type="email" name="email" placeholder="Email" autocomplete="email" inputmode="email" required />
+      </label>
+      <label>
+        <span class="visually-hidden">Phone</span>
+        <input type="tel" name="phone" placeholder="Phone (SMS)" autocomplete="tel" inputmode="tel" />
+      </label>
+      <button type="submit" class="caps-label">Sign up</button>
+    </div>
+    <label class="consent">
+      <input type="checkbox" name="consent" required />
+      <span>{consent}</span>
+    </label>
+    <p class="status" role="status" aria-live="polite" data-status></p>
+  </form>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>("[data-newsletter]").forEach((form) => {
+    const status = form.querySelector<HTMLElement>("[data-status]")!;
+    const button = form.querySelector<HTMLButtonElement>("button[type=submit]")!;
+    const successText = form.closest<HTMLElement>("section")?.dataset.success || "Thanks!";
+
+    // Result from the no-JS fallback redirect.
+    const params = new URLSearchParams(location.search);
+    if (params.has("subscribed")) status.textContent = successText;
+    else if (params.get("error")) status.textContent = params.get("error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      button.disabled = true;
+      status.textContent = "";
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        const data = await res.json();
+        if (data.ok) {
+          form.reset();
+          status.textContent = successText;
+        } else {
+          status.textContent = data.error || "Something went wrong, please try again.";
+        }
+      } catch {
+        status.textContent = "Something went wrong, please try again.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+</script>
+
+<style>
+  .newsletter {
+    max-width: 560px;
+  }
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+  }
+  .fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .fields label {
+    flex: 1 1 180px;
+  }
+  input[type="email"],
+  input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--fg);
+    background: none;
+    color: inherit;
+    font: inherit;
+    border-radius: 0;
+  }
+  input::placeholder {
+    color: var(--fg);
+    opacity: 0.85;
+  }
+  button {
+    padding: 12px 20px;
+    border: 1px solid var(--fg);
+    background: var(--fg);
+    color: var(--bg);
+    font: inherit;
+    cursor: pointer;
+    border-radius: 0;
+  }
+  button:disabled {
+    opacity: 0.5;
+  }
+  .consent {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 0.75rem;
+  }
+  .consent input {
+    appearance: none;
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin: 1px 0 0;
+    border: 1px solid var(--fg);
+    background: none;
+    cursor: pointer;
+  }
+  .consent input:checked {
+    background: var(--fg);
+    box-shadow: inset 0 0 0 2px var(--bg);
+  }
+  .status {
+    min-height: 1.5em;
+    font-size: 0.875rem;
+  }
+  @media (width <= 600px) {
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .fields label {
+      min-width: 0;
+    }
+    .fields button {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+  }
+</style>

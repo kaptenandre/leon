@@ -1,0 +1,60 @@
+---
+import { site } from "../site";
+
+const { image, video } = site.background;
+---
+
+<div class="bg" aria-hidden="true">
+  {
+    video ? (
+      <video
+        class="bg-media"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster={video.poster ?? image}
+        data-bg-video
+        data-mobile-src={video.mobile}
+      >
+        {video.webm && <source src={video.webm} type="video/webm" />}
+        {video.mp4 && <source src={video.mp4} type="video/mp4" />}
+      </video>
+    ) : (
+      image && <img class="bg-media" src={image} alt="" decoding="async" fetchpriority="high" />
+    )
+  }
+  <div class="bg-overlay"></div>
+</div>
+
+<script>
+  const video = document.querySelector<HTMLVideoElement>("[data-bg-video]");
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+  if (video && (matchMedia("(prefers-reduced-motion: reduce)").matches || saveData)) {
+    video.removeAttribute("autoplay");
+    video.pause();
+  } else if (video?.dataset.mobileSrc && matchMedia("(max-width: 700px) and (orientation: portrait)").matches) {
+    video.src = video.dataset.mobileSrc;
+    video.play().catch(() => {});
+  }
+</script>
+
+<style>
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg);
+  }
+  .bg-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--overlay);
+  }
+</style>

@@ -1,0 +1,201 @@
+---
+import { site } from "../site";
+
+const r = site.release;
+const isOut = Date.now() >= Date.parse(r.outAt);
+const cta = r.smartLink ?? r.platforms[0]?.href;
+---
+
+<section
+  class="release"
+  aria-labelledby="release-title"
+  data-release
+  data-out-at={r.outAt}
+  data-release-date={r.releaseDate}
+  data-upcoming-label={r.upcomingLabel}
+>
+  <div class="title-box">
+    <h2 id="release-title" class="title" data-fit>{r.title}</h2>
+  </div>
+  <div class="details">
+    <p class="meta caps-label">
+      <span data-kind data-base={r.kind}>{isOut ? `New ${r.kind.toLowerCase()}` : r.kind}</span>{" · "}<span
+        data-status>{isOut ? "Out now" : r.upcomingLabel}</span>
+    </p>
+    <ul class="stream" aria-label={`Listen to ${r.title}`}>
+      {
+        cta && (
+          <li>
+            <a class="primary" href={cta} target="_blank" rel="noopener" data-cta>
+              {isOut ? "Listen" : "Pre-save"}
+            </a>
+          </li>
+        )
+      }
+      {
+        r.video && (
+          <li>
+            <a class="video" href={r.video} target="_blank" rel="noopener">
+              Watch video
+            </a>
+          </li>
+        )
+      }
+      {
+        r.platforms.map((p) => (
+          <li>
+            <a href={p.href} target="_blank" rel="noopener">
+              {p.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  // Flip "Pre-save" to "Listen" at release time without a rebuild.
+  document.querySelectorAll<HTMLElement>("[data-release]").forEach((el) => {
+    const outAt = Date.parse(el.dataset.outAt!);
+    const status = el.querySelector<HTMLElement>("[data-status]");
+    const kind = el.querySelector<HTMLElement>("[data-kind]");
+    const cta = el.querySelector<HTMLElement>("[data-cta]");
+    const update = () => {
+      const out = Date.now() >= outAt;
+      const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Stockholm" }).format(new Date());
+      if (kind) kind.textContent = out ? `New ${kind.dataset.base!.toLowerCase()}` : kind.dataset.base!;
+      if (status) {
+        status.textContent = out ? "Out now" : el.dataset.releaseDate === today ? "Out today" : el.dataset.upcomingLabel!;
+      }
+      if (cta) cta.textContent = out ? "Listen" : "Pre-save";
+      return out;
+    };
+    const wait = outAt - Date.now();
+    if (!update() && wait < 2 ** 31 - 1) setTimeout(update, wait + 500);
+  });
+
+  // Scale the title to fill its box.
+  const fit = (el: HTMLElement) => {
+    const box = el.parentElement!;
+    let lo = 16;
+    let hi = Math.max(box.clientWidth, box.clientHeight);
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      el.style.fontSize = `${mid}px`;
+      if (el.scrollWidth <= box.clientWidth && el.offsetHeight <= box.clientHeight) lo = mid;
+      else hi = mid;
+    }
+    el.style.fontSize = `${lo}px`;
+  };
+  const titles = [...document.querySelectorAll<HTMLElement>("[data-fit]")];
+  const fitAll = () => titles.forEach(fit);
+  document.fonts.ready.finally(fitAll);
+  const ro = new ResizeObserver(fitAll);
+  titles.forEach((t) => ro.observe(t.parentElement!));
+</script>
+
+<style>
+  .release {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .title-box {
+    flex: 1;
+    min-height: 120px;
+    position: relative;
+  }
+  .title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(3.5rem, 17vw, 16rem);
+    line-height: 0.88;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px 24px;
+  }
+  .meta {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  .stream {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stream a {
+    display: inline-block;
+    padding: 10px 14px;
+    border: 1px solid var(--fg);
+    color: var(--fg);
+    font-size: 0.8125rem;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: var(--caps-tracking);
+    text-decoration: none;
+  }
+  .stream a.primary,
+  .stream a:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  @media (width <= 600px) {
+    .release {
+      gap: 12px;
+    }
+    .title-box {
+      min-height: 80px;
+    }
+    .details {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .stream {
+      gap: 0 18px;
+    }
+    .stream li:has(.primary) {
+      flex-basis: 100%;
+      margin-bottom: 2px;
+    }
+    .stream:has(.video) {
+      column-gap: 8px;
+    }
+    .stream:has(.video) li:has(.primary),
+    .stream li:has(.video) {
+      flex: 0 0 calc(50% - 4px);
+      margin-bottom: 2px;
+    }
+    .stream a.primary,
+    .stream a.video {
+      display: block;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stream a:not(.primary, .video) {
+      padding: 10px 0;
+      border: 0;
+      background: none;
+      color: var(--fg);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  }
+</style>
