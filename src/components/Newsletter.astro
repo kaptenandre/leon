@@ -5,7 +5,7 @@ const { title, success, consent } = site.newsletter;
 ---
 
 <section id="newsletter" class="newsletter" aria-labelledby="newsletter-title" data-success={success}>
-  <h2 id="newsletter-title" class="caps-label">{title}</h2>
+  <h2 id="newsletter-title" class="caps-label section-title">{title}</h2>
   <form method="post" action="/api/subscribe" data-newsletter>
     <input type="hidden" name="source" value="website" />
     <!-- Honeypot -->
@@ -21,7 +21,7 @@ const { title, success, consent } = site.newsletter;
         <span class="visually-hidden">Phone</span>
         <input type="tel" name="phone" placeholder="Phone (SMS)" autocomplete="tel" inputmode="tel" />
       </label>
-      <button type="submit" class="caps-label">Sign up</button>
+      <button type="submit" class="button primary">Sign up</button>
     </div>
     <label class="consent">
       <input type="checkbox" name="consent" required />
@@ -69,52 +69,35 @@ const { title, success, consent } = site.newsletter;
 </script>
 
 <style>
-  .newsletter {
-    max-width: 560px;
-  }
-  h2 {
-    margin: 0 0 8px;
-    font-size: 1rem;
-  }
   .fields {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 8px;
-  }
-  .fields label {
-    flex: 1 1 180px;
   }
   input[type="email"],
   input[type="tel"] {
     width: 100%;
-    padding: 12px;
+    padding: 14px 16px;
     border: 1px solid var(--fg);
-    background: none;
+    background: #0000004d;
     color: inherit;
     font: inherit;
+    font-size: 1rem;
+    text-align: center;
     border-radius: 0;
   }
   input::placeholder {
     color: var(--fg);
-    opacity: 0.85;
-  }
-  button {
-    padding: 12px 20px;
-    border: 1px solid var(--fg);
-    background: var(--fg);
-    color: var(--bg);
-    font: inherit;
-    cursor: pointer;
-    border-radius: 0;
-  }
-  button:disabled {
-    opacity: 0.5;
+    opacity: 0.75;
   }
   .consent {
     display: flex;
     gap: 8px;
     margin-top: 12px;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    text-align: left;
+    opacity: 0.85;
   }
   .consent input {
     appearance: none;
@@ -132,19 +115,7 @@ const { title, success, consent } = site.newsletter;
   }
   .status {
     min-height: 1.5em;
+    margin: 8px 0 0;
     font-size: 0.875rem;
-  }
-  @media (width <= 600px) {
-    .fields {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-    .fields label {
-      min-width: 0;
-    }
-    .fields button {
-      grid-column: 1 / -1;
-      justify-self: start;
-    }
   }
 </style>

@@ -1,61 +1,25 @@
 ---
-import { site } from "../site";
+import type { Link } from "../site";
+
+interface Props {
+  title: string;
+  links: Link[];
+}
+
+const { title, links } = Astro.props;
 ---
 
-<footer>
-  <ul aria-label="Listen">
+<section aria-label={title}>
+  <h2 class="caps-label section-title">{title}</h2>
+  <ul class="buttons">
     {
-      site.streaming.map((l) => (
+      links.map((l) => (
         <li>
-          <a href={l.href} target="_blank" rel="me noopener">
+          <a class="button" href={l.href} target="_blank" rel="me noopener">
             {l.label}
           </a>
         </li>
       ))
     }
   </ul>
-  <ul aria-label="Socials">
-    {
-      site.socials.map((l) => (
-        <li>
-          <a href={l.href} target="_blank" rel="me noopener">
-            {l.label}
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-</footer>
-
-<style>
-  footer {
-    padding: var(--gutter);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px 24px;
-    font-size: 0.875rem;
-  }
-  ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  a {
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-  @media (width <= 600px) {
-    footer {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  }
-</style>
+</section>

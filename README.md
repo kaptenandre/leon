@@ -1,13 +1,13 @@
 # LÉON
 
-Artist site for LÉON. Astro on Netlify, same setup as grantissoindie.com: one page with the current release, streaming links, email + SMS signup and socials.
+Artist site for LÉON at https://leon.site. Astro on Netlify, same stack as grantissoindie.com: one centered column of buttons (current release, streaming, socials) plus email + SMS signup.
 
 ## Edit content
 
 Everything lives in `src/site.ts`:
 
-- `release`: title, type, release time (`outAt`), pre-save/smart link, video and platform links. Before `outAt` the button reads "Pre-save" and flips to "Listen" on its own at release time.
-- `streaming` / `socials`: the links in the footer.
+- `release`: release time (`outAt`), pre-save/smart link and optional video. Before `outAt` the top button reads "Pre-save" and flips to "Listen now" on its own at release time.
+- `streaming` / `socials`: the Listen and Follow buttons.
 - `background`: image or video (webm/mp4 + mobile version) behind everything.
 
 ## Signup (Mailchimp)

@@ -3,10 +3,12 @@ import Base from "../layouts/Base.astro";
 import Release from "../components/Release.astro";
 import Newsletter from "../components/Newsletter.astro";
 import Links from "../components/Links.astro";
+import { site } from "../site";
 ---
 
 <Base>
   <Release />
+  <Links title="Listen" links={site.streaming} />
+  <Links title="Follow" links={site.socials} />
   <Newsletter />
-  <Links slot="footer" />
 </Base>
