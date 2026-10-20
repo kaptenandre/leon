@@ -4,26 +4,61 @@ import type { Link } from "../site";
 interface Props {
   title: string;
   links: Link[];
+  /** "buttons" (default): stacked boxed buttons with a heading. "text": small inline links, no heading. */
+  variant?: "buttons" | "text";
 }
 
-const { title, links } = Astro.props;
+const { title, links, variant = "buttons" } = Astro.props;
+const external = (href: string) => (href.startsWith("http") ? { target: "_blank", rel: "me noopener" } : {});
 ---
 
-<section aria-label={title}>
-  <h2 class="caps-label section-title">{title}</h2>
-  <ul class="buttons">
-    {
-      links.map((l) => (
-        <li>
-          <a
-            class="button"
-            href={l.href}
-            {...(l.href.startsWith("http") ? { target: "_blank", rel: "me noopener" } : {})}
-          >
-            {l.label}
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-</section>
+{
+  variant === "text" ? (
+    <nav aria-label={title}>
+      <ul class="text-links caps-label">
+        {links.map((l) => (
+          <li>
+            <a href={l.href} {...external(l.href)}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  ) : (
+    <section aria-label={title}>
+      <h2 class="caps-label section-title">{title}</h2>
+      <ul class="buttons">
+        {links.map((l) => (
+          <li>
+            <a class="button" href={l.href} {...external(l.href)}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .text-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.75rem;
+  }
+  .text-links a {
+    text-decoration: none;
+    opacity: 0.8;
+  }
+  .text-links a:hover {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>
