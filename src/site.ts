@@ -31,7 +31,7 @@ export const site = {
 
   /** Full-bleed background. Video wins over image when both are set. */
   background: {
-    video: { mp4: "/video/bg-1080.mp4", mobile: "/video/bg-720.mp4", poster: "/video/bg-poster.jpg" },
+    video: { mp4: "/video/bg-1080.mp4", mobile: "/video/bg-mobile.mp4", poster: "/video/bg-poster.jpg" },
   } as Background,
 
   release: {
@@ -59,6 +59,12 @@ export const site = {
     { label: "Instagram", href: "https://www.instagram.com/leon/" },
     { label: "Facebook", href: "https://www.facebook.com/itsleonleon" },
     // TODO: TikTok, YouTube (not verified yet)
+  ] as Link[],
+
+  contact: [
+    { label: "Management", href: "mailto:oskar@arketyp.se" },
+    // TODO: real booking contact (The Team)
+    { label: "Booking", href: "mailto:info@leon.site" },
   ] as Link[],
 
   newsletter: {

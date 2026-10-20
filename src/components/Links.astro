@@ -15,7 +15,11 @@ const { title, links } = Astro.props;
     {
       links.map((l) => (
         <li>
-          <a class="button" href={l.href} target="_blank" rel="me noopener">
+          <a
+            class="button"
+            href={l.href}
+            {...(l.href.startsWith("http") ? { target: "_blank", rel: "me noopener" } : {})}
+          >
             {l.label}
           </a>
         </li>
