@@ -7,7 +7,7 @@ const { title, success, consent } = site.newsletter;
 <section id="newsletter" class="newsletter" aria-labelledby="newsletter-title" data-success={success}>
   <h2 id="newsletter-title" class="caps-label section-title">{title}</h2>
   <form method="post" action="/api/subscribe" data-newsletter>
-    <input type="hidden" name="source" value="website" />
+    <input type="hidden" name="source" value="Hemsida" />
     <!-- Honeypot -->
     <label class="visually-hidden" aria-hidden="true">
       Company <input type="text" name="company" tabindex="-1" autocomplete="off" />

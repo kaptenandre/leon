@@ -1,20 +1,14 @@
 import type { APIRoute } from "astro";
+import { parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js";
 import { subscribe, SubscribeError } from "../../lib/mailchimp";
 
 export const prerender = false;
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Light normalisation: keep digits and a leading +, convert 00 prefix. */
-function normalisePhone(raw: string): string | undefined {
-  const trimmed = raw.trim();
-  if (!trimmed) return undefined;
-  let phone = trimmed.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
-  if (phone.startsWith("00")) phone = `+${phone.slice(2)}`;
-  return phone;
-}
+type NetlifyLocals = { netlify?: { context?: { geo?: { country?: { code?: string } }; ip?: string } } };
 
-export const POST: APIRoute = async ({ request, redirect }) => {
+export const POST: APIRoute = async ({ request, redirect, locals, clientAddress }) => {
   const wantsJson = request.headers.get("accept")?.includes("application/json");
   const reply = (ok: boolean, error?: string, status = ok ? 200 : 400) =>
     wantsJson
@@ -31,19 +25,36 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   // Honeypot: pretend success so bots move on.
   if (String(form.get("company") ?? "").trim()) return reply(true);
 
+  // Visitor country and IP from Netlify's edge, for segmentation and phone parsing.
+  const ctx = (locals as NetlifyLocals).netlify?.context;
+  const geoCountry = (ctx?.geo?.country?.code || request.headers.get("x-country") || "").toUpperCase();
+  const country = /^[A-Z]{2}$/.test(geoCountry) ? geoCountry : undefined;
+  let ip = ctx?.ip || request.headers.get("x-nf-client-connection-ip") || undefined;
+  if (!ip) {
+    try {
+      ip = clientAddress;
+    } catch {
+      // Not available in every runtime.
+    }
+  }
+
   const email = String(form.get("email") ?? "").trim();
-  const phoneRaw = String(form.get("phone") ?? "");
-  const phone = normalisePhone(phoneRaw);
+  const phoneRaw = String(form.get("phone") ?? "").trim();
   const source = String(form.get("source") ?? "website").trim().slice(0, 40);
 
   if (!EMAIL.test(email) || email.length > 254) return reply(false, "Please enter a valid email.");
-  if (phoneRaw.trim() && (!phone || !/^\+?\d{6,15}$/.test(phone))) {
-    return reply(false, "Please enter a valid phone number.");
+
+  let phone: string | undefined;
+  if (phoneRaw) {
+    // Numbers without a country code are read as local to the visitor's country.
+    const parsed = parsePhoneNumberFromString(phoneRaw.replace(/^00/, "+"), (country as CountryCode) || undefined);
+    if (!parsed?.isValid()) return reply(false, "Please enter a valid phone number, including country code.");
+    phone = parsed.number;
   }
   if (!form.get("consent")) return reply(false, "Please accept the terms to sign up.");
 
   try {
-    await subscribe({ email, phone, source }, process.env);
+    await subscribe({ email, phone, country, ip, source }, process.env);
     return reply(true);
   } catch (err) {
     if (err instanceof SubscribeError) return reply(false, err.message, err.status);

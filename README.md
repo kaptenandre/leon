@@ -12,7 +12,7 @@ Everything lives in `src/site.ts`:
 
 ## Signup (Mailchimp)
 
-The form posts to `/api/subscribe` (Netlify function), which upserts the contact in Mailchimp with email, phone (merge field `PHONE`) and the tag `website`. Set these in Netlify under Site configuration > Environment variables (see `.env.example`):
+The form posts to `/api/subscribe` (Netlify function), which upserts the contact in Mailchimp with email, phone (E.164, merge field `PHONE`, also opted into Mailchimp SMS), country from the visitor's IP (merge field `COUNTRY`, plus `ip_signup` for Mailchimp's own location segments) and the tag `Hemsida`. If Mailchimp rejects the SMS opt-in, the email signup is kept. Set these in Netlify under Site configuration > Environment variables (see `.env.example`):
 
 | Variable | |
 | --- | --- |
@@ -21,6 +21,7 @@ The form posts to `/api/subscribe` (Netlify function), which upserts the contact
 | `MAILCHIMP_DOUBLE_OPTIN` | `true` = confirmation email first |
 | `MAILCHIMP_SMS` | `true` = also opt the number into Mailchimp SMS |
 | `MAILCHIMP_PHONE_FIELD` | Merge field for the number (default `PHONE`) |
+| `MAILCHIMP_COUNTRY_FIELD` | Merge field for the country code (default `COUNTRY`) |
 | `MAILCHIMP_TAGS` | Tags, comma separated (default `website`) |
 
 The provider sits in `src/lib/mailchimp.ts`. Switching provider later means replacing that module only.

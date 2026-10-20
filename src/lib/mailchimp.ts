@@ -2,7 +2,15 @@
 // the API route only depends on `subscribe()` and `SubscribeError`.
 import { createHash } from "node:crypto";
 
-export type Signup = { email: string; phone?: string; source?: string };
+export type Signup = {
+  email: string;
+  /** E.164, e.g. +46701234567 */
+  phone?: string;
+  /** ISO 3166-1 alpha-2 from the visitor's IP, e.g. "SE" */
+  country?: string;
+  ip?: string;
+  source?: string;
+};
 
 export class SubscribeError extends Error {
   readonly status: number;
@@ -29,20 +37,33 @@ export async function subscribe(signup: Signup, env: Env): Promise<void> {
     Authorization: `Basic ${btoa(`anystring:${apiKey}`)}`,
     "Content-Type": "application/json",
   };
-  const phoneField = env.MAILCHIMP_PHONE_FIELD || "PHONE";
+
+  const mergeFields: Record<string, string> = {};
+  if (signup.phone) mergeFields[env.MAILCHIMP_PHONE_FIELD || "PHONE"] = signup.phone;
+  if (signup.country) mergeFields[env.MAILCHIMP_COUNTRY_FIELD || "COUNTRY"] = signup.country;
 
   const member: Record<string, unknown> = {
     email_address: signup.email,
     status_if_new: env.MAILCHIMP_DOUBLE_OPTIN === "true" ? "pending" : "subscribed",
-    merge_fields: signup.phone ? { [phoneField]: signup.phone } : {},
+    merge_fields: mergeFields,
   };
-  if (signup.phone && env.MAILCHIMP_SMS === "true") {
-    member.sms_phone_number = signup.phone;
-    member.sms_subscription_status = "subscribed";
-  }
+  // Lets Mailchimp geolocate the contact for its built-in location segments.
+  if (signup.ip) member.ip_signup = signup.ip;
+
+  const withSms = !!signup.phone && env.MAILCHIMP_SMS === "true";
+  const put = (body: Record<string, unknown>) =>
+    fetch(`${base}/${hash}`, { method: "PUT", headers, body: JSON.stringify(body) });
 
   // PUT upserts, so returning fans don't get a "Member Exists" error.
-  const res = await fetch(`${base}/${hash}`, { method: "PUT", headers, body: JSON.stringify(member) });
+  let res = await put(
+    withSms ? { ...member, sms_phone_number: signup.phone, sms_subscription_status: "subscribed" } : member,
+  );
+  if (!res.ok && withSms) {
+    // SMS can be rejected (no SMS program for that country, etc). Keep the email signup.
+    const body = (await res.json().catch(() => ({}))) as { title?: string; detail?: string };
+    console.error("Mailchimp SMS rejected, retrying without SMS", res.status, body.title, body.detail);
+    res = await put(member);
+  }
   if (!res.ok) {
     const body = (await res.json().catch(() => ({}))) as { title?: string; detail?: string };
     console.error("Mailchimp error", res.status, body.title, body.detail);
