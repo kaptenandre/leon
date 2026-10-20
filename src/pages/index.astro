@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import Release from "../components/Release.astro";
 import Newsletter from "../components/Newsletter.astro";
 import Links from "../components/Links.astro";
+import Credit from "../components/Credit.astro";
 import { site } from "../site";
 ---
 
@@ -12,4 +13,5 @@ import { site } from "../site";
   <Links title="Listen" links={site.streaming} />
   <Newsletter />
   <Links title="Contact" links={site.contact} variant="text" />
+  <Credit />
 </Base>
