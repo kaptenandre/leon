@@ -50,7 +50,7 @@ const jsonLd = {
   :root {
     --fg: #fff;
     --bg: #000;
-    --overlay: #00000080;
+    --overlay: transparent;
     --font-sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
     --gutter: 16px;
     --caps-tracking: 0.06em;
@@ -148,6 +148,12 @@ const jsonLd = {
     transition:
       background-color 0.15s,
       color 0.15s;
+  }
+  .name,
+  .section-title,
+  .button:not(.primary, :hover),
+  .newsletter .consent {
+    text-shadow: 0 0 10px #00000080;
   }
   .button.primary,
   .button:hover {

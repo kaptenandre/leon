@@ -31,7 +31,7 @@ export const site = {
 
   /** Full-bleed background. Video wins over image when both are set. */
   background: {
-    image: "/release/dirt.jpg",
+    video: { mp4: "/video/bg-1080.mp4", mobile: "/video/bg-720.mp4", poster: "/video/bg-poster.jpg" },
   } as Background,
 
   release: {
@@ -51,13 +51,13 @@ export const site = {
     { label: "Spotify", href: "https://open.spotify.com/artist/4SqTiwOEdYrNayaGMkc7ia" },
     { label: "Apple Music", href: "https://music.apple.com/se/artist/l%C3%A9on/1065692205" },
     { label: "Deezer", href: "https://www.deezer.com/artist/8005464" },
+    { label: "SoundCloud", href: "https://soundcloud.com/itsleonleon" },
     // TODO: Tidal, YouTube Music, Amazon Music
   ] as Link[],
 
   socials: [
     { label: "Instagram", href: "https://www.instagram.com/leon/" },
     { label: "Facebook", href: "https://www.facebook.com/itsleonleon" },
-    { label: "X", href: "https://x.com/itsleonleon" },
     // TODO: TikTok, YouTube (not verified yet)
   ] as Link[],
 
