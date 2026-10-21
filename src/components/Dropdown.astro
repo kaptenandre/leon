@@ -12,7 +12,7 @@ const { label, links, cta = false } = Astro.props;
 const external = (href: string) => (href.startsWith("http") ? { target: "_blank", rel: "me noopener" } : {});
 ---
 
-<!-- Shared name: opening one closes the other (native exclusive accordion). -->
+<!-- Shared name keeps one open at a time without JS; the script below takes over and animates. -->
 <details class="dropdown" name="menu">
   <summary class="button primary">
     <span {...cta ? { "data-cta": "" } : {}}>{label}</span>
@@ -20,18 +20,73 @@ const external = (href: string) => (href.startsWith("http") ? { target: "_blank"
       ><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg
     >
   </summary>
-  <ul class="buttons">
-    {
-      links.map((l) => (
-        <li>
-          <a class="button" href={l.href} {...external(l.href)}>
-            {l.label}
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <div class="panel">
+    <ul class="buttons">
+      {
+        links.map((l) => (
+          <li>
+            <a class="button" href={l.href} {...external(l.href)}>
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </details>
+
+<script>
+  const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const all = [...document.querySelectorAll<HTMLDetailsElement>("details.dropdown")];
+  const toggles = new Map<HTMLDetailsElement, (open: boolean) => void>();
+
+  all.forEach((d) => {
+    d.removeAttribute("name"); // exclusivity handled here so closing animates too
+    d.classList.add("js");
+    const summary = d.querySelector("summary")!;
+    const panel = d.querySelector<HTMLElement>(".panel")!;
+    let isOpen = d.open;
+    let anim: Animation | null = null;
+
+    const set = (open: boolean) => {
+      if (open === isOpen) return;
+      isOpen = open;
+      d.classList.toggle("is-open", open);
+      const from = anim ? panel.getBoundingClientRect().height : open ? 0 : panel.scrollHeight;
+      anim?.cancel();
+      if (open) d.open = true;
+      if (reduce) {
+        if (!open) d.open = false;
+        return;
+      }
+      const to = open ? panel.scrollHeight : 0;
+      anim = panel.animate({ height: [`${from}px`, `${to}px`] }, { duration: open ? 420 : 280, easing: EASE });
+      if (open) {
+        panel.querySelectorAll("li").forEach((li, i) =>
+          li.animate([{ opacity: 0, transform: "translateY(-8px)" }, { opacity: 1, transform: "none" }], {
+            duration: 360,
+            delay: 80 + i * 50,
+            easing: EASE,
+            fill: "backwards",
+          }),
+        );
+      }
+      anim.onfinish = () => {
+        anim = null;
+        if (!isOpen) d.open = false;
+      };
+    };
+
+    toggles.set(d, set);
+    summary.addEventListener("click", (e) => {
+      e.preventDefault();
+      const open = !isOpen;
+      if (open) all.forEach((other) => other !== d && toggles.get(other)?.(false));
+      set(open);
+    });
+  });
+</script>
 
 <style>
   summary {
@@ -48,31 +103,20 @@ const external = (href: string) => (href.startsWith("http") ? { target: "_blank"
     width: 12px;
     height: 8px;
     margin-top: -4px;
-    transition: transform 0.2s;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .dropdown[open] .chevron {
+  .dropdown.is-open .chevron,
+  .dropdown:not(.js)[open] .chevron {
     transform: rotate(180deg);
   }
-  .dropdown ul {
+  .panel {
+    overflow: hidden;
+  }
+  .panel ul {
     padding-top: 6px;
   }
-  .dropdown[open] ul {
-    animation: drop 0.25s ease-out;
-  }
-  @keyframes drop {
-    from {
-      opacity: 0;
-      transform: translateY(-4px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
   @media (prefers-reduced-motion: reduce) {
-    .dropdown[open] ul,
     .chevron {
-      animation: none;
       transition: none;
     }
   }
