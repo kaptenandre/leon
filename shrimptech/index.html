@@ -7,6 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Shrimptech Radio. Live 24/7 from downtown Shrimpville, USA. The tri-state's #1 shrimp station.">
 <meta name="theme-color" content="#0a0c16">
+<link rel="preconnect" href="https://dl.dropboxusercontent.com" crossorigin>
 <style>
   :root {
     /* Layout: flag bands top and bottom, rising-sun stage in the middle, a modern player under it.
@@ -285,6 +286,9 @@
   .play::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--red); animation: pulse 1.8s ease-out infinite; pointer-events: none; }
   .is-playing .play { background: var(--red); color: var(--cream); }
   .is-playing .play::before { animation: none; opacity: 0; }
+  /* tuning in: a ring runs round the button until the program is on */
+  .play::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--cream); opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .is-tuning .play::after { opacity: 1; animation: spin .8s linear infinite; }
   @keyframes pulse { from { transform: scale(.95); opacity: .9; } to { transform: scale(1.3); opacity: 0; } }
   .play-ico { width: 0; height: 0; margin-left: 5px; border-left: 20px solid currentColor; border-top: 12px solid transparent; border-bottom: 12px solid transparent; }
   .is-playing .play-ico { width: 18px; height: 22px; margin: 0; border: 0; background: linear-gradient(90deg, currentColor 0 35%, transparent 35% 65%, currentColor 65%); }
@@ -583,7 +587,11 @@ const RED = '#e8112d', CREAM = '#f4efe4', INK = '#0a0c16', RED_DEEP = '#7a0918';
 // The Shrimptech Radio episode loops on 106.9420. Sources are tried in order: the
 // full-quality file, then small preview encodes (used where the Dropbox host is
 // blocked), then the synth bed.
+// Stream encodes served next to the page come first (a nearby CDN seeks fast); the full
+// 320 kbps file on Dropbox and the small preview encodes are the fallbacks.
 const SHOW_SRC = [
+  { url: 'audio/shrimptech-radio.webm', type: 'audio/webm; codecs=opus' },
+  { url: 'audio/shrimptech-radio.mp3', type: 'audio/mpeg' },
   { url: 'https://dl.dropboxusercontent.com/scl/fi/zpqxtk2hz7lj90rg07met/Shrimptech-Radio-edit2.mp3?rlkey=niekuv5bfma230pzholloe7lv&dl=1', type: 'audio/mpeg' },
   { url: 'audio/shrimptech-radio-preview.webm', type: 'audio/webm; codecs=opus' },
   { url: 'audio/shrimptech-radio-preview.mp3', type: 'audio/mpeg' },
@@ -926,7 +934,7 @@ const MIDI_FILES = [
   ['PYRAMID OF HEALTH', '04-pyramid-of-health'], ['DIRTY BOYZ', '05-dirty-boyz'], ['MEDICINE FOR HORSES', '06-medicine-for-horses'],
   ['WATERBOY', '07-waterboy'], ['STORE POLICY', '08-store-policy'], ['YOU N33D ME', '09-you-n33d-me'],
   ['BEST IN SHOW PT. IV', '10-best-in-show-pt-iv'], ['RIVER KING', '11-river-king'],
-].slice(0, 3).map(([title, file]) => ({ title, url: `midi/${file}.mid` }));  // the rest are still being transcribed
+].map(([title, file]) => ({ title, url: `midi/${file}.mid` }));
 
 // `src`: a list of { url, type } to loop. Every visitor joins at the same spot
 // (wall clock + `offset`, modulo the loop length), so it plays like a live stream
@@ -1126,6 +1134,7 @@ let playing = false, vol = 0.8;
 let gen = null, talkStop = null, pendingStart = 0;
 let startSeq = 0, resuming = false;  // a tap while the audio context wakes up must not start a second stream
 let lofi = false;                    // CONTINUE IN EXTREME LOW QUALITY AUDIO (see the fan gate)
+let tuning = false;                  // playing, but the program hasn't started yet
 const wall = () => ctx.currentTime + offset;
 
 function ensureCtx() {
@@ -1499,6 +1508,8 @@ async function loadMidiSongs(files) {
     return { title: f.title, by: f.by || 'VIAGRA BOYS', len, events: midiEvents(notes) };
   }));
 }
+let midiReady = null;
+const midiSongs = (files) => (midiReady ??= loadMidiSongs(files));
 function midiTimeline(songs) {
   const ev = [], marks = [];
   let t = 0;
@@ -1515,6 +1526,7 @@ function midiGen(ch) {
   let loop = null, dead = false;
   const begin = (songs, placeholder) => {
     if (dead) return;
+    onAir();
     const { ev, marks, L } = midiTimeline(songs);
     const showSong = (song) => {
       setLcdBase(placeholder ? `♪ ${song.title} (${song.by}) · IN MIDI` : `♪ ${song.title} · ${song.by} · IN MIDI`);
@@ -1542,7 +1554,7 @@ function midiGen(ch) {
       }
     });
   };
-  if (ch.midi?.length) loadMidiSongs(ch.midi).then((songs) => begin(songs, false), () => begin(placeholderSongs(), true));
+  if (ch.midi?.length) midiSongs(ch.midi).then((songs) => begin(songs, false), () => begin(placeholderSongs(), true));
   else begin(placeholderSongs(), true);
   return { bus, stop() { dead = true; loop?.(); tm.clear(); fadeOut(bus); } };
 }
@@ -1580,11 +1592,13 @@ function windGen() {
 // Real barks: single barks cut from recordings into one sprite, [offset, duration] in seconds.
 const DOG_SPRITE = { url: 'audio/k-dog-barks.mp3', segs: {"big":[[0.0,0.185],[0.265,0.205],[0.549,0.185],[0.814,0.185],[1.079,0.255],[1.413,0.155],[1.648,0.284],[2.012,0.165],[2.257,0.205],[2.542,0.175],[2.796,0.155],[3.031,0.235],[3.346,0.225],[3.65,0.255],[3.985,0.195],[4.259,0.215],[4.554,0.205],[4.839,0.205],[5.123,0.264],[5.468,0.694],[6.241,0.284],[6.606,0.205],[6.89,0.195],[7.165,0.235],[7.48,0.135],[7.694,0.225],[7.999,0.245],[8.323,0.264],[8.668,0.205],[8.953,0.235],[9.267,0.205],[9.552,0.185],[9.816,0.235],[10.131,0.235],[10.446,0.195],[10.72,0.195],[10.995,0.215],[11.289,0.245],[11.614,0.245],[11.939,0.205]],"small":[[12.223,0.394],[12.697,0.394],[13.172,0.165],[13.416,0.205],[13.701,0.564],[14.345,0.185],[14.609,0.245],[14.934,0.494],[15.508,0.175],[15.763,0.255],[16.097,0.215],[16.392,0.155],[16.626,0.175],[16.881,0.255],[17.216,0.175],[17.47,0.195],[17.745,0.594],[18.419,0.165],[18.663,0.185],[18.928,0.195],[19.203,0.165],[19.447,0.155],[19.682,0.175],[19.937,0.165],[20.182,0.175],[20.436,0.215],[20.731,0.175],[20.986,0.175],[21.24,0.624],[21.944,0.175],[22.199,0.175],[22.453,0.245],[22.778,0.175],[23.033,0.165],[23.277,0.215],[23.572,0.175],[23.827,0.165],[24.071,0.205],[24.356,0.175],[24.611,0.245]],"cry":[[24.935,0.185],[25.2,0.205],[25.484,0.195],[25.759,0.195],[26.034,0.195],[26.308,0.195],[26.583,0.205],[26.868,0.195],[27.142,0.155],[27.377,0.165]]} };
 let barkBuffer = null;
+let barkBytes = null;
+const fetchBarks = () => (barkBytes ??= fetch(DOG_SPRITE.url).then((r) => {
+  if (!r.ok) throw new Error(`${DOG_SPRITE.url}: ${r.status}`);
+  return r.arrayBuffer();
+}));
 function loadBarks() {
-  barkBuffer ??= fetch(DOG_SPRITE.url).then((r) => {
-    if (!r.ok) throw new Error(`${DOG_SPRITE.url}: ${r.status}`);
-    return r.arrayBuffer();
-  }).then((b) => ctx.decodeAudioData(b)).catch(() => null);
+  barkBuffer ??= fetchBarks().then((b) => ctx.decodeAudioData(b)).catch(() => null);
   return barkBuffer;
 }
 function playBark(out, buf, t, seg, rate, gain) {
@@ -1636,32 +1650,70 @@ function dogGen() {
 }
 
 // A real file, looped and joined at the wall-clock position. Tries each source in
-// order (the next one on error) and falls back to the synth when none plays.
+// order (the next one on error) and falls back to the synth when none plays. Takes the
+// warmed-up element for this channel when there is one (see warmUp).
 function fileGen(ch, fallback) {
-  const el = new Audio();
-  el.crossOrigin = 'anonymous'; el.loop = true; el.preload = 'auto';
+  const w = takeWarm(ch);
+  const el = w?.el || mediaEl();
   const node = ctx.createMediaElementSource(el), bus = makeBus(1);
   node.connect(bus);
-  const sources = ch.src.filter((s) => !s.type || el.canPlayType(s.type));
-  let dead = false, sub = null, i = 0, cc = 0;
+  const sources = w?.sources || playable(el, ch.src);
+  let dead = false, sub = null, i = w?.i ?? 0, cc = 0;
   const next = () => {
-    if (i < sources.length) { el.src = sources[i++].url; el.load(); } else sub = fallback();
+    if (i < sources.length) { el.src = sources[i++].url; el.load(); } else { sub = fallback(); onAir(); }
   };
-  el.addEventListener('loadedmetadata', () => {
+  const start = () => {
     if (dead || !isFinite(el.duration) || !el.duration) return;
     // Seek with the channel's fixed loop length, not this file's own duration: over
     // ~500,000 loops since 1970 a 0.01 s difference between encodes adds up to an hour.
-    el.currentTime = Math.min(loopPos(ch.loopLen || el.duration, ch.offset), el.duration - 0.25);
+    el.currentTime = livePos(ch, el);
     el.play().catch(() => {});
     lastCaption = undefined;
+    clearInterval(cc);
     if (ch.captions) cc = setInterval(() => showCaption(ch.captions, el.currentTime), 250);
-  });
+  };
+  el.addEventListener('loadedmetadata', start);
   el.addEventListener('error', () => { if (!dead) next(); });
-  next();
+  el.addEventListener('playing', () => { if (!dead) onAir(); });
+  el.addEventListener('waiting', () => { if (!dead) setTuning(true); });
+  if (w?.failed) next();
+  else if (!w) next();
+  else if (el.readyState >= 1) start();
   return {
     get bus() { return sub ? sub.bus : bus; },
     stop() { dead = true; clearInterval(cc); el.pause(); el.removeAttribute('src'); el.load(); fadeOut(bus); sub?.stop(); },
   };
+}
+const mediaEl = () => { const el = new Audio(); el.crossOrigin = 'anonymous'; el.loop = true; el.preload = 'auto'; return el; };
+const playable = (el, src) => src.filter((s) => !s.type || el.canPlayType(s.type));
+const livePos = (ch, el) => Math.min(loopPos(ch.loopLen || el.duration, ch.offset), el.duration - 0.25);
+
+// ---------- warm-up ----------
+// Before anyone presses play, the current show channel gets its audio element, pointed at
+// the stream and parked at the live position, so pressing play only has to start it. Done
+// once the page is idle, and again for a channel a finger or pointer is heading for.
+const warm = new Map();
+function warmUp(ch) {
+  if (!ch?.src || navigator.connection?.saveData) return;
+  const have = warm.get(ch.id);
+  if (have) {
+    // parked a while ago: move it back to live so it buffers what will actually play
+    if (have.el.readyState >= 1 && Date.now() - have.parked > 20000) { have.el.currentTime = livePos(ch, have.el); have.parked = Date.now(); }
+    return;
+  }
+  const el = mediaEl(), w = { el, sources: playable(el, ch.src), i: 0, parked: 0, failed: false, ac: new AbortController() };
+  const next = () => { if (w.i < w.sources.length) { el.src = w.sources[w.i++].url; el.load(); } else w.failed = true; };
+  el.addEventListener('error', next, { signal: w.ac.signal });
+  el.addEventListener('loadedmetadata', () => { el.currentTime = livePos(ch, el); w.parked = Date.now(); }, { signal: w.ac.signal });
+  warm.set(ch.id, w);
+  next();
+}
+function takeWarm(ch) {
+  const w = warm.get(ch.id);
+  if (!w) return null;
+  warm.delete(ch.id);
+  w.ac.abort();
+  return w;
 }
 
 // Closed captions from [start, end, text] rows sorted by start; cleared in the gaps.
@@ -1677,7 +1729,24 @@ function showCaption(rows, t) {
 
 function makeGen(ch) {
   const synth = () => (ch.gen === 'midi' ? midiGen(ch) : ch.gen === 'dogs' ? dogGen(ch) : ch.gen === 'wind' ? windGen(ch) : bedGen(ch));
-  return ch.src ? fileGen(ch, synth) : synth();
+  const g = ch.src ? fileGen(ch, synth) : synth();
+  // synths are on air at once; files when they play, the MIDI channel when its files are in
+  if (!ch.src && ch.gen !== 'midi') onAir();
+  return g;
+}
+function setTuning(on) {
+  tuning = on && playing;
+  document.body.classList.toggle('is-tuning', tuning);
+  playSub();
+}
+const onAir = () => setTuning(false);
+
+// Get what a channel needs before it is played: the show's stream, the MIDI files or the barks.
+function prepare(ch) {
+  if (!ch) return;
+  if (ch.src) warmUp(ch);
+  else if (ch.gen === 'midi' && ch.midi?.length) midiSongs(ch.midi).catch(() => {});
+  else if (ch.gen === 'dogs') fetchBarks().catch(() => {});
 }
 
 // ---------- the DJ (browser text-to-speech) ----------
@@ -1724,10 +1793,12 @@ function startTalk(ch) {
 function startChannel(withStatic) {
   stopChannel();
   const ch = current;
+  setTuning(true);
   if (withStatic) tuneStatic(ctx.currentTime + 0.02);
+  // start loading right away; the static covers the wait
+  gen = makeGen(ch);
   pendingStart = setTimeout(() => {
     if (!playing || ch !== current) return;
-    gen = makeGen(ch);
     zap(ctx.currentTime + 0.05);
     // a real show brings its own hosts, so the synth DJ only talks over synth channels
     if (!ch.src) talkStop = startTalk(ch);
@@ -1749,7 +1820,7 @@ async function startAudio() {
   document.body.classList.add('is-playing');
   playBtn.setAttribute('aria-pressed', 'true');
   playBtn.setAttribute('aria-label', 'Stop');
-  playSub();
+  setTuning(true);
   try { await ctx.resume(); } catch {}
   if (seq !== startSeq) return;
   resuming = false;
@@ -1760,6 +1831,7 @@ function stopAudio() {
   startSeq++;
   playing = false; resuming = false;
   stopChannel();
+  setTuning(false);
   document.body.classList.remove('is-playing');
   playBtn.setAttribute('aria-pressed', 'false');
   playBtn.setAttribute('aria-label', 'Listen live');
@@ -1864,6 +1936,12 @@ function tune(id, user = false) {
 }
 
 playBtn.addEventListener('click', () => (playing ? stopAudio() : startAudio()));
+// a pointer or finger heading for play or a channel is the cue to get it ready
+playBtn.addEventListener('pointerover', () => prepare(current));
+nav.addEventListener('pointerover', (e) => {
+  const a = e.target.closest('a[data-ch]');
+  if (a) prepare(CHANNELS.find((c) => c.id === a.dataset.ch));
+});
 $('#vol').addEventListener('input', (e) => {
   vol = Number(e.target.value) / 100;
   e.target.style.setProperty('--v', `${e.target.value}%`);
@@ -2056,7 +2134,7 @@ function setMaster() {
   if (master) master.gain.setTargetAtTime(vol * vol * (gate.hidden ? 1 : 0.12), ctx.currentTime, 0.05);
 }
 function playSub() {
-  $('#play-sub').textContent = !playing ? 'PRESS PLAY TO LISTEN' : lofi ? 'EXTREME LOW QUALITY · 8 KBPS' : 'LISTENING';
+  $('#play-sub').textContent = !playing ? 'PRESS PLAY TO LISTEN' : tuning ? 'TUNING IN...' : lofi ? 'EXTREME LOW QUALITY · 8 KBPS' : 'LISTENING';
 }
 function openGate() {
   gate.hidden = false;
@@ -2282,6 +2360,8 @@ window.shrimpRadio = {
 // ---------- start on the channel in the URL (?ch=k-dog or #k-dog) ----------
 const fromUrl = new URLSearchParams(location.search).get('ch') || location.hash.slice(1);
 tune(CHANNELS.some((c) => c.id === fromUrl) ? fromUrl : CHANNELS[0].id);
+// ...and get the channel on screen ready once the page has settled
+addEventListener('load', () => (window.requestIdleCallback ? requestIdleCallback(() => prepare(current), { timeout: 3000 }) : setTimeout(() => prepare(current), 1500)));
 </script>
 
 <script type="module">

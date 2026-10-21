@@ -14,7 +14,8 @@ npx serve shrimptech   # then open the printed URL
 - **3D shrimp**: Three.js 0.170 from jsDelivr through an import map. The shrimp is built in code (a segmented body swept along a curve, legs, swimmerets, antennae, rostrum, tail fan) with a clearcoat `MeshPhysicalMaterial` and a `RoomEnvironment` for reflections. Each channel swaps the look: natural, chrome, red wireframe, floppy ears and tongue (K-DOG), black lacquer. The canvas covers the window and the camera offset keeps the shrimp centered on `#stage` wherever it sits on the page. If WebGL or the CDN fails, a spinning emoji takes its place.
 - **Player**: play button, now playing, a live spectrum, volume and the five channel tiles. `?ch=wind` or `#wind` opens a channel. On phones the play row docks at the bottom of the screen and the channels become a swipeable row.
 - **Phones**: no bloom pass, a lower pixel ratio, and the 3D canvas scrolls with the page (ending in a fade under the stage) instead of chasing it from a fixed position. Rendering pauses while it is scrolled out of view.
-- **Fake live**: the episode loops from Dropbox (`SHOW_SRC`). Every visitor joins at `(now + offset) % SHOW_LEN`, so it plays like a live broadcast with no streaming server and each visitor downloads the file progressively. The host has to answer HTTP Range requests and send CORS headers; the `dl.dropboxusercontent.com` link does both. Sources are tried in order, so the small preview encodes in `audio/` take over when the full file can't play. `SHOW_LEN` is fixed so every source lands on the same second.
+- **Fake live**: the episode loops from `SHOW_SRC`. Every visitor joins at `(now + offset) % SHOW_LEN`, so it plays like a live broadcast with no streaming server and each visitor downloads the file progressively. Sources are tried in order: stream encodes next to the page (Opus 96 kbps, MP3 128 kbps), then the full 320 kbps file on Dropbox, then small preview encodes. A host has to answer HTTP Range requests (and send CORS headers when it is another origin, as `dl.dropboxusercontent.com` does). `SHOW_LEN` is fixed so every source lands on the same second.
+- **Fast start**: once the page is idle, the channel on screen gets its audio element, pointed at the stream and parked at the live position; a pointer or finger heading for play or a channel does the same for that channel (and fetches the MIDI files or the barks). Pressing play then only has to start it. Until the program is actually on, the play button shows a running ring and the player says TUNING IN. Streaming from Dropbox took 3 to 5.6 s to start; see the deploy notes below.
 - **Closed captions**: a TV-style CC box on the stage shows what is being said right now (`SHOW_CC`, transcribed with Whisper) and the song title during music. The ON AIR card shows who is in the studio at this point of the loop (`SHOW_GUESTS`).
 
 ## Channels
@@ -61,7 +62,7 @@ Shown in the captions while they play. Each block was matched against the album 
 | 1 | 81 Saw Lead | the vocal line, moved up an octave or two | Basic Pitch on the vocal stem |
 | 3 | 4 Electric Piano | guitars, synths and sax, up to three notes | Basic Pitch on the rest |
 
-How they were made: [Demucs](https://github.com/adefossez/demucs) (`htdemucs`) splits each master into drums, bass, vocals and other; the beat comes from the drum stem; [Basic Pitch](https://github.com/spotify/basic-pitch) (ONNX model) turns the pitched stems into notes; everything is snapped to a 16th-note grid and the grid is turned so the snare lands on 2 and 4. As a check, each note's pitch class is compared with the two strongest chroma bins of its stem at that moment.
+How they were made: [Demucs](https://github.com/adefossez/demucs) (`htdemucs`) splits each master into drums, bass, vocals and other; the beat comes from the drum stem; [Basic Pitch](https://github.com/spotify/basic-pitch) (ONNX model) turns the pitched stems into notes; everything is snapped to a 16th-note grid and the grid is turned so the snare lands on 2 and 4. A soft snare under a four-on-the-floor kick doesn't clear the snare rule, so when the snare band is clearly louder on every other beat, those beats get a snare wherever it rises. As a check, each note's pitch class is compared with the two strongest chroma bins of its stem at that moment: 97 to 100 % for the bass, 91 to 97 % for the vocal line and 74 to 98 % for the rest. River King has almost no drums, and Store Policy's snare is too faint to place.
 
 ## Fan gate
 
@@ -86,7 +87,14 @@ Captions and clips are generated from a Whisper transcript with word timestamps.
 
 ## Production notes
 
-- Hosting: static files on Netlify, published straight from this folder. Dropbox shared links have traffic limits, so for real traffic move the episode to Netlify or a CDN bucket (Cloudflare R2, Bunny), ideally re-encoded to 128 kbps (about 56 MB instead of 140 MB).
+- Hosting: static files on Netlify, published straight from this folder. The stream encodes and previews in `audio/` are too big for git, so they are uploaded with the deploy and not kept here. Make them from the episode with:
+
+  ```sh
+  ffmpeg -i Shrimptech-Radio-edit2.mp3 -c:a libopus -b:a 96k -vbr on -application audio -cues_to_front 1 -f webm audio/shrimptech-radio.webm
+  ffmpeg -i Shrimptech-Radio-edit2.mp3 -c:a libmp3lame -b:a 128k audio/shrimptech-radio.mp3
+  ```
+
+  Without them the page falls back to Dropbox, which works but starts slower and has traffic limits.
 - A real 24/7 stream with live DJs and a now-playing API would need Icecast or AzuraCast on a small VPS. The fake-live loop needs no server.
 - 3D: a sculpted shrimp (Blender, or bought) exported as Draco-compressed GLB would replace the procedural one. Load it with `GLTFLoader`.
 - iOS: the page sets `navigator.audioSession.type = 'playback'` so audio plays with the silent switch on (Safari 16.4+).
