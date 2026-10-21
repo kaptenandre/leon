@@ -7,13 +7,11 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Shrimptech Radio. Live 24/7 from downtown Shrimpville, USA. The tri-state's #1 shrimp station.">
 <meta name="theme-color" content="#0a0c16">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bungee&family=Monoton&family=VT323&display=swap">
 <style>
   :root {
-    /* Layout: flag bands top and bottom, rising-sun stage in the middle, flat console under it.
-       Palette: three colors (sun red, paper cream, ink). Chrome is only for the logo. */
+    /* Layout: flag bands top and bottom, rising-sun stage in the middle, a modern player under it.
+       Palette: three colors (sun red, paper cream, ink). Chrome is only for the logo.
+       Type: Helvetica only; weight, size and tracking do all the work. */
     --red: #e8112d;
     --cream: #f4efe4;
     --ink: #0a0c16;
@@ -21,12 +19,15 @@
     --red-deep: #7a0918;
     --ink-2: #141826;
     --cream-dim: rgba(244,239,228,.64);
-    --line: rgba(244,239,228,.2);
-    --font-display: "Anton", Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif;
-    --font-badge: "Bungee", "Arial Black", Impact, sans-serif;
-    --font-neon: "Monoton", "Bungee", "Arial Black", sans-serif;
-    --font-lcd: "VT323", "Courier New", ui-monospace, monospace;
-    --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --cream-faint: rgba(244,239,228,.07);
+    --line: rgba(244,239,228,.16);
+    --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --thin: 200;
+    --light: 300;
+    --medium: 500;
+    --bold: 700;
+    --label: .12em;   /* tracking for small caps labels */
+    --tight: -.03em;  /* tracking for big bold type */
     --gut-l: max(16px, env(safe-area-inset-left, 0px));
     --gut-r: max(16px, env(safe-area-inset-right, 0px));
     color-scheme: dark;
@@ -37,33 +38,33 @@
     margin: 0;
     background: var(--ink);
     color: var(--cream);
-    font-family: var(--font-body);
+    font-family: var(--font);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
+  button { font-family: inherit; }
   :focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 
   #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
   .app { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; }
   .band-in { padding-left: var(--gut-l); padding-right: var(--gut-r); }
   .star { color: var(--red); }
+  @keyframes blink { to { visibility: hidden; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ---------- top bar ---------- */
   .topbar {
     background: var(--ink);
     border-bottom: 4px solid transparent;
     border-image: repeating-linear-gradient(90deg, var(--red) 0 22px, var(--cream) 22px 44px) 4;
-    font-family: var(--font-badge);
-    font-size: 12px;
-    letter-spacing: .06em;
+    font-size: 11px; font-weight: var(--bold); letter-spacing: var(--label);
   }
   .topbar .band-in { display: flex; align-items: center; gap: 14px; min-height: 42px; padding-block: 6px; }
-  .live-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--red); color: var(--cream); padding: 3px 10px 3px 8px; border-radius: 3px; }
-  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--cream); animation: blink 1s steps(2, start) infinite; }
-  @keyframes blink { to { visibility: hidden; } }
+  .live-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--red); color: var(--cream); padding: 4px 10px 4px 8px; border-radius: 3px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cream); animation: blink 1s steps(2, start) infinite; }
   .onair {
-    font-family: var(--font-neon); font-size: 17px; line-height: 1.35; color: var(--cream);
-    padding: 0 8px; border: 2px solid var(--red); border-radius: 6px;
+    font-size: 14px; font-weight: var(--thin); letter-spacing: .28em; line-height: 1.5; color: var(--cream);
+    padding: 0 6px 0 10px; border: 2px solid var(--red); border-radius: 6px;
     text-shadow: 0 0 4px var(--cream), 0 0 12px var(--red), 0 0 26px var(--red);
     box-shadow: 0 0 12px var(--red), inset 0 0 10px rgba(232,17,45,.5);
     animation: flicker 6s infinite;
@@ -83,11 +84,11 @@
   .half { display: inline-flex; }
   @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-  .stocks { background: var(--ink); border-bottom: 1px solid var(--line); font-family: var(--font-lcd); font-size: 21px; }
+  .stocks { background: var(--ink); border-bottom: 1px solid var(--line); font-size: 14px; font-weight: var(--medium); }
   .stocks .band-in { display: flex; align-items: center; gap: 12px; height: 34px; }
-  .stocks-label { font-family: var(--font-badge); font-size: 11px; line-height: 1; white-space: nowrap; color: var(--cream); background: var(--red); padding: 5px 8px; border-radius: 3px; }
+  .stocks-label { font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); line-height: 1; white-space: nowrap; color: var(--cream); background: var(--red); padding: 5px 8px; border-radius: 3px; }
   .tk { padding-right: 30px; color: var(--cream-dim); font-variant-numeric: tabular-nums; }
-  .tk b { color: var(--cream); font-weight: 400; }
+  .tk b { color: var(--cream); font-weight: var(--bold); }
   .up { color: var(--cream); }
   .down { color: var(--red); }
 
@@ -96,8 +97,8 @@
     flex: 1; width: 100%; max-width: 1480px; margin: 0 auto;
     display: grid;
     grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(220px, 280px);
-    grid-template-rows: auto minmax(320px, 1fr) auto;
-    grid-template-areas: "brand brand brand" "left stage right" "console console console";
+    grid-template-rows: auto minmax(340px, 1fr) auto;
+    grid-template-areas: "brand brand brand" "left stage right" "player player player";
     gap: 10px 22px;
     padding-block: 14px 18px;
     padding-left: var(--gut-l);
@@ -107,18 +108,18 @@
   .onair-card { grid-area: left; align-self: center; }
   .stage { grid-area: stage; }
   .hotline { grid-area: right; align-self: center; }
-  .console { grid-area: console; }
+  .player { grid-area: player; }
   @media (max-width: 980px) {
     .deck {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       grid-template-rows: auto auto auto auto;
-      grid-template-areas: "brand brand" "stage stage" "console console" "left right";
+      grid-template-areas: "brand brand" "stage stage" "player player" "left right";
     }
     .stage { height: clamp(300px, 62vw, 520px); }
     .onair-card, .hotline { align-self: stretch; }
   }
   @media (max-width: 620px) {
-    .deck { grid-template-columns: minmax(0, 1fr); grid-template-areas: "brand" "stage" "console" "left" "right"; }
+    .deck { grid-template-columns: minmax(0, 1fr); grid-template-areas: "brand" "stage" "player" "left" "right"; }
     .stage { height: clamp(290px, 88vw, 430px); }
   }
 
@@ -127,8 +128,8 @@
   .logo { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
   .wordmark {
     position: relative; margin: 0;
-    font-family: var(--font-display); font-weight: 400;
-    font-size: clamp(54px, 7.4vw, 102px); line-height: .92; letter-spacing: .015em;
+    font-size: clamp(48px, 7vw, 96px); font-weight: var(--bold); line-height: .92; letter-spacing: -.045em;
+    padding-right: .06em;
     transform: skewX(-9deg);
     background: linear-gradient(180deg, #fff 0%, #eef2fb 26%, #9aa7c2 47%, #222a46 50%, #59678a 60%, #d9e1f0 84%, #fff 100%);
     -webkit-background-clip: text; background-clip: text;
@@ -145,36 +146,35 @@
     animation: shine 5s ease-in-out infinite;
   }
   @keyframes shine { 0%, 55% { background-position: 150% 0; } 100% { background-position: -50% 0; } }
-  .logo-row { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+  .logo-row { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
   .radio-banner {
-    font-family: var(--font-badge); font-size: clamp(15px, 2vw, 24px); letter-spacing: .12em;
+    font-size: clamp(13px, 1.6vw, 18px); font-weight: var(--bold); letter-spacing: .3em;
     color: var(--cream); background: var(--red);
-    padding: 4px 16px; border: 2px solid var(--cream);
+    padding: 5px 10px 5px 16px; border: 2px solid var(--cream);
     transform: skewX(-12deg);
     box-shadow: 4px 4px 0 var(--ink);
   }
   .freq {
-    font-family: var(--font-display); font-size: clamp(32px, 3.8vw, 50px); line-height: 1;
-    color: var(--cream); transform: skewX(-9deg);
+    font-size: clamp(30px, 3.6vw, 48px); font-weight: var(--thin); letter-spacing: -.02em; line-height: 1;
+    color: var(--cream); font-variant-numeric: tabular-nums;
     text-shadow: 3px 3px 0 var(--ink);
   }
-  .freq small { font-size: .45em; margin-left: 4px; letter-spacing: .05em; }
+  .freq small { font-size: .38em; font-weight: var(--bold); letter-spacing: var(--label); margin-left: 6px; }
   .slogan {
-    margin: 8px 0 0; padding: 4px 14px; border-radius: 999px;
+    margin: 8px 0 0; padding: 5px 14px; border-radius: 999px;
     background: var(--ink); color: var(--cream);
-    font-family: var(--font-badge); font-size: clamp(11px, 1.3vw, 14px); letter-spacing: .14em; text-wrap: balance;
+    font-size: clamp(10px, 1.1vw, 12px); font-weight: var(--bold); letter-spacing: .16em; text-wrap: balance;
   }
 
   /* starburst stickers */
   .burst { position: absolute; display: grid; place-items: center; width: 92px; aspect-ratio: 1; pointer-events: none; filter: drop-shadow(3px 3px 0 var(--ink)); }
   .burst-bg { position: absolute; inset: 0; border-radius: 50%; background: var(--cream); animation: spin 14s linear infinite; }
-  .burst-txt { position: relative; font-family: var(--font-badge); font-size: 15px; line-height: 1.02; color: var(--red); text-align: center; transform: rotate(-12deg); animation: throb 1.2s ease-in-out infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .burst-txt { position: relative; font-size: 14px; font-weight: var(--bold); letter-spacing: -.02em; line-height: 1; color: var(--red); text-align: center; transform: rotate(-12deg); animation: throb 1.2s ease-in-out infinite; }
   @keyframes throb { 50% { transform: rotate(-12deg) scale(1.1); } }
   .burst-live { top: -20px; right: -70px; }
   @media (max-width: 620px) {
-    .wordmark { font-size: 14.5vw; }
-    .burst-live { width: 62px; right: -6px; top: -30px; }
+    .wordmark { font-size: 11.5vw; }
+    .burst-live { width: 62px; right: -10px; top: -30px; }
     .burst-live .burst-txt { font-size: 11px; }
   }
 
@@ -193,17 +193,17 @@
       linear-gradient(var(--c), var(--c)) bottom right / var(--l) var(--w) no-repeat,
       linear-gradient(var(--c), var(--c)) bottom right / var(--w) var(--l) no-repeat;
   }
-  .bug { position: absolute; top: 20px; left: 20px; display: flex; font-family: var(--font-badge); font-size: 12px; }
-  .bug-live { display: inline-flex; align-items: center; gap: 6px; background: var(--red); padding: 4px 8px; }
-  .bug-cam { background: var(--ink); padding: 4px 8px; }
+  .bug { position: absolute; top: 20px; left: 20px; display: flex; font-size: 11px; font-weight: var(--bold); letter-spacing: var(--label); }
+  .bug-live { display: inline-flex; align-items: center; gap: 6px; background: var(--red); padding: 5px 8px; }
+  .bug-cam { background: var(--ink); padding: 5px 8px; }
   .badges { position: absolute; top: 20px; right: 20px; display: flex; gap: 4px; }
-  .badges span { font-family: var(--font-badge); font-size: 11px; padding: 3px 6px; border: 1.5px solid var(--cream); border-radius: 4px; background: var(--ink); }
+  .badges span { font-size: 10px; font-weight: var(--bold); letter-spacing: .08em; padding: 3px 6px; border: 1.5px solid var(--cream); border-radius: 4px; background: var(--ink); }
   .burst-3d { right: 7%; bottom: 26%; width: 88px; }
   .burst-3d .burst-bg { animation-direction: reverse; }
   .lower-third { position: absolute; left: 20px; right: 20px; bottom: 20px; max-width: 470px; display: grid; grid-template-columns: auto minmax(0, 1fr); }
-  .lt-tag { grid-row: 1 / 3; display: grid; place-items: center; padding: 0 12px; background: var(--red); color: var(--cream); font-family: var(--font-badge); font-size: 14px; }
-  .lt-main { background: var(--cream); color: var(--ink); font-family: var(--font-display); font-size: 24px; line-height: 1.2; padding: 2px 12px; letter-spacing: .02em; }
-  .lt-sub { background: var(--ink); font-family: var(--font-badge); font-size: 11px; letter-spacing: .08em; padding: 4px 12px; }
+  .lt-tag { grid-row: 1 / 3; display: grid; place-items: center; padding: 0 12px; background: var(--red); color: var(--cream); font-size: 12px; font-weight: var(--bold); letter-spacing: var(--label); }
+  .lt-main { background: var(--cream); color: var(--ink); font-size: 22px; font-weight: var(--bold); letter-spacing: var(--tight); line-height: 1.25; padding: 3px 12px 1px; }
+  .lt-sub { background: var(--ink); font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); padding: 5px 12px; }
   .stage-fallback { position: absolute; inset: 0; display: grid; place-items: center; font-size: 120px; opacity: 0; animation: fbIn .4s 2.5s forwards, spinY 3s linear infinite; pointer-events: none; }
   .gl-on .stage-fallback { display: none; }
   @keyframes fbIn { to { opacity: 1; } }
@@ -211,14 +211,24 @@
   @media (max-width: 620px) {
     .burst-3d { width: 70px; bottom: 30%; right: 4%; }
     .burst-3d .burst-txt { font-size: 12px; }
-    .lt-main { font-size: 20px; }
+    .lt-main { font-size: 19px; }
   }
 
   /* "Jamie, pull that up": the screen the studio doesn't have */
   .jamie { position: absolute; top: 56px; right: 20px; width: min(300px, 72%); background: var(--cream); color: var(--ink); border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--red); animation: jamieIn .25s ease-out; }
-  .jamie-tag { display: block; padding: 4px 8px; background: var(--red); color: var(--cream); font-family: var(--font-badge); font-size: 11px; letter-spacing: .08em; }
-  .jamie b { display: block; padding: 10px 12px 12px; font-family: var(--font-display); font-size: 24px; font-weight: 400; line-height: 1.05; }
+  .jamie-tag { display: block; padding: 5px 8px; background: var(--red); color: var(--cream); font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); }
+  .jamie b { display: block; padding: 10px 12px 12px; font-size: 22px; font-weight: var(--bold); letter-spacing: var(--tight); line-height: 1.05; }
   @keyframes jamieIn { from { transform: scale(.6) rotate(-4deg); opacity: 0; } }
+
+  /* closed captions, TV style, over the bottom of the stage */
+  .cc { position: absolute; left: 50%; bottom: 22px; z-index: 2; width: min(92%, 780px); transform: translateX(-50%); text-align: center; pointer-events: none; }
+  .cc span {
+    font-size: clamp(18px, 2.3vw, 30px); font-weight: var(--medium); line-height: 1.5; white-space: pre-line;
+    color: var(--cream); background: rgba(10,12,22,.9); padding: .1em .4em;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  }
+  .lower-third { transition: opacity .2s; }
+  .cc-on .lower-third { opacity: 0; }
 
   /* ---------- cards ---------- */
   .card {
@@ -226,24 +236,24 @@
     padding: 0 16px 16px;
     background: var(--ink-2); border: 1px solid var(--line); border-radius: 12px;
   }
-  .card-head { display: flex; align-items: center; gap: 8px; margin: 0 -16px 4px; padding: 8px 16px; background: var(--red); }
-  .card-head h2 { margin: 0; font-family: var(--font-badge); font-size: 14px; font-weight: 400; letter-spacing: .1em; }
-  .rec { width: 10px; height: 10px; border-radius: 50%; background: var(--cream); animation: blink 1s steps(2, start) infinite; }
-  .show { margin: 0; font-family: var(--font-display); font-size: 28px; line-height: 1.04; text-transform: uppercase; text-wrap: balance; }
-  .host { margin: 0; color: var(--cream-dim); font-size: 14px; }
-  .rating { margin: 0; color: var(--red); font-family: var(--font-badge); font-size: 10px; letter-spacing: .08em; }
+  .card-head { display: flex; align-items: center; gap: 8px; margin: 0 -16px 4px; padding: 9px 16px; background: var(--red); }
+  .card-head h2 { margin: 0; font-size: 11px; font-weight: var(--bold); letter-spacing: .16em; }
+  .rec { width: 9px; height: 9px; border-radius: 50%; background: var(--cream); animation: blink 1s steps(2, start) infinite; }
+  .show { margin: 0; font-size: 26px; font-weight: var(--bold); letter-spacing: var(--tight); line-height: 1; text-transform: uppercase; text-wrap: balance; }
+  .host { margin: 0; color: var(--cream-dim); font-size: 14px; font-weight: var(--light); }
+  .rating { margin: 0; color: var(--red); font-size: 10px; font-weight: var(--bold); letter-spacing: .08em; }
   .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 2px 0 0; }
   .stats div, .wx-card { background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
-  .stats dt { font-family: var(--font-badge); font-size: 10px; letter-spacing: .08em; color: var(--red); }
-  .stats dd { margin: 0; font-family: var(--font-lcd); font-size: 26px; line-height: 1; font-variant-numeric: tabular-nums; }
-  .next { margin: 0; font-family: var(--font-badge); font-size: 11px; letter-spacing: .05em; line-height: 1.35; color: var(--cream-dim); }
-  .phone { margin: 0; font-family: var(--font-display); font-size: 36px; line-height: 1; letter-spacing: .02em; color: var(--red); white-space: nowrap; }
-  .call-btn { font-size: 13px; padding: 11px 14px; }
-  .call-status { margin: 0; min-height: 1.2em; font-family: var(--font-lcd); font-size: 21px; line-height: 1.05; color: var(--cream); }
-  .contest { margin: 0; font-size: 13px; line-height: 1.4; color: var(--cream-dim); }
-  .contest b { font-family: var(--font-badge); font-weight: 400; color: var(--cream); }
-  .wx-card { display: flex; align-items: center; gap: 10px; font-size: 12px; line-height: 1.3; color: var(--cream-dim); }
-  .wx-temp { font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--cream); }
+  .stats dt { font-size: 9px; font-weight: var(--bold); letter-spacing: var(--label); color: var(--red); }
+  .stats dd { margin: 2px 0 0; font-size: 24px; font-weight: var(--thin); letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .next { margin: 0; font-size: 10px; font-weight: var(--bold); letter-spacing: .08em; line-height: 1.45; color: var(--cream-dim); }
+  .phone { margin: 0; font-size: clamp(20px, 1.9vw, 27px); font-weight: var(--bold); letter-spacing: -.04em; line-height: 1; color: var(--red); white-space: nowrap; }
+  .call-btn { font-size: 11px; letter-spacing: var(--label); padding: 12px 14px; }
+  .call-status { margin: 0; min-height: 1.3em; font-size: 14px; font-weight: var(--medium); line-height: 1.25; color: var(--cream); }
+  .contest { margin: 0; font-size: 13px; font-weight: var(--light); line-height: 1.4; color: var(--cream-dim); }
+  .contest b { font-weight: var(--bold); color: var(--cream); }
+  .wx-card { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: var(--light); line-height: 1.3; color: var(--cream-dim); }
+  .wx-temp { font-size: 30px; font-weight: var(--thin); letter-spacing: -.03em; line-height: 1; color: var(--cream); }
 
   /* ---------- flat buttons ---------- */
   .btn {
@@ -251,7 +261,7 @@
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     border: 2px solid var(--cream); border-radius: 8px;
     background: var(--ink); color: var(--cream);
-    font-family: var(--font-badge); text-decoration: none; cursor: pointer;
+    font-weight: var(--bold); text-decoration: none; cursor: pointer;
     transition: background .15s, color .15s, border-color .15s, transform .08s;
   }
   .btn:hover { background: var(--cream); color: var(--ink); }
@@ -259,76 +269,67 @@
   .btn-red { background: var(--red); border-color: var(--red); }
   .btn-red:hover { background: var(--cream); border-color: var(--cream); color: var(--red); }
 
-  /* ---------- console ---------- */
-  .console { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px; border-radius: 14px; background: var(--ink-2); border: 1px solid var(--line); }
-  .faceplate { display: grid; grid-template-columns: auto auto minmax(0, 1fr) minmax(150px, 210px); align-items: center; gap: 16px; }
+  /* ---------- player ---------- */
+  .player { display: flex; flex-direction: column; gap: 14px; padding: 16px; border-radius: 20px; background: var(--ink-2); border: 1px solid var(--line); }
+  .player-main { display: grid; grid-template-columns: auto minmax(0, 1fr) auto minmax(120px, 180px); align-items: center; gap: 18px; }
   @media (max-width: 820px) {
-    .faceplate { grid-template-columns: auto minmax(0, 1fr); }
-    .lcd, .vol { grid-column: 1 / -1; }
+    .player-main { grid-template-columns: auto minmax(0, 1fr); gap: 14px; }
+    #spectrum { grid-column: 1 / -1; width: 100%; }
+    .vol { grid-column: 1 / -1; }
   }
-  .play { position: relative; width: 72px; height: 72px; padding: 0; border: 3px solid var(--cream); border-radius: 50%; cursor: pointer; display: grid; place-items: center; background: var(--red); }
-  .play::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 2px solid var(--red); animation: pulse 1.6s ease-out infinite; pointer-events: none; }
-  @keyframes pulse { from { transform: scale(.95); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
-  .play-ring { display: grid; place-items: center; }
-  .play-ico { width: 0; height: 0; margin-left: 6px; border-left: 22px solid var(--cream); border-top: 14px solid transparent; border-bottom: 14px solid transparent; }
-  .is-playing .play-ico { width: 22px; height: 26px; margin: 0; border: 0; background: linear-gradient(90deg, var(--cream) 0 36%, transparent 36% 64%, var(--cream) 64%); }
-  .play-label b { display: block; font-family: var(--font-display); font-size: 30px; font-weight: 400; line-height: 1; letter-spacing: .02em; white-space: nowrap; }
-  .play-label span { font-family: var(--font-badge); font-size: 11px; letter-spacing: .08em; color: var(--red); white-space: nowrap; }
+  .play {
+    position: relative; width: 64px; height: 64px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+    display: grid; place-items: center; background: var(--cream); color: var(--ink);
+    transition: transform .15s, background .15s;
+  }
+  .play:hover { transform: scale(1.05); }
+  .play::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--red); animation: pulse 1.8s ease-out infinite; pointer-events: none; }
+  .is-playing .play { background: var(--red); color: var(--cream); }
+  .is-playing .play::before { animation: none; opacity: 0; }
+  @keyframes pulse { from { transform: scale(.95); opacity: .9; } to { transform: scale(1.3); opacity: 0; } }
+  .play-ico { width: 0; height: 0; margin-left: 5px; border-left: 20px solid currentColor; border-top: 12px solid transparent; border-bottom: 12px solid transparent; }
+  .is-playing .play-ico { width: 18px; height: 22px; margin: 0; border: 0; background: linear-gradient(90deg, currentColor 0 35%, transparent 35% 65%, currentColor 65%); }
 
-  /* LED display */
-  .lcd {
-    position: relative; min-width: 0; overflow: hidden;
-    display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: center;
-    padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line);
-    background: var(--ink);
-    font-family: var(--font-lcd); font-size: 22px; line-height: 1.1;
-    color: var(--red); text-shadow: 0 0 6px rgba(232,17,45,.7);
-  }
-  .lcd::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.3) 0 1px, transparent 1px 3px); pointer-events: none; }
-  .lcd-lines { min-width: 0; }
-  .lcd-l1 { display: flex; gap: 12px; white-space: nowrap; overflow: hidden; }
-  .lcd-live { color: var(--cream); visibility: hidden; }
-  .is-playing .lcd-live { visibility: visible; animation: blink 1s steps(2, start) infinite; }
-  .lcd-l2 { white-space: nowrap; overflow: hidden; }
-  .lcd-l2 span { display: inline-block; }
-  .lcd-l2.scroll span { padding-left: 100%; animation: lcdScroll var(--d, 12s) linear infinite; }
-  .lcd-l2.pan span { animation: lcdPan var(--d, 4s) linear forwards; }
+  .now { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .now-meta { display: flex; align-items: center; gap: 10px; font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); color: var(--cream-dim); white-space: nowrap; overflow: hidden; }
+  @media (max-width: 480px) { #lcd-freq { display: none; } }
+  .live-tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--cream-dim); }
+  .live-tag i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .is-playing .live-tag { background: var(--red); border-color: var(--red); color: var(--cream); }
+  .is-playing .live-tag i { animation: blink 1s steps(2, start) infinite; }
+  .now-title { margin: 0; font-size: clamp(20px, 2.2vw, 28px); font-weight: var(--bold); letter-spacing: var(--tight); line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .now-line { font-size: 14px; font-weight: var(--light); line-height: 1.4; color: var(--cream); white-space: nowrap; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent); mask-image: linear-gradient(90deg, #000 92%, transparent); }
+  .now-line span { display: inline-block; }
+  .now-line.scroll span { padding-left: 100%; animation: lcdScroll var(--d, 12s) linear infinite; }
+  .now-line.pan span { animation: lcdPan var(--d, 4s) linear forwards; }
   @keyframes lcdScroll { to { transform: translateX(-100%); } }
   @keyframes lcdPan { 0%, 12% { transform: translateX(0); } 100% { transform: translateX(var(--shift, 0)); } }
-  #spectrum { width: 150px; height: 46px; display: block; }
-  @media (max-width: 820px) { #spectrum { width: 90px; } }
+  #spectrum { width: 140px; height: 40px; display: block; }
 
-  .vol { display: flex; align-items: center; gap: 10px; font-family: var(--font-badge); font-size: 11px; color: var(--cream-dim); }
-  .vol input { flex: 1; min-width: 0; accent-color: var(--red); }
+  .vol { display: flex; align-items: center; gap: 10px; font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); color: var(--cream-dim); }
+  .vol input { flex: 1; min-width: 0; height: 18px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+  .vol input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--cream) var(--v, 80%), var(--line) var(--v, 80%)); }
+  .vol input::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -5px; border-radius: 50%; background: var(--cream); border: 0; }
+  .vol input::-moz-range-track { height: 4px; border-radius: 2px; background: var(--line); }
+  .vol input::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--cream); }
+  .vol input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--cream); border: 0; }
 
-  .dial { position: relative; height: 48px; overflow: hidden; border-radius: 8px; border: 1px solid var(--line); background: var(--ink); }
-  .dial-band { position: absolute; left: 6px; font-family: var(--font-badge); font-size: 10px; color: var(--cream-dim); }
-  .dial-band.fm { top: 6px; }
-  .dial-band.am { bottom: 6px; }
-  .dial-track { position: absolute; inset: 0 26px 0 34px; }
-  .scale { position: absolute; left: 0; right: 0; height: 50%; font-family: var(--font-lcd); font-size: 16px; line-height: 1; color: var(--cream-dim); }
-  .scale::before { content: ""; position: absolute; left: 0; right: 0; height: 6px; background: repeating-linear-gradient(90deg, rgba(244,239,228,.35) 0 1px, transparent 1px 9px); }
-  .scale.fm { top: 0; }
-  .scale.fm::before { bottom: 0; }
-  .scale.am { bottom: 0; }
-  .scale.am::before { top: 0; }
-  .scale span { position: absolute; transform: translateX(-50%); }
-  .scale.fm span { top: 6px; }
-  .scale.am span { bottom: 6px; }
-  .mark { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--cream); }
-  .needle { position: absolute; top: 3px; bottom: 3px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--red); box-shadow: 0 0 10px var(--red); transition: left .8s cubic-bezier(.3, 1.5, .5, 1); }
-
-  /* channel buttons: same page, the three colors in a different order */
-  .channels { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  /* channel tiles: same page, the three colors in a different order */
+  .channels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
   @media (max-width: 980px) { .channels { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 480px) { .channels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .ch { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 3px; min-height: 60px; padding: 8px 12px 9px; text-align: left; }
-  .ch-freq { font-family: var(--font-display); font-size: 25px; line-height: 1; }
-  .ch-freq small { font-size: .5em; }
-  .ch-name { font-family: var(--font-badge); font-size: 11px; line-height: 1.1; letter-spacing: .03em; }
-  .ch-sun { position: absolute; right: 9px; top: 9px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid currentColor; background: repeating-conic-gradient(var(--a) 0 11.25deg, var(--b) 11.25deg 22.5deg); }
-  .ch[aria-current="true"] { background: var(--red); border-color: var(--red); color: var(--cream); }
-  .ch[aria-current="true"]:hover { background: var(--cream); border-color: var(--cream); color: var(--red); }
+  .ch {
+    position: relative; display: flex; flex-direction: column; gap: 5px; min-height: 64px; padding: 10px 12px;
+    border-radius: 12px; background: var(--cream-faint); color: var(--cream); text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .ch:hover { background: rgba(244,239,228,.14); }
+  .ch-freq { font-size: 22px; font-weight: var(--light); letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .ch-freq small { font-size: .45em; font-weight: var(--bold); letter-spacing: .08em; }
+  .ch-name { font-size: 9px; font-weight: var(--bold); letter-spacing: var(--label); line-height: 1.25; color: var(--cream-dim); }
+  .ch-sun { position: absolute; right: 10px; top: 10px; width: 18px; height: 18px; border-radius: 50%; box-shadow: 0 0 0 1.5px currentColor; background: repeating-conic-gradient(var(--a) 0 11.25deg, var(--b) 11.25deg 22.5deg); }
+  .ch[aria-current="true"] { background: var(--red); }
+  .ch[aria-current="true"] .ch-name { color: var(--cream); }
   .is-playing .ch[aria-current="true"] .ch-sun { animation: spin 4s linear infinite; }
 
   /* ---------- news crawl ---------- */
@@ -338,30 +339,38 @@
     background: var(--ink); border-block: 2px solid var(--red);
   }
   .news .band-in { display: flex; align-items: center; gap: 14px; height: 48px; }
-  .news-label { font-family: var(--font-badge); font-size: 12px; line-height: 1; white-space: nowrap; background: var(--red); color: var(--cream); padding: 6px 10px; transform: skewX(-10deg); animation: newsPulse 1.2s steps(2, start) infinite; }
+  .news-label { font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); line-height: 1.1; white-space: nowrap; background: var(--red); color: var(--cream); padding: 6px 10px; transform: skewX(-10deg); animation: newsPulse 1.2s steps(2, start) infinite; }
   @keyframes newsPulse { 50% { background: var(--cream); color: var(--red); } }
-  .news .track { font-family: var(--font-display); font-size: 23px; letter-spacing: .02em; }
+  .news .track { font-size: 18px; font-weight: var(--bold); letter-spacing: -.01em; }
   .item { padding-right: 34px; }
   .item::before { content: "\2605"; color: var(--red); margin-right: 14px; }
 
-  /* ---------- sponsors ---------- */
+  /* ---------- sponsors: one family, every weight ---------- */
   .sponsors { background: var(--cream); color: var(--ink); }
   .sponsors .band-in { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-block: 12px 14px; }
-  .sp-label { margin: 0; font-family: var(--font-badge); font-size: 11px; letter-spacing: .14em; text-align: center; }
+  .sp-label { margin: 0; font-size: 10px; font-weight: var(--bold); letter-spacing: .16em; text-align: center; text-wrap: balance; }
   .sp-row { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-  .sp { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 56px; padding: 6px 14px; border-radius: 8px; text-align: center; line-height: 1; border: 2px solid var(--ink); }
-  .sp b { font-weight: 400; }
-  .sp small { margin-top: 5px; font-family: var(--font-badge); font-size: 9px; letter-spacing: .07em; }
+  .sp { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 56px; padding: 7px 14px; border-radius: 8px; text-align: center; line-height: 1; border: 2px solid var(--ink); }
+  .sp { text-decoration: none; transition: transform .15s; }
+  .sp:hover { transform: translateY(-3px) rotate(-1deg); }
+  .sp b { font-weight: var(--bold); }
+  .sp small { margin-top: 6px; font-size: 8px; font-weight: var(--bold); letter-spacing: var(--label); }
   .sp.ink { background: var(--ink); color: var(--cream); }
   .sp.red { background: var(--red); border-color: var(--red); color: var(--cream); }
   .sp.paper { background: var(--cream); color: var(--ink); }
   .sp.paper-red { background: var(--cream); border-color: var(--red); color: var(--red); }
-  .sp .f-serif { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 20px; letter-spacing: .04em; }
-  .sp .f-italic { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 20px; }
-  .sp .f-display { font-family: var(--font-display); font-size: 22px; letter-spacing: .02em; }
-  .sp .f-badge { font-family: var(--font-badge); font-size: 15px; }
-  .sp .f-neon { font-family: var(--font-neon); font-size: 17px; }
-  .fine { margin: 0; font-family: var(--font-badge); font-size: 10px; letter-spacing: .06em; color: rgba(10,12,22,.6); text-align: center; text-wrap: balance; }
+  .sp .w-black { font-size: 21px; font-weight: var(--bold); letter-spacing: -.05em; }
+  .sp .w-bold-italic { font-size: 20px; font-weight: var(--bold); font-style: italic; letter-spacing: -.03em; }
+  .sp .w-wide { font-size: 14px; font-weight: var(--bold); letter-spacing: .2em; }
+  .sp .w-light-italic { font-size: 21px; font-weight: var(--light); font-style: italic; letter-spacing: -.02em; }
+  .sp .w-thin { font-size: 20px; font-weight: 100; letter-spacing: .28em; }
+  .sp .w-medium { font-size: 17px; font-weight: var(--medium); letter-spacing: .02em; }
+  .credits { display: flex; align-items: center; justify-content: center; gap: 16px; padding-top: 4px; }
+  .credit { display: block; color: var(--ink); opacity: .8; transition: opacity .15s; }
+  .credit:hover { opacity: 1; }
+  .credit svg { display: block; width: 20px; height: 20px; }
+  .credit.vb svg { width: 30px; height: 30px; }
+  .fine { margin: 0; font-size: 9px; font-weight: var(--bold); letter-spacing: .1em; color: rgba(10,12,22,.6); text-align: center; text-wrap: balance; }
 
   @media (prefers-reduced-motion: reduce) {
     .burst-bg, .burst-txt, .onair, .wordmark::after, .play::before, .news-label, .stage-fallback, .ch-sun { animation: none !important; }
@@ -378,7 +387,7 @@
     <div class="band-in">
       <span class="live-pill"><i class="dot"></i>LIVE</span>
       <span class="onair">ON AIR</span>
-      <span class="network">SHRIMP TECH ENTERPRISES PRESENTS <span class="star">&#9733;</span> SHRIMP TECH RADIO 106.9420 <span class="star">&#9733;</span> FOR YOU, BY US <span class="star">&#9733;</span> IN YOUR HOME OR AT YOUR HOUSE, EVERY DAY</span>
+      <span class="network">SHRIMPTECH ENTERPRISES PRESENTS <span class="star">&#9733;</span> SHRIMPTECH RADIO 106.9420 <span class="star">&#9733;</span> HOME OF VIAGRA BOYS <span class="star">&#9733;</span> FOR YOU, BY US <span class="star">&#9733;</span> IN YOUR HOME OR AT YOUR HOUSE, EVERY DAY</span>
       <span class="tb-right">
         <span class="clock" id="clock">--:--:-- ET</span>
         <span class="tb-wx">74&deg;F SUNNY</span>
@@ -408,7 +417,7 @@
 
     <aside class="card onair-card" aria-labelledby="onair-h">
       <div class="card-head"><span class="rec"></span><h2 id="onair-h">ON AIR NOW</h2></div>
-      <p class="show" id="show">Shrimp Tech Radio</p>
+      <p class="show" id="show">Shrimptech Radio</p>
       <p class="host" id="host">with your host Ron Dangle</p>
       <p class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; "IT TASTES LIKE WHAT IT IS"</p>
       <dl class="stats">
@@ -428,6 +437,7 @@
         <span class="lt-sub" id="lt-sub">ROTATING CONTINUOUSLY SINCE 1997</span>
       </div>
       <div class="jamie" id="jamie" hidden><span class="jamie-tag">JAMIE, PULL THAT UP</span><b id="jamie-text"></b></div>
+      <div class="cc" id="cc" hidden><span id="cc-text"></span></div>
       <div class="stage-fallback" aria-hidden="true">&#129424;</div>
     </div>
 
@@ -440,27 +450,16 @@
       <div class="wx-card"><span class="wx-temp">74&deg;</span><span>IT'S GETTING COLDER.<br>YOU CAN TELL IF YOU LOOK OUTSIDE.</span></div>
     </aside>
 
-    <section class="console" aria-label="Radio">
-      <div class="faceplate">
-        <button class="play" id="play" type="button" aria-pressed="false" aria-label="Listen live"><span class="play-ring"><span class="play-ico"></span></span></button>
-        <div class="play-label"><b id="play-text">LISTEN LIVE</b><span id="play-sub">TAP TO TUNE IN</span></div>
-        <div class="lcd">
-          <div class="lcd-lines">
-            <div class="lcd-l1"><span id="lcd-freq">104.7 FM</span><span id="lcd-call">WSHR</span><span>STEREO</span><span class="lcd-live">&#9679; LIVE</span></div>
-            <div class="lcd-l2" id="lcd-l2"><span id="lcd-text">PRESS PLAY TO TUNE IN</span></div>
-          </div>
-          <canvas id="spectrum" aria-hidden="true"></canvas>
+    <section class="player" aria-label="Radio player">
+      <div class="player-main">
+        <button class="play" id="play" type="button" aria-pressed="false" aria-label="Listen live"><span class="play-ico"></span></button>
+        <div class="now">
+          <div class="now-meta"><span class="live-tag"><i></i>LIVE</span><span id="lcd-freq">106.9420 FM</span><span id="play-sub">PRESS PLAY TO LISTEN</span></div>
+          <p class="now-title" id="now-title">Shrimptech Radio</p>
+          <div class="now-line" id="lcd-l2"><span id="lcd-text">Press play to tune in</span></div>
         </div>
+        <canvas id="spectrum" aria-hidden="true"></canvas>
         <label class="vol" for="vol"><span>VOL</span><input type="range" id="vol" min="0" max="100" value="80"></label>
-      </div>
-      <div class="dial" aria-hidden="true">
-        <span class="dial-band fm">FM</span><span class="dial-band am">AM</span>
-        <div class="dial-track">
-          <div class="scale fm" id="scale-fm"></div>
-          <div class="scale am" id="scale-am"></div>
-          <div id="marks"></div>
-          <div class="needle" id="needle"></div>
-        </div>
       </div>
       <nav class="channels" id="channels" aria-label="Channels"></nav>
     </section>
@@ -475,18 +474,22 @@
 
   <footer class="sponsors">
     <div class="band-in">
-      <p class="sp-label">SHRIMP TECH RADIO IS BROUGHT TO YOU BY SHRIMP TECH ENTERPRISES &amp; SHRIMP TECH MICROSYSTEMS</p>
+      <p class="sp-label">SHRIMPTECH RADIO IS BROUGHT TO YOU BY VIAGRA BOYS, SHRIMPTECH ENTERPRISES &amp; SHRIMPTECH MICROSYSTEMS</p>
       <ul class="sp-row">
-        <li class="sp red"><b class="f-display">CHICKEN WATER</b><small>HOMEGROWN AMERICAN CHICKEN JUICE &middot; 60 OZ</small></li>
-        <li class="sp ink"><b class="f-serif">RAISIN RECYCLING SYSTEM</b><small>OLD RAISINS, MADE EVEN OLDER</small></li>
-        <li class="sp paper"><b class="f-badge">RUBBER BUCKET</b><small>FOLDS INTO YOUR TRAINING SHOES &middot; YEE-HAW</small></li>
-        <li class="sp paper-red"><b class="f-italic">Useless Bread</b><small>MADE WITH ABSOLUTELY NO FOOD</small></li>
-        <li class="sp ink"><b class="f-display">SAUCE SLAMMERS!</b><small>THE DARKER SAUCE WINS. ALWAYS.</small></li>
-        <li class="sp red"><b class="f-badge">SHRIMP TECH FROZEN SHRIMP</b><small>SHRIMPS WITH FACES. SHRIMPS WITH IDEAS.</small></li>
-        <li class="sp ink"><b class="f-neon">SHRIMPSCAPES</b><small>THE NEW ALBUM BY BOGDAN</small></li>
-        <li class="sp paper"><b class="f-serif">MILK TOKENS</b><small>ONE TOKEN, $652</small></li>
+        <li><a class="sp red" href="https://shop.vboysstockholm.com" target="_blank" rel="noopener"><b class="w-bold-italic">CHICKEN WATER</b><small>HOMEGROWN AMERICAN CHICKEN JUICE &middot; 60 OZ</small></a></li>
+        <li><a class="sp ink" href="https://shop.vboysstockholm.com" target="_blank" rel="noopener"><b class="w-black">RAISIN RECYCLING SYSTEM</b><small>OLD RAISINS, MADE EVEN OLDER</small></a></li>
+        <li><a class="sp paper" href="https://shop.vboysstockholm.com" target="_blank" rel="noopener"><b class="w-wide">RUBBER BUCKET</b><small>FOLDS INTO YOUR TRAINING SHOES &middot; YEE-HAW</small></a></li>
+        <li><a class="sp paper-red" href="https://shop.vboysstockholm.com" target="_blank" rel="noopener"><b class="w-light-italic">Useless Bread</b><small>MADE WITH ABSOLUTELY NO FOOD</small></a></li>
+        <li><a class="sp ink" href="https://shop.vboysstockholm.com" target="_blank" rel="noopener"><b class="w-bold-italic">SAUCE SLAMMERS!</b><small>THE DARKER SAUCE WINS. ALWAYS.</small></a></li>
+        <li><a class="sp red" href="https://shop.vboysstockholm.com" target="_blank" rel="noopener"><b class="w-wide">SHRIMPTECH FROZEN SHRIMP</b><small>SHRIMPS WITH FACES. SHRIMPS WITH IDEAS.</small></a></li>
+        <li><a class="sp ink" href="https://shop.vboysstockholm.com" target="_blank" rel="noopener"><b class="w-thin">SHRIMPSCAPES</b><small>THE NEW ALBUM BY BOGDAN</small></a></li>
+        <li><a class="sp paper" href="https://shop.vboysstockholm.com" target="_blank" rel="noopener"><b class="w-black">MILK TOKENS</b><small>ONE TOKEN, $652</small></a></li>
       </ul>
-      <p class="fine">&copy; 2026 SHRIMP TECH ENTERPRISES. A PARODY. THIS WEBSITE IS NOT A SUBSTITUTE FOR SPIRITUALITY. TRY TYPING SOMETHING YOU HEARD ON AIR.</p>
+      <p class="fine">&copy; 2026 SHRIMPTECH ENTERPRISES</p>
+      <div class="credits">
+        <a class="credit vb" href="https://www.vboysstockholm.com" target="_blank" rel="noopener" aria-label="Viagra Boys"><svg viewBox="0 0 814.26 813.99" fill="currentColor" aria-hidden="true"><path d="M321.78,121.1c.57,1.7,1.14,3.36,1.7,4.96.56,1.61,1.03,3.26,1.42,4.96,1.89,5.29,3.64,10.54,5.25,15.73,1.6,5.2,3.26,10.44,4.96,15.73.75,1.7,1.32,3.4,1.7,5.1.38,1.7.94,3.4,1.7,5.1,1.89,5.29,3.64,10.63,5.25,16.02,1.6,5.39,3.26,10.82,4.96,16.3,4.16,12.1,8.12,24.19,11.91,36.28,3.78,12.1,7.75,24.09,11.9,36,1.32,3.97,2.6,7.99,3.83,12.05,1.23,4.07,2.5,8.08,3.83,12.05.75,2.27,1.46,4.58,2.13,6.95.66,2.36,2.03,4.11,4.11,5.24,1.51.95,3.45,1.37,5.81,1.28,2.36-.09,4.58-.14,6.66-.14h20.41c1.7,0,3.5.05,5.39.14,1.89.1,3.59-.05,5.1-.43,2.83-.75,4.72-2.22,5.67-4.39.94-2.17,1.89-4.58,2.83-7.23,1.51-4.34,2.93-8.74,4.25-13.18,1.32-4.44,2.84-8.83,4.54-13.18,5.1-15.31,10.21-30.66,15.31-46.06,5.1-15.4,10.21-30.75,15.31-46.06,1.51-4.15,2.88-8.31,4.11-12.47,1.23-4.15,2.6-8.22,4.11-12.19.38-1.13.71-2.27.99-3.4.29-1.14.71-2.27,1.28-3.4,1.51-4.54,2.98-9.12,4.39-13.75,1.42-4.63,2.98-9.12,4.68-13.47.57-1.7,1.14-3.83,1.7-6.38.57-2.55-.1-4.3-1.98-5.25-1.13-.75-2.65-1.13-4.54-1.13h-30.19c-1.8,0-3.36.47-4.68,1.42-1.51.95-2.51,2.17-2.98,3.68-.47,1.52-1.09,3.03-1.84,4.54-.95,3.02-1.89,6-2.83,8.93-.95,2.93-1.89,5.91-2.84,8.93-4.16,12.47-8.18,24.9-12.05,37.27-3.88,12.38-7.89,24.8-12.05,37.28-1.51,4.35-2.83,8.6-3.97,12.76-1.13,4.16-2.46,8.22-3.97,12.19-.56,1.51-1.18,3.17-1.84,4.96-.66,1.8-2.03,2.69-4.11,2.69-.38-.38-.71-.61-.99-.71-.29-.09-.52-.33-.71-.71-.95-1.32-1.7-2.83-2.27-4.53-.57-1.7-1.14-3.4-1.7-5.1-.95-3.21-1.94-6.42-2.98-9.63-1.04-3.21-2.03-6.42-2.98-9.64-3.78-11.72-7.51-23.43-11.2-35.15-3.68-11.71-7.42-23.43-11.19-35.15-1.32-3.78-2.51-7.46-3.54-11.05-1.04-3.59-2.22-7.18-3.54-10.77-.76-2.08-1.42-4.15-1.99-6.24-.56-2.08-1.7-3.59-3.4-4.53-1.32-.94-3.07-1.42-5.24-1.42h-29.34c-.38.19-.81.24-1.27.14-.47-.09-.9-.04-1.28.14-1.89.38-3.12,1.23-3.69,2.55-.38.76-.52,1.61-.42,2.55.09.95.23,1.89.42,2.83Z"/><path d="M505.49,635.27c-.38-1.51-.66-3.07-.85-4.68-.19-1.6-.57-3.16-1.13-4.67-1.7-5.86-4.07-10.96-7.09-15.31-3.22-4.54-7.37-8.51-12.47-11.91-1.51-.94-3.31-1.94-5.38-2.98-2.08-1.04-3.31-2.31-3.69-3.83-.38-.94-.33-1.74.14-2.41.47-.66.9-1.18,1.28-1.56,1.13-1.51,2.45-2.74,3.97-3.68,1.51-.94,2.93-2.08,4.25-3.4,3.97-4.35,7.18-9.92,9.64-16.73.38-.94.61-1.93.71-2.98.09-1.04.33-2.22.71-3.54,0-.38.04-.94.14-1.7.09-.75.14-1.42.14-1.99v-2.55c.19-.38.33-.99.43-1.84.09-.85.04-1.56-.14-2.13-.19-.75-.24-1.51-.14-2.27.09-.75.05-1.51-.14-2.27-.38-1.51-.62-2.93-.71-4.25-.1-1.32-.33-2.64-.71-3.97-1.51-5.1-3.5-9.64-5.95-13.61-2.46-3.97-5.58-7.27-9.36-9.92-2.65-1.89-5.58-3.45-8.79-4.68-3.21-1.23-6.62-2.5-10.2-3.82-1.51-.38-2.98-.66-4.4-.85-1.42-.18-2.88-.47-4.39-.85-1.32-.38-2.6-.52-3.83-.42-1.23.1-2.41-.05-3.54-.43h-1.7c-.95-.18-1.89-.18-2.84,0-.95.19-1.89.1-2.83-.28-1.14-.19-2.37-.23-3.69-.14-1.32.1-2.65.14-3.97.14h-84.47c-.38.19-.76.24-1.13.14-.38-.09-.76-.04-1.14.14-2.08.57-3.5,1.52-4.25,2.84-.95,1.51-1.37,3.54-1.28,6.09.09,2.55.14,4.96.14,7.23v166.39c0,2.08-.05,4.68-.14,7.8-.1,3.12.14,5.43.71,6.94.94,2.27,2.5,3.54,4.68,3.83,2.17.28,4.86.43,8.08.43h82.77c.94,0,1.84.05,2.69.14.85.1,1.65.05,2.41-.14.94-.38,1.84-.47,2.69-.29.85.19,1.65.19,2.41,0,.94-.19,1.84-.28,2.69-.28s1.75-.09,2.69-.28c2.08-.38,4.25-.71,6.52-.99,2.27-.28,4.44-.8,6.52-1.56,4.15-1.32,8.08-2.79,11.76-4.39,3.69-1.6,7.13-3.54,10.35-5.81,8.31-6.05,14.46-13.79,18.43-23.24.57-1.51,1.04-3.12,1.42-4.82.38-1.7.75-3.49,1.13-5.39.38-1.89.71-4.53.99-7.94.29-3.4.23-6.14-.14-8.22v-3.12ZM380.62,567.38c.09-1.42.14-2.79.14-4.11v-21.4c0-1.98.47-3.64,1.42-4.96.75-1.13,2.08-1.98,3.97-2.55.38-.19.8-.28,1.27-.28s.9-.09,1.28-.29h24.09c2.64,0,5.43-.04,8.36-.14,2.93-.09,5.53.14,7.8.71,1.51,0,2.64.1,3.4.28,1.51.38,2.93.71,4.25.99,1.32.28,2.55.62,3.68.99,4.34,2.08,7.65,4.96,9.92,8.65,2.27,3.68,3.21,8.74,2.84,15.16-.38,3.97-1.23,7.19-2.55,9.64-2.84,4.73-7.09,8.04-12.76,9.92-2.08.76-4.54,1.27-7.37,1.56-2.84.28-5.81.42-8.93.42s-6.24-.04-9.36-.14c-3.12-.09-6.09-.14-8.93-.14-1.7,0-3.59.05-5.67.14-2.08.1-4.11.1-6.1,0-1.98-.09-3.78-.33-5.38-.71-1.61-.38-2.79-1.04-3.54-1.98-.38-.75-.66-1.56-.85-2.41-.19-.85-.47-1.84-.85-2.98v-2.84c-.19-.94-.24-2.12-.14-3.54ZM461.55,642.92v1.7c-.57,2.08-1.14,4.11-1.7,6.09-.56,1.99-1.32,3.73-2.27,5.25-2.27,3.4-5.25,5.91-8.93,7.51-3.69,1.61-7.89,2.74-12.61,3.4-4.73.66-9.74.95-15.02.85-5.29-.09-10.77-.14-16.44-.14-1.7,0-3.69.05-5.95.14-2.27.1-4.49.1-6.66,0-2.17-.09-4.11-.38-5.81-.85-1.7-.47-2.93-1.18-3.69-2.13-.95-1.32-1.47-3.16-1.56-5.53-.1-2.36-.14-4.68-.14-6.95v-31.89c0-2.36.47-4.3,1.42-5.81.75-1.32,2.27-2.27,4.54-2.84.38,0,.71.05.99.14.28.1.61-.04.99-.42h32.03c4.16,0,8.17.1,12.05.28,3.87.19,7.41.76,10.63,1.7,7.75,2.65,12.94,7.37,15.59,14.17.75,1.51,1.46,3.78,2.13,6.8.66,3.03.8,5.86.43,8.51Z"/><path d="M806.49,327.69c-7.54-38.29-20.54-74.65-38.61-109.28-18.35-35.15-41.73-66.57-68.99-95.22-10.08-10.6-21.1-20.18-32.34-29.53-31.78-26.44-66.81-47.49-105.05-63.14C515.52,11.7,467.6,1.81,417.98.17c-21.66-.72-43.24.82-64.72,3.59-30.22,3.9-59.58,11.28-88.13,21.92-25.09,9.35-49.1,20.92-71.78,35.15-33.5,21.02-63.9,45.72-90.09,75.52-11.52,13.11-22.47,26.62-32.28,41.03-29.23,42.99-49.96,89.74-61.2,140.56C3.63,345.73.05,373.83,0,402.33c-.02,12.64.25,25.25,1.31,37.88,2.04,24.43,5.97,48.51,12.41,72.15,8.46,31.01,20.16,60.72,35.57,89,16.91,31.03,37.56,59.29,61.66,85.05,12.29,13.14,25.56,25.25,39.51,36.65,24.72,20.19,51.59,37,80.2,50.96,21.75,10.61,44.45,18.9,67.83,25.27,33.51,9.14,67.66,13.81,102.35,14.62,18,.42,35.92-.85,53.81-2.87,26.33-2.97,52.1-8.52,77.33-16.6,28.74-9.21,56.08-21.52,82.08-36.86,25.76-15.2,49.49-33.1,71.38-53.41,13.19-12.23,25.28-25.52,36.76-39.41,24.35-29.45,43.92-61.8,59-96.83,22.07-51.25,32.82-104.91,33.05-152.34.05-35.13-2.59-61.65-7.77-87.9ZM193.96,604.83c.56,30.78,6.92,60.19,20.74,87.82,3.27,6.53,6.91,12.86,10.36,19.3,1.46,2.72,2.92,5.45,4.26,8.23.74,1.54,1.24,3.29.08,4.8-1.4,1.83-3.51,1.68-5.42,1.13-2.15-.62-4.28-1.41-6.26-2.43-2.99-1.54-5.92-3.23-8.76-5.05-19.66-12.63-38.1-26.86-55.11-42.9-17.2-16.22-33.19-33.5-47.12-52.68-19.13-26.32-34.21-54.74-45.38-85.27-9.89-27.02-16.63-54.85-20.39-83.33-2.76-20.89-4.55-41.91-3.7-63.02,1.78-44.52,10.89-87.39,28.94-128.28,16.13-36.54,37.79-69.48,63.85-99.66,25.17-29.15,53.91-54.04,87.08-73.7,38.6-22.87,80.07-38.09,124.18-46.06,29.1-5.26,34.42-5.58,60.87-5.64,11.82-.27,26.66.6,41.3,3.72,32.12,6.85,60.01,21.64,83.84,44.26,15.44,14.66,28.18,31.29,37.51,50.44,10.74,22.04,16.19,45.39,17.02,69.89.71,20.97-1.48,41.48-8.18,61.46-6.87,20.51-17.49,38.85-31.17,55.52-9.12,11.12-19.21,21.21-30.72,29.9-22.91,17.3-48.76,27.52-76.88,32.48-8.61,1.52-17.29,1.85-26,2.17-18.83.68-37.54,2.4-55.89,7.07-28.78,7.31-54.6,20.46-77.84,38.83-15.07,11.91-28.36,25.59-39.9,40.91-19.63,26.05-32.19,55.21-37.67,87.37-2.41,14.14-3.91,28.37-3.65,42.75ZM775.21,444.11c-1.16,16.55-4.06,32.88-7.87,49.05-11.18,47.48-32.01,90.39-60.88,129.56-15.04,20.41-31.56,39.52-50.11,56.81-21.06,19.63-44.14,36.45-69.37,50.39-40.33,22.29-83.47,35.96-128.86,42.97-14.74,2.27-29.61,3.1-45.53,3.03-29.05.88-57.84-4.65-84.53-18.69-38.96-20.51-67.63-50.77-83.85-92.04-7.87-20.03-11.69-40.94-11.99-62.57-.37-26.35,4.91-51.39,16.16-75.13,19.22-40.54,49.46-69.76,90.7-87.51,20.92-9,42.82-13.19,65.57-13.79,21.96-.58,43.64-3.34,64.84-9.61,24.56-7.26,47.12-18.42,67.18-34.25,31.77-25.09,55.22-56.55,70.13-94.23,6.87-17.36,10.34-35.52,12.21-54.08,1.84-18.31,1.04-36.46-1.58-54.6-3.87-26.8-13.45-51.54-26.82-74.95-2.09-3.65-4.05-7.39-5.93-11.15-.76-1.53-1.04-3.28.36-4.7,1.33-1.35,3.11-1.4,4.72-.86,2.39.79,4.81,1.65,6.96,2.92,6.05,3.57,12.12,7.13,17.9,11.1,25.83,17.71,49.32,38.19,70.31,61.41,18.91,20.92,35.04,43.9,48.27,68.84,20.63,38.91,33.06,80.4,39.44,123.88,2.45,16.73,3.13,33.55,4.21,50.36.82,12.65-.78,25.27-1.66,37.87Z"/></svg></a>
+        <a class="credit" href="https://arketypgroup.com" target="_blank" rel="noopener" aria-label="Arketyp Group"><svg viewBox="220 220 840 810" fill="currentColor" aria-hidden="true"> <path d="M234.137 711.538V595.875L1043.44 285.924V401.586L831.86 481.396V823.723L1043.44 901.201V1016.86L234.137 711.538ZM733.615 518.396L532.425 594.728C483.857 613.228 416.794 637.5 361.309 652.559V657.184C416.794 674.538 483.857 697.663 532.425 715.016L733.615 787.869V518.396Z" ></path> <path d="M234.137 289.512C234.137 257.433 260.03 231.718 292.101 231.718C324.171 231.718 349.879 257.433 349.879 289.512C349.879 321.591 324.171 347.64 292.101 347.64C260.03 347.64 234.137 321.591 234.137 289.512ZM341.15 289.512C341.15 261.873 319.547 239.34 292.101 239.34C264.654 239.34 242.719 261.873 242.719 289.512C242.719 317.151 264.469 340.018 292.101 340.018C319.732 340.018 341.15 317.003 341.15 289.512ZM268.131 256.323H296.392C308.931 256.323 317.365 263.316 317.365 275.045C317.365 283 312.593 288.698 306.897 291.251V291.399C312.297 293.138 315.774 297.134 316.255 305.2L316.736 315.523C316.884 318.705 317.365 321.406 317.994 322.516V322.997H308.006C307.378 320.925 307.045 318.409 306.897 315.523L306.416 306.162C306.083 298.207 301.977 295.691 294.209 295.691H277.711V322.997H268.168V256.323H268.131ZM307.821 276.007C307.821 269.014 303.05 264.093 294.801 264.093H277.638V287.921H294.801C303.05 287.921 307.821 283.148 307.821 276.007Z" ></path> </svg></a>
+      </div>
     </div>
   </footer>
 </div>
@@ -508,7 +511,7 @@
 const RED = '#e8112d', CREAM = '#f4efe4', INK = '#0a0c16', RED_DEEP = '#7a0918';
 
 // ---------- the show ----------
-// The Shrimp Tech Radio episode loops on 106.9420. Sources are tried in order: the
+// The Shrimptech Radio episode loops on 106.9420. Sources are tried in order: the
 // full-quality file, then small preview encodes (used where the Dropbox host is
 // blocked), then the synth bed.
 const SHOW_SRC = [
@@ -529,8 +532,8 @@ const SHOW_GUESTS = [
 ];
 // Closed captions [start, end, text] and sound clips, both from the episode transcript.
 const SHOW_CC = [
-  [0,187.2,"♪ SHRIMP TECH RADIO ♪"],
-  [187.44,191.28,"Listening to Shrimp Tech Radio 106.9420."],
+  [0,187.2,"♪ VIAGRA BOYS: MAN MADE OF MEAT ♪"],
+  [187.44,191.28,"Listening to Shrimptech Radio 106.9420."],
   [191.38,193.06,"Ladies and gentlemen, this is Ron Dangle."],
   [193.2,196.72,"I'm joined in the studio by Bogdan, who's actually my dog's veterinarian."],
   [196.94,200.18,"He took a few minutes off of his busy schedule to come to the studio"],
@@ -547,9 +550,9 @@ const SHOW_CC = [
   [234.78,239.2,"free anymore? I don't know they are scheduled to be free again fourth"],
   [239.2,242.22,"of July next summer, but I don't know now We will see."],
   [242.6,243.78,"OK, thank you so much, Bogdan."],
-  [243.88,247.08,"I'm a convicted felon and you're listening to Shrimp Tech Radio."],
-  [247.3,372.2,"♪ MUSIC ♪"],
-  [372.22,376.62,"I talk about Swedish politics You are listening to Shrimp Tech Radio"],
+  [243.88,247.08,"I'm a convicted felon and you're listening to Shrimptech Radio."],
+  [247.3,372.2,"♪ VIAGRA BOYS: UNO II ♪"],
+  [372.22,376.62,"I talk about Swedish politics You are listening to Shrimptech Radio"],
   [376.62,383.76,"106.9420 okay we're back in the studio with Bogdan and okay well"],
   [383.76,386.72,"thanks for being here Bogdan I've got a few questions about your"],
   [386.72,390.76,"upcoming album Shrimpscapes what is that relaxing shrimp themed"],
@@ -568,11 +571,11 @@ const SHOW_CC = [
   [435.62,440.36,"We're actually drinking a fresh can of chicken water, which is actually"],
   [440.36,442.26,"our next segment here in the studio."],
   [442.72,444.18,"Play the chicken water commercial now."],
-  [444.46,446.58,"Shrimp Tech Enterprises proudly presents."],
+  [444.46,446.58,"Shrimptech Enterprises proudly presents."],
   [447.36,450.38,"Ever wonder what life would be like if you didn't have to eat and"],
   [450.38,453.98,"all you needed was a fresh beer and a freshly grilled chicken?"],
   [454.28,458.64,"What if I told you the best of both worlds are available now in"],
-  [458.64,463.2,"a 60 ounce can? I'm talking about the new product from Shrimp Tech"],
+  [458.64,463.2,"a 60 ounce can? I'm talking about the new product from Shrimptech"],
   [463.2,468.1,"Enterprises, of course, chicken water homegrown American chicken"],
   [468.1,472.74,"juice brewed with alcohol made from potatoes ain't no substitute"],
   [472.74,476.3,"to the real thing I'll tell you that but it sure beats having a"],
@@ -592,7 +595,7 @@ const SHOW_CC = [
   [526.94,530.08,"so everyone can see the experiment i made do you do you like jordan"],
   [530.08,530.48,"peterson"],
   [531.64,534.84,"sometimes when he thinks he's a smart guy yeah i'll tell you that"],
-  [534.84,545.26,"okay you are listening to shrimp tech radio 106.9420 so back to"],
+  [534.84,545.26,"okay you are listening to Shrimptech radio 106.9420 so back to"],
   [545.26,547.7,"being a veterinarian what's that like man what what What does your"],
   [547.7,551.52,"day look like? I go up at half past six in the morning."],
   [551.76,554.82,"I eat some breakfast eggs. And then I go to the job."],
@@ -604,12 +607,12 @@ const SHOW_CC = [
   [573.0,576.0,"Oh, that's quite kind of you, because, you know, that's the only"],
   [576.0,581.76,"way to stop COVID these days is horse horse dewormer yeah um are"],
   [581.76,585.74,"raisins going out of style no they're not we're bringing them back"],
-  [585.74,595.32,"with raisin recycling system RRS brought to you by shrimp tech micro"],
+  [585.74,595.32,"with raisin recycling system RRS brought to you by Shrimptech micro"],
   [595.32,599.2,"systems we've created a brand new technology that is able to take"],
   [599.2,602.82,"old raisins and make them even older they're repackaged into small"],
   [602.82,606.28,"cardboard boxes with funny little characters on front for your kids."],
-  [606.4,796.7,"♪ MUSIC ♪"],
-  [796.79,802.27,"shrimp tech radio for you by us in your home or at your house every"],
+  [606.4,796.7,"♪ VIAGRA BOYS: PYRAMID OF HEALTH ♪"],
+  [796.79,802.27,"Shrimptech radio for you by us in your home or at your house every"],
   [802.27,802.79,"day"],
   [804.65,809.45,"so i left my dog in your care yeah about a year ago i he was just"],
   [809.45,811.55,"gonna spend the night because i didn't want him in the house and"],
@@ -647,7 +650,7 @@ const SHOW_CC = [
   [1157.19,1159.09,"Yeah, they can help with our gastrointestinal problems."],
   [1159.21,1162.79,"That's for sure. Yeah. Okay, this next song is a song about milk."],
   [1163.19,1164.69,"It's called Milk Farm nations"],
-  [1164.7,1370.9,"♪ MILK FARM NATIONS IN THE NATION ♪"],
+  [1164.7,1370.9,"♪ MUSIC ♪"],
   [1370.96,1373.88,"in the nation. Okay, what's your stance on public breastfeeding?"],
   [1375.18,1377.94,"It's okay when you do it. No, I'm kidding."],
   [1378.3,1382.34,"It's okay when it's not so much people there because I think it"],
@@ -680,7 +683,7 @@ const SHOW_CC = [
   [1480.34,1482.3,"woman that I can collect urine from."],
   [1482.5,1485.98,"However, my local gym doesn't allow normal metal buckets."],
   [1486.42,1488.4,"I have come up with a solution."],
-  [1488.96,1492.84,"Me and the people at Shrimp Tech are creating a rubber bucket system,"],
+  [1488.96,1492.84,"Me and the people at Shrimptech are creating a rubber bucket system,"],
   [1493.14,1496.66,"a foldable bucket that fits into your training shoes or a duffel"],
   [1496.66,1499.86,"bag. You can place the buckets out strategically across the gym"],
   [1499.86,1503.36,"where you think that large bodybuilding woman will be doing squats"],
@@ -688,7 +691,7 @@ const SHOW_CC = [
   [1505.14,1508.26,"By the end of the day, you could have 16 litres of PIMPS!"],
   [1508.26,1511.18,"And SPILL! YEE-HAW! Rubber bucket!"],
   [1511.5,1514.12,"Ladies and gentlemen, this is your host, Ron Dangle."],
-  [1514.26,1516.46,"Welcome back to Shrimp Tech Radio."],
+  [1514.26,1516.46,"Welcome back to Shrimptech Radio."],
   [1517.14,1519.06,"106.9420."],
   [1521.02,1524.28,"Pounds of frozen shrimp directly at your doorstep."],
   [1525.0,1528.18,"Shrimps with faces. Shrimps with conscience."],
@@ -696,7 +699,7 @@ const SHOW_CC = [
   [1531.56,1532.14,"Shrimp day."],
   [1533.28,1536.74,"Frozen shrimp. Now on Amazon Prime."],
   [1536.7,1699.5,"♪ MUSIC ♪"],
-  [1699.78,1705.98,"are listening to shrimp tech radio 106.9 for 20 We're back."],
+  [1699.78,1705.98,"are listening to Shrimptech radio 106.9420 We're back."],
   [1706.34,1710.2,"Hell yeah, man, and we got that asshole bogged on out of the studio."],
   [1710.28,1713.76,"He was a square Nobody liked him and he's never touching my dog"],
   [1713.76,1717.3,"again I swear to God his name on Instagram is the dog diddler or"],
@@ -719,8 +722,8 @@ const SHOW_CC = [
   [1778.38,1778.58,"Ha ha!"],
   [1781.61,1783.11,"Do you think dogs should be allowed to vote?"],
   [1783.41,1785.05,"Do you think that breastfeeding should be illegal?"],
-  [1785.33,1787.99,"Contact us now. Send a letter to Shrimp Tech!"],
-  [1788.0,1951.2,"♪ MUSIC ♪"],
+  [1785.33,1787.99,"Contact us now. Send a letter to Shrimptech!"],
+  [1788.0,1951.2,"♪ VIAGRA BOYS: THE BOG BODY ♪"],
   [1951.29,1954.41,"Still got a dead body sitting on a chair right across from me."],
   [1954.71,1957.51,"She's 100% dead. She's somehow still breathing."],
   [1957.95,1960.63,"And I think that she's a little bit excited."],
@@ -741,7 +744,7 @@ const SHOW_CC = [
   [2009.31,2011.31,"If you have allergies to eggs, poultry, or alcohol, you can be eligible"],
   [2011.31,2013.07,"for a free sample of chicken water lite, now chicken-free."],
   [2013.19,2014.99,"Side effects include decentness, diarrhea, and loss of libido."],
-  [2015.0,2228.6,"♪ MUSIC ♪"],
+  [2015.0,2228.6,"♪ VIAGRA BOYS: STORE POLICY ♪"],
   [2228.83,2231.91,"We've got this dead body's throat lubed up, and she's ready to answer"],
   [2231.91,2233.51,"some hard-hitting questions."],
   [2235.31,2236.65,"Were things better when you were alive?"],
@@ -762,10 +765,10 @@ const SHOW_CC = [
   [2288.1,2290.68,"out, throw it on the ground, the darker sauce wins."],
   [2291.04,2292.74,"Always. Those are the rules."],
   [2293.08,2294.02,"SAUCE SLAMMERS!"],
-  [2294.1,2613.6,"♪ MUSIC ♪"],
+  [2294.1,2613.6,"♪ VIAGRA BOYS: BEST IN SHOW PT. IV ♪"],
   [2613.81,2616.41,"not believe that girls fucked it and pooped."],
   [2616.73,2619.51,"That is sick. That is a sick way of thinking."],
-  [2626.29,2629.27,"Ooh, this is Ron Dangle. You're listening to Shrimp Tech Radio."],
+  [2626.29,2629.27,"Ooh, this is Ron Dangle. You're listening to Shrimptech Radio."],
   [2630.19,2632.97,"We're gonna get in on a more serious note here now."],
   [2634.37,2637.53,"So, I spent some time in California a couple years ago with an ex"],
   [2637.53,2638.33,"-girlfriend of mine."],
@@ -800,7 +803,9 @@ const SHOW_CC = [
   [2747.05,2748.07,"the studio with a dolphin"],
   [2749.53,2754.25,"he's getting sad now folks he's getting really sad and I think it's"],
   [2754.25,2760.83,"cuz cuz he hasn't heard the new song from Viagra boys get"],
-  [2760.8,3163.7,"♪ WATER BOY ♪"],
+  [2760.8,2985.6,"♪ VIAGRA BOYS: DIRTY BOYZ ♪"],
+  [2986.55,2987.83,"guys"],
+  [2987.0,3163.7,"♪ VIAGRA BOYS: WATERBOY ♪"],
   [3163.9,3167.24,"just heard the hit song for the first time here by the up-and-coming"],
   [3167.24,3172.8,"rapper known as water boy or Nino del aqua in Spanish I believe"],
   [3172.8,3176.04,"or Agua maybe I don't know took Spanish in seventh grade haven't"],
@@ -839,47 +844,64 @@ const SHOW_CC = [
   [3288.08,3289.44,"Slice it. Put butter on it."],
   [3289.52,3291.6,"Put anything between it. It's Useless."],
   [3292.02,3292.8,"Useless Bread."],
-  [3294.08,3300.34,"You are listening to Shrimp Tech Radio 106.9420."],
-  [3300.6,3497.01,"♪ SHRIMP TECH RADIO ♪"],
+  [3294.08,3300.34,"You are listening to Shrimptech Radio 106.9420."],
+  [3300.6,3497.01,"♪ MUSIC ♪"],
 ];
-const SHOW_CLIPS = {"felon":{"who":"RON DANGLE","t":[243.73,247.43],"text":"I'M A CONVICTED FELON AND YOU'RE LISTENING TO SHRIMP TECH RADIO."},"sauce":{"who":"SHRIMP TECH ENTERPRISES","t":[2287.45,2293.09],"text":"PULL THE SAUCE OUT, THROW IT ON THE GROUND. THE DARKER SAUCE WINS. ALWAYS."},"chicken":{"who":"RON DANGLE","t":[479.43,486.49],"text":"OH MAN, THIS CHICKEN WATER IS SO GOOD. IT TASTES LIKE WHAT IT IS."},"yeehaw":{"who":"RUBBER BUCKET","t":[1508.99,1511.53],"text":"YEE-HAW! RUBBER BUCKET!"},"dirtyboyz":{"who":"RON DANGLE","t":[2679.78,2686.7],"text":"DIRTY BOYZ WITH A Z AT THE END, FOLKS. THAT'S D-I-R-T-Y B-O-Y-Z."},"cringe":{"who":"RON DANGLE","t":[3254.69,3259.63],"text":"LIFE AFTER DEATH IS NO LONGER CRINGE, FOLKS. YOU HEARD IT HERE, WE'RE ALL GOING TO HEAVEN."},"raisin":{"who":"SHRIMP TECH MICROSYSTEMS","t":[595.79,601.85],"text":"WE'VE CREATED A BRAND NEW TECHNOLOGY THAT IS ABLE TO TAKE OLD RAISINS AND MAKE THEM EVEN OLDER."},"jamie":{"who":"RON DANGLE","t":[523.67,528.73],"text":"JAMIE, BRING THAT EXPERIMENT UP ON THE SCREEN SO EVERYONE CAN SEE THE EXPERIMENT I MADE."},"host":{"who":"RON DANGLE","t":[1511.35,1516.81],"text":"LADIES AND GENTLEMEN, THIS IS YOUR HOST, RON DANGLE. WELCOME BACK TO SHRIMP TECH RADIO."},"back":{"who":"RON DANGLE","t":[1704.69,1707.39],"text":"WE'RE BACK! HELL YEAH, MAN."},"okayfolks":{"who":"RON DANGLE","t":[1769.43,1776.69],"text":"OKAY, OKAY, OKAY FOLKS. THAT WAS A WEIRD EXPERIENCE FOR ME AND I'VE GOT TO LEAVE THE ROOM RIGHT NOW."}};
+const SHOW_CLIPS = {"felon":{"who":"RON DANGLE","t":[243.73,247.43],"text":"I'M A CONVICTED FELON AND YOU'RE LISTENING TO SHRIMPTECH RADIO."},"sauce":{"who":"SHRIMPTECH ENTERPRISES","t":[2287.45,2293.09],"text":"PULL THE SAUCE OUT, THROW IT ON THE GROUND. THE DARKER SAUCE WINS. ALWAYS."},"chicken":{"who":"RON DANGLE","t":[479.43,486.49],"text":"OH MAN, THIS CHICKEN WATER IS SO GOOD. IT TASTES LIKE WHAT IT IS."},"yeehaw":{"who":"RUBBER BUCKET","t":[1508.99,1511.53],"text":"YEE-HAW! RUBBER BUCKET!"},"dirtyboyz":{"who":"RON DANGLE","t":[2679.78,2686.7],"text":"DIRTY BOYZ WITH A Z AT THE END, FOLKS. THAT'S D-I-R-T-Y B-O-Y-Z."},"cringe":{"who":"RON DANGLE","t":[3254.69,3259.63],"text":"LIFE AFTER DEATH IS NO LONGER CRINGE, FOLKS. YOU HEARD IT HERE, WE'RE ALL GOING TO HEAVEN."},"raisin":{"who":"SHRIMPTECH MICROSYSTEMS","t":[595.79,601.85],"text":"WE'VE CREATED A BRAND NEW TECHNOLOGY THAT IS ABLE TO TAKE OLD RAISINS AND MAKE THEM EVEN OLDER."},"jamie":{"who":"RON DANGLE","t":[523.67,528.73],"text":"JAMIE, BRING THAT EXPERIMENT UP ON THE SCREEN SO EVERYONE CAN SEE THE EXPERIMENT I MADE."},"host":{"who":"RON DANGLE","t":[1511.35,1516.81],"text":"LADIES AND GENTLEMEN, THIS IS YOUR HOST, RON DANGLE. WELCOME BACK TO SHRIMPTECH RADIO."},"back":{"who":"RON DANGLE","t":[1704.69,1707.39],"text":"WE'RE BACK! HELL YEAH, MAN."},"okayfolks":{"who":"RON DANGLE","t":[1769.43,1776.69],"text":"OKAY, OKAY, OKAY FOLKS. THAT WAS A WEIRD EXPERIENCE FOR ME AND I'VE GOT TO LEAVE THE ROOM RIGHT NOW."}};
+
+// Viagra Boys songs as Standard MIDI Files for VIAGRA BOYS IN MIDI, played in order and
+// looped like everything else. Put .mid files next to the page and list them here, e.g.
+// { title: 'PYRAMID OF HEALTH', url: 'midi/pyramid-of-health.mid' }. Until then the
+// channel plays its public-domain placeholder tunes.
+const MIDI_FILES = [];
 
 // `src`: a list of { url, type } to loop. Every visitor joins at the same spot
-// (wall clock % duration), so it plays like a live stream without a streaming
-// server. Channels without a file are synthesized here.
+// (wall clock + `offset`, modulo the loop length), so it plays like a live stream
+// without a streaming server. Channels without a file are synthesized here.
+const SHOW = {
+  band: 'FM', call: 'WSHR',
+  src: SHOW_SRC, loopLen: SHOW_LEN, captions: SHOW_CC, guests: SHOW_GUESTS,
+  gen: 'bed', bed: { bpm: 96, prog: 'jazz', style: 'smooth', level: 0.7 },
+  host: 'with your host Ron Dangle', next: '',
+  dj: 'RON DANGLE', voice: { pitch: 0.75, rate: 1.12 }, talkEvery: [32, 55],
+  idLine: 'You are listening to Shrimptech Radio. One oh six point nine four two oh.',
+  lines: [
+    "I'm a convicted felon and you're listening to Shrimptech Radio.",
+    'Shrimptech Radio. For you, by us. In your home, or at your house. Every day.',
+    'Shrimps with faces. Shrimps with conscience. Shrimps with ideas. Shrimptech frozen shrimp.',
+    'Chicken water. It tastes like what it is.',
+    'Life after death is no longer cringe, folks. Book your tickets now.',
+    'Shrimptech Radio. The home of Viagra Boys.',
+  ],
+  songs: [['SHRIMPTECH RADIO', 'FOR YOU, BY US']],
+};
 const CHANNELS = [
   {
-    id: 'shrimp-fm', band: 'FM', freq: '106.9420', call: 'WSHR', name: 'SHRIMP TECH RADIO',
+    ...SHOW, id: 'shrimptech-1', freq: '106.9420', name: 'SHRIMPTECH RADIO 1',
     tagline: 'FOR YOU, BY US. IN YOUR HOME OR AT YOUR HOUSE.',
     sun: [RED, RED_DEEP], accent: CREAM, shrimp: 'natural',
-    src: SHOW_SRC, loopLen: SHOW_LEN, captions: SHOW_CC, guests: SHOW_GUESTS,
-    gen: 'bed', bed: { bpm: 96, prog: 'jazz', style: 'smooth', level: 0.7 },
-    show: 'Shrimp Tech Radio', host: 'with your host Ron Dangle', next: '', listeners: 106942,
-    dj: 'RON DANGLE', voice: { pitch: 0.75, rate: 1.12 }, talkEvery: [32, 55],
-    idLine: 'You are listening to Shrimp Tech Radio. One oh six point nine four two oh.',
-    lines: [
-      "I'm a convicted felon and you're listening to Shrimp Tech Radio.",
-      'Shrimp Tech Radio. For you, by us. In your home, or at your house. Every day.',
-      'Shrimps with faces. Shrimps with conscience. Shrimps with ideas. Shrimp Tech frozen shrimp.',
-      'Chicken water. It tastes like what it is.',
-      'Life after death is no longer cringe, folks. Book your tickets now.',
-    ],
-    songs: [['SHRIMP TECH RADIO', 'FOR YOU, BY US']],
+    show: 'Shrimptech Radio', listeners: 106942, offset: 0,
   },
   {
-    id: 'midi-mania', band: 'FM', freq: '88.1', call: 'WMID', name: 'MIDI MANIA',
-    tagline: 'ALL MIDI. ALL THE TIME.',
+    // the same episode, half a loop further along
+    ...SHOW, id: 'shrimptech-2', freq: '106.9421', name: 'SHRIMPTECH RADIO 2',
+    tagline: 'THE SAME SHOW. A DIFFERENT PART OF IT.',
+    sun: [RED, INK], accent: CREAM, shrimp: 'chrome',
+    show: 'Shrimptech Radio 2', listeners: 69420, offset: Math.round(SHOW_LEN / 2),
+  },
+  {
+    id: 'viagra-midi', band: 'FM', freq: '88.1', call: 'WMID', name: 'VIAGRA BOYS IN MIDI',
+    tagline: 'VIAGRA BOYS. IN MIDI. ALL THE TIME.',
     sun: [CREAM, INK], accent: RED, shrimp: 'wire',
-    src: null, gen: 'midi',
-    show: 'The MIDI Marathon', host: 'Hour 41,212 with DJ General MIDI', next: 'Up next: more MIDI', listeners: 341,
+    src: null, gen: 'midi', midi: MIDI_FILES,
+    show: 'Viagra Boys in MIDI', host: 'with DJ General MIDI', next: 'Up next: more Viagra Boys. In MIDI.', listeners: 341,
     dj: 'DJ GENERAL MIDI', voice: { pitch: 1.1, rate: 1.0 }, talkEvery: [45, 75],
-    idLine: 'MIDI Mania. Eighty eight point one. All MIDI. All the time.',
+    idLine: 'Viagra Boys in MIDI. Eighty eight point one. General MIDI, all day, all night.',
     lines: [
       'This next one goes out to everyone with a sound card.',
-      'We are now entering hour forty one thousand of the MIDI marathon. Send help.',
-      'Request line is open. We will play it in MIDI. We will play everything in MIDI.',
+      'We are now entering hour forty one thousand of Viagra Boys in MIDI. Send help.',
       'That was General MIDI patch number eighty one. A listener favorite.',
-      'Coming up, the MIDI version of Sauce Slammers. The darker sauce wins. Always.',
+      'Viagra Boys in MIDI. The darker sauce wins. Always.',
     ],
   },
   {
@@ -896,69 +918,16 @@ const CHANNELS = [
       'This conversation is unscripted. It is also untranslated.',
       'Biscuit and Pickles recently saw a veterinarian named Bogdan. They no longer have teeth.',
       'Should dogs be allowed to vote? Biscuit and Pickles say yes. Loudly.',
+      'Biscuit and Pickles would like to dedicate this bark to Uno and to Viagra Boys.',
     ],
   },
   {
-    id: 'shrimp-gold', band: 'FM', freq: '101.1', call: 'WGLD', name: 'SHRIMP GOLD',
-    tagline: 'CLASSIC SHRIMP. TIMELESS HITS.',
+    id: 'wind', band: 'FM', freq: '87.7', call: 'WIND', name: 'WIND',
+    tagline: 'JUST WIND. 24/7.',
     sun: [CREAM, RED], accent: INK, shrimp: 'lacquer',
-    src: null, gen: 'bed', bed: { bpm: 70, prog: 'doowop', style: 'doowop', crackle: true, level: 0.7 },
-    show: 'Golden Shrimp Oldies', host: "with 'Smooth' Rick Shellby", next: 'Up next: The Sock Hop at the Seafood Shack', listeners: 4420,
-    dj: 'SMOOTH RICK', voice: { pitch: 0.65, rate: 0.95 }, talkEvery: [35, 60],
-    idLine: 'Shrimp Gold. One oh one point one. Classic shrimp, timeless hits.',
-    lines: [
-      'That one came out in nineteen fifty nine. Same year the shrimp started spinning.',
-      'Smooth Rick Shellby with you until midnight. Or until the shrimp stops spinning. It will not stop spinning.',
-      'Remember when shrimp cost a nickel? Neither do I. But my dad told me about it.',
-      'That record is older than the raisins in the Raisin Recycling System. And those are old.',
-    ],
-    songs: [
-      ['THE CRUSTONES', 'SHRIMP SHRIMP SHRIMP SHRIMP (1959)'],
-      ['DOTTIE & THE DEVEINERS', 'MY GUY IS A SHRIMP (1962)'],
-      ['THE BOILING POINTS', 'TWIST AND SHELL (1964)'],
-      ['SMOOTH RICK SHELLBY', 'MOONLIGHT OVER THE BAYOU (1971)'],
-    ],
-  },
-  {
-    id: 'the-prawn', band: 'FM', freq: '95.5', call: 'WPRN', name: 'THE PRAWN',
-    tagline: 'HIP HOP & CRUSTACEAN R&B',
-    sun: [INK, RED], accent: CREAM, shrimp: 'pearl',
-    src: null, gen: 'bed', bed: { bpm: 88, prog: 'rnb', style: 'boom', level: 0.75 },
-    show: 'The Drive Home', host: 'with DJ Scampi', next: 'Up next 7PM: The Quiet Storm Surge', listeners: 23009,
-    dj: 'DJ SCAMPI', voice: { pitch: 0.7, rate: 1.15 }, talkEvery: [30, 50],
-    idLine: 'The Prawn. Ninety five point five. Turn it up!',
-    lines: [
-      'DJ Scampi in the mix. Shout out to everybody stuck on the interstate.',
-      "This is the part where the bass drops. The bass is a shrimp. Shrimp can't drop. It's complicated.",
-      'If you can hear this, you are already the main character.',
-      'Big shout out to Water Boy. Niño del Agua. Up and coming, folks.',
-      "This one goes out to the Dirty Boyz. With a Z. Lock up your bicycles.",
-    ],
-    songs: [
-      ['LIL SCAMPI', 'DRIP (COCKTAIL SAUCE)'],
-      ['MC TAILFAN', 'BOILED UP'],
-      ['THE PRAWN SQUAD', 'HUMID SEASON'],
-      ['DJ DEVEIN FT. KRILL G', 'NO BONES'],
-    ],
-  },
-  {
-    id: 'shrimp-talk', band: 'AM', freq: '1260', call: 'WTLK', name: 'SHRIMP TALK',
-    tagline: 'TALK, TRAFFIC & TIDES',
-    sun: [RED, INK], accent: CREAM, shrimp: 'chrome',
-    src: null, gen: 'bed', bed: { bpm: 80, prog: 'jazz', style: 'smooth', am: true, level: 0.35 },
-    show: 'Shrimp Talk Tonight', host: 'with Dr. Barb Krillson', next: 'Up next: Traffic & Tides on the 8s', listeners: 7,
-    dj: 'DR. BARB', voice: { pitch: 0.85, rate: 1.0 }, talkEvery: [14, 24],
-    idLine: "You're listening to Shrimp Talk. Twelve sixty AM. Talk, traffic, and tides.",
-    lines: [
-      'Our lines are open. Our lines are always open. Nobody ever calls.',
-      "Today's topic. Is a prawn just a shrimp with a better publicist? The lines are open.",
-      'We have a caller on line two. Go ahead, caller. Caller? Okay. Line two is a dog again.',
-      'Traffic on the eights. The interstate is backed up six miles due to an overturned shrimp truck. Drivers report the traffic smells delicious.',
-      'Remember, if your shrimp is not spinning, consult your shrimp.',
-      'Do you think dogs should be allowed to vote? Contact us now. Send a letter to Shrimp Tech.',
-      "Jamie, bring that up on the screen. Jamie? We don't have a screen. This is radio.",
-    ],
-    songs: [['NOW', "TODAY'S TOPIC: IS A PRAWN JUST A SHRIMP WITH A BETTER PUBLICIST?"]],
+    src: null, gen: 'wind',
+    show: 'Wind', host: 'with nobody', next: 'Up next: more wind', listeners: 3,
+    lines: [],
   },
 ];
 
@@ -979,12 +948,16 @@ const NEWS = [
   'Sauce Slammers final ends. The darker sauce won. It always does',
   "Bogdan's new album 'Shrimpscapes' explores shrimp travelling through space and time",
   "Useless Bread: you can't eat it, it doesn't go bad",
-  'Should dogs be allowed to vote? Send a letter to Shrimp Tech Radio',
+  'Should dogs be allowed to vote? Send a letter to Shrimptech Radio',
+  'Viagra Boys confirm the Dirty Boyz are a-coming. Hide your bicycle',
+  "Local veterinarian Bogdan denies taking Uno's teeth to Australia",
+  "Viagra Boys' 'Pyramid of Health' tops the Shrimptech chart for the 600th straight week",
+  'Store policy update: you got to leave, says Viagra Boys',
 ];
 
 const STOCKS = [
   ['SHRMP', 106.94], ['CHKNW', 60.0], ['RRS', 3.17], ['RBBKT', 16.0], ['USLSB', 0.01], ['SAUCE', 37.48],
-  ['MILKT', 652.0], ['TEETH', 0.32], ['DRTYZ', 4.2], ['BOGDN', 19.7], ['KDOG', 99.5], ['MIDI', 8.81],
+  ['MILKT', 652.0], ['TEETH', 0.32], ['DRTYZ', 4.2], ['BOGDN', 19.7], ['KDOG', 99.5], ['VBOYS', 69.42], ['MIDI', 8.81],
 ];
 
 const DOGS = [
@@ -1046,7 +1019,7 @@ const pick = (a) => a[Math.floor(Math.random() * a.length)];
 const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
 const fmt = (n) => Math.round(n).toLocaleString('en-US');
 // Where a loop of `len` seconds is right now, the same for every visitor.
-const loopPos = (len) => (Date.now() / 1000) % len;
+const loopPos = (len, shift = 0) => (Date.now() / 1000 + shift) % len;
 function rng(seed) {
   let a = seed | 0;
   return () => {
@@ -1203,12 +1176,12 @@ function sub808(out, t, m, dur) {
   o.frequency.exponentialRampToValueAtTime(mtof(m + 12), t + 0.06);
   o.connect(g).connect(out); o.start(t); o.stop(t + dur + 0.05);
 }
-function lead(out, t, m, dur) {
+function lead(out, t, m, dur, vel = 1) {
   const o = osc('square', mtof(m), t), lp = ctx.createBiquadFilter(), g = ctx.createGain();
   lp.type = 'lowpass'; lp.frequency.value = 3600;
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.085, t + 0.006);
-  g.gain.setValueAtTime(0.065, t + Math.max(0.02, dur * 0.85));
+  g.gain.exponentialRampToValueAtTime(0.085 * vel, t + 0.006);
+  g.gain.setValueAtTime(0.065 * vel, t + Math.max(0.02, dur * 0.85));
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   o.connect(lp).connect(g).connect(out); o.start(t); o.stop(t + dur + 0.02);
 }
@@ -1222,7 +1195,7 @@ function zap(t) {
   o2.frequency.exponentialRampToValueAtTime(900, t + 0.2);
   o2.connect(g2).connect(air); o2.start(t); o2.stop(t + 0.25);
 }
-// Static and a heterodyne whistle while the needle moves.
+// Static and a heterodyne whistle while switching channels.
 function tuneStatic(t, dur = 0.5) {
   const s = ctx.createBufferSource(); s.buffer = noiseBuf;
   const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.8;
@@ -1348,73 +1321,208 @@ function bedGen(ch) {
   return { bus, stop() { loop(); fadeOut(bus, extra); } };
 }
 
-let midiTimeline = null;
-function buildMidiTimeline() {
-  const ev = [], marks = [];
-  let t = 0;
-  for (const song of MIDI_SONGS) {
-    const u = 60 / song.bpm / 4, notes = [];
+// ---------- MIDI ----------
+// A song is { title, by, len, events: [{ t, type, m, dur, vel }] } with t relative to the song.
+
+// The public-domain tunes, used until real MIDI files are listed in MIDI_FILES.
+function placeholderSongs() {
+  return MIDI_SONGS.map((song) => {
+    const u = 60 / song.bpm / 4, events = [], melody = [];
     let pos = 0;
     for (const tok of song.notes.trim().split(/\s+/)) {
       const [n, d] = tok.split('/');
       const dur = Number(d) * u;
-      if (n !== '-') notes.push({ t: t + pos, m: noteToMidi(n) + song.tr, dur });
+      if (n !== '-') melody.push({ t: pos, type: 'lead', m: noteToMidi(n) + song.tr, dur });
       pos += dur;
     }
-    marks.push({ t, song });
-    notes.forEach((n) => ev.push({ ...n, type: 'lead' }));
+    events.push(...melody);
     // drums and a bass note on every beat, following the melody
     const beatDur = u * 4;
     for (let b = 0; b * beatDur < pos - 0.01; b++) {
-      const bt = t + b * beatDur;
-      ev.push({ t: bt, type: b % 2 ? 'hat' : 'kick' });
-      const under = notes.filter((n) => n.t <= bt + 0.001).pop();
-      if (under) ev.push({ t: bt, type: 'bass', m: under.m - 24, dur: beatDur * 0.8 });
+      const bt = b * beatDur;
+      events.push({ t: bt, type: b % 2 ? 'hat' : 'kick' });
+      const under = melody.filter((n) => n.t <= bt + 0.001).pop();
+      if (under) events.push({ t: bt, type: 'bass', m: under.m - 24, dur: beatDur * 0.8 });
     }
-    t += pos + 1.8;
+    return { title: song.title, by: song.by, len: pos, events };
+  });
+}
+
+// Minimal Standard MIDI File reader: notes with times in seconds, tempo changes applied.
+function parseMidi(buf) {
+  const d = new DataView(buf), bytes = new Uint8Array(buf);
+  const tag = (p) => String.fromCharCode(bytes[p], bytes[p + 1], bytes[p + 2], bytes[p + 3]);
+  if (tag(0) !== 'MThd') throw new Error('not a MIDI file');
+  const tracks = d.getUint16(10), div = d.getUint16(12);
+  if (div & 0x8000) throw new Error('SMPTE timing is not supported');
+  let p = 8 + d.getUint32(4);
+  const events = [];
+  for (let n = 0; n < tracks && p < bytes.length;) {
+    const id = tag(p), end = p + 8 + d.getUint32(p + 4);
+    p += 8;
+    if (id !== 'MTrk') { p = end; continue; }
+    n++;
+    let tick = 0, status = 0;
+    const vlq = () => { let v = 0, b; do { b = bytes[p++]; v = (v << 7) | (b & 0x7f); } while (b & 0x80); return v; };
+    while (p < end) {
+      tick += vlq();
+      if (bytes[p] & 0x80) status = bytes[p++]; // otherwise running status
+      const kind = status & 0xf0, chn = status & 0x0f;
+      if (status === 0xff) {
+        const type = bytes[p++], len = vlq();
+        if (type === 0x51) events.push({ tick, tempo: (bytes[p] << 16) | (bytes[p + 1] << 8) | bytes[p + 2] });
+        p += len;
+      } else if (status === 0xf0 || status === 0xf7) p += vlq();
+      else if (kind === 0x80 || kind === 0x90) { events.push({ tick, chn, m: bytes[p], vel: kind === 0x90 ? bytes[p + 1] : 0 }); p += 2; }
+      else if (kind === 0xc0) events.push({ tick, chn, program: bytes[p++] });
+      else if (kind === 0xd0) p += 1;
+      else p += 2;
+    }
+    p = end;
+  }
+  events.sort((a, b) => a.tick - b.tick || (b.tempo !== undefined) - (a.tempo !== undefined));
+  let tempo = 500000, lastTick = 0, sec = 0;
+  const notes = [], open = new Map(), programs = new Array(16).fill(0);
+  for (const e of events) {
+    sec += ((e.tick - lastTick) * tempo) / (div * 1e6);
+    lastTick = e.tick;
+    if (e.tempo !== undefined) { tempo = e.tempo; continue; }
+    if (e.program !== undefined) { programs[e.chn] = e.program; continue; }
+    const key = e.chn * 128 + e.m;
+    if (e.vel > 0) open.set(key, { t: sec, m: e.m, vel: e.vel / 127, chn: e.chn, program: programs[e.chn] });
+    else {
+      const note = open.get(key);
+      if (note) { note.dur = Math.max(0.03, sec - note.t); notes.push(note); open.delete(key); }
+    }
+  }
+  return { notes, len: sec };
+}
+// Map General MIDI to the house sounds: channel 10 drums, bass programs and low notes to bass.
+function midiEvents(notes) {
+  return notes.map((n) => {
+    if (n.chn === 9) return { t: n.t, type: n.m <= 36 ? 'kick' : n.m <= 40 ? 'snare' : 'hat', vel: n.vel };
+    const isBass = (n.program >= 32 && n.program <= 39) || n.m < 45;
+    return { t: n.t, type: isBass ? 'bass' : 'lead', m: n.m, dur: n.dur, vel: n.vel };
+  }).sort((a, b) => a.t - b.t);
+}
+async function loadMidiSongs(files) {
+  return Promise.all(files.map(async (f) => {
+    const res = await fetch(f.url);
+    if (!res.ok) throw new Error(`${f.url}: ${res.status}`);
+    const { notes, len } = parseMidi(await res.arrayBuffer());
+    return { title: f.title, by: f.by || 'VIAGRA BOYS', len, events: midiEvents(notes) };
+  }));
+}
+function midiTimeline(songs) {
+  const ev = [], marks = [];
+  let t = 0;
+  for (const song of songs) {
+    marks.push({ t, song });
+    song.events.forEach((e) => ev.push({ ...e, t: t + e.t }));
+    t += song.len + 1.8;
   }
   ev.sort((a, b) => a.t - b.t);
   return { ev, marks, L: t };
 }
 function midiGen(ch) {
-  midiTimeline ??= buildMidiTimeline();
-  const { ev, marks, L } = midiTimeline;
   const bus = makeBus(0.8), tm = timers();
-  const showSong = (song) => setLcdBase(`♪ ${song.title} (${song.by}) · GM PATCH 81: SQUARE LEAD · 22 KHZ`);
-  const p = ((wall() % L) + L) % L;
-  showSong(marks.filter((m) => m.t <= p).pop().song);
-  const loop = runLoop((w0, w1) => {
-    for (let k = Math.floor(w0 / L); k <= Math.floor(w1 / L); k++) {
-      const base = k * L;
-      for (const e of ev) {
-        const tw = base + e.t;
-        if (tw < w0) continue;
-        if (tw >= w1) break;
-        const t = tw - offset;
-        if (e.type === 'lead') lead(bus, t, e.m, e.dur);
-        else if (e.type === 'bass') bass(bus, t, e.m, e.dur, 0.22);
-        else if (e.type === 'kick') kick(bus, t, 0.55);
-        else hat(bus, t, 0.6);
+  let loop = null, dead = false;
+  const begin = (songs, placeholder) => {
+    if (dead) return;
+    const { ev, marks, L } = midiTimeline(songs);
+    const showSong = (song) => {
+      setLcdBase(placeholder ? `♪ ${song.title} (${song.by}) · PLACEHOLDER UNTIL THE VIAGRA BOYS MIDI FILES ARRIVE` : `♪ ${song.title} · ${song.by} · IN MIDI`);
+      setCC(`♪ ${song.title} (MIDI) ♪`);
+    };
+    showSong(marks.filter((m) => m.t <= loopPos(L)).pop().song);
+    loop = runLoop((w0, w1) => {
+      for (let k = Math.floor(w0 / L); k <= Math.floor(w1 / L); k++) {
+        const base = k * L;
+        for (const e of ev) {
+          const tw = base + e.t;
+          if (tw < w0) continue;
+          if (tw >= w1) break;
+          const t = tw - offset, v = e.vel ?? 1;
+          if (e.type === 'lead') lead(bus, t, e.m, e.dur, v);
+          else if (e.type === 'bass') bass(bus, t, e.m, e.dur, 0.22 * v);
+          else if (e.type === 'kick') kick(bus, t, 0.55 * v);
+          else if (e.type === 'snare') snare(bus, t);
+          else hat(bus, t, 0.6 * v);
+        }
+        for (const m of marks) {
+          const tw = base + m.t;
+          if (tw >= w0 && tw < w1) tm.at(tw - offset, () => { showSong(m.song); if (Math.random() < 0.4) djLine(ch); });
+        }
       }
-      for (const m of marks) {
-        const tw = base + m.t;
-        if (tw >= w0 && tw < w1) tm.at(tw - offset, () => { showSong(m.song); if (Math.random() < 0.4) djLine(ch); });
-      }
-    }
-  });
-  return { bus, stop() { loop(); tm.clear(); fadeOut(bus); } };
+    });
+  };
+  if (ch.midi?.length) loadMidiSongs(ch.midi).then((songs) => begin(songs, false), () => begin(placeholderSongs(), true));
+  else begin(placeholderSongs(), true);
+  return { bus, stop() { dead = true; loop?.(); tm.clear(); fadeOut(bus); } };
+}
+
+// Wind: filtered noise, its gusts scheduled on the wall clock like everything else.
+let windBuf = null;
+function windGen() {
+  const bus = makeBus(0.9), tm = timers();
+  if (!windBuf) {
+    windBuf = ctx.createBuffer(1, ctx.sampleRate * 7, ctx.sampleRate);
+    const d = windBuf.getChannelData(0);
+    for (let i = 0, b = 0; i < d.length; i++) { b = 0.97 * b + 0.03 * (Math.random() * 2 - 1); d[i] = b * 6; } // brownish noise
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = windBuf; src.loop = true;
+  const body = ctx.createBiquadFilter(), whistle = ctx.createBiquadFilter(), gBody = ctx.createGain(), gWhistle = ctx.createGain();
+  body.type = 'bandpass'; body.frequency.value = 400; body.Q.value = 0.8;
+  whistle.type = 'bandpass'; whistle.frequency.value = 900; whistle.Q.value = 9;
+  gBody.gain.value = 0.4; gWhistle.gain.value = 0.05;
+  src.connect(body).connect(gBody).connect(bus);
+  src.connect(whistle).connect(gWhistle).connect(bus);
+  src.start();
+  setCC('[WIND]');
+  const loop = runLoop(stepper(1.7, (k, t) => {
+    const r = rng(k * 104729), gust = r() < 0.12;
+    body.frequency.setTargetAtTime(220 + r() * 520 + (gust ? 420 : 0), t, 0.7);
+    gBody.gain.setTargetAtTime(gust ? 1 : 0.25 + r() * 0.45, t, 0.6);
+    whistle.frequency.setTargetAtTime(650 + r() * 900, t, 0.9);
+    gWhistle.gain.setTargetAtTime(gust ? 0.2 : r() * 0.07, t, 0.8);
+    if (gust) { tm.at(t, () => setCC('[WIND INTENSIFIES]')); tm.at(t + 3.4, () => setCC('[WIND]')); }
+  }));
+  return { bus, stop() { loop(); tm.clear(); fadeOut(bus, [src]); } };
+}
+
+// Real barks: single barks cut from recordings into one sprite, [offset, duration] in seconds.
+const DOG_SPRITE = { url: 'audio/k-dog-barks.mp3', segs: {"big":[[0.0,0.185],[0.265,0.205],[0.549,0.185],[0.814,0.185],[1.079,0.255],[1.413,0.155],[1.648,0.284],[2.012,0.165],[2.257,0.205],[2.542,0.175],[2.796,0.155],[3.031,0.235],[3.346,0.225],[3.65,0.255],[3.985,0.195],[4.259,0.215],[4.554,0.205],[4.839,0.205],[5.123,0.264],[5.468,0.694],[6.241,0.284],[6.606,0.205],[6.89,0.195],[7.165,0.235],[7.48,0.135],[7.694,0.225],[7.999,0.245],[8.323,0.264],[8.668,0.205],[8.953,0.235],[9.267,0.205],[9.552,0.185],[9.816,0.235],[10.131,0.235],[10.446,0.195],[10.72,0.195],[10.995,0.215],[11.289,0.245],[11.614,0.245],[11.939,0.205]],"small":[[12.223,0.394],[12.697,0.394],[13.172,0.165],[13.416,0.205],[13.701,0.564],[14.345,0.185],[14.609,0.245],[14.934,0.494],[15.508,0.175],[15.763,0.255],[16.097,0.215],[16.392,0.155],[16.626,0.175],[16.881,0.255],[17.216,0.175],[17.47,0.195],[17.745,0.594],[18.419,0.165],[18.663,0.185],[18.928,0.195],[19.203,0.165],[19.447,0.155],[19.682,0.175],[19.937,0.165],[20.182,0.175],[20.436,0.215],[20.731,0.175],[20.986,0.175],[21.24,0.624],[21.944,0.175],[22.199,0.175],[22.453,0.245],[22.778,0.175],[23.033,0.165],[23.277,0.215],[23.572,0.175],[23.827,0.165],[24.071,0.205],[24.356,0.175],[24.611,0.245]],"cry":[[24.935,0.185],[25.2,0.205],[25.484,0.195],[25.759,0.195],[26.034,0.195],[26.308,0.195],[26.583,0.205],[26.868,0.195],[27.142,0.155],[27.377,0.165]]} };
+let barkBuffer = null;
+function loadBarks() {
+  barkBuffer ??= fetch(DOG_SPRITE.url).then((r) => {
+    if (!r.ok) throw new Error(`${DOG_SPRITE.url}: ${r.status}`);
+    return r.arrayBuffer();
+  }).then((b) => ctx.decodeAudioData(b)).catch(() => null);
+  return barkBuffer;
+}
+function playBark(out, buf, t, seg, rate, gain) {
+  const s = ctx.createBufferSource(), g = ctx.createGain();
+  s.buffer = buf; s.playbackRate.value = rate; g.gain.value = gain;
+  s.connect(g).connect(out);
+  s.start(t, seg[0], seg[1]);
+  return seg[1] / rate;
 }
 
 function dogGen() {
   const bus = makeBus(0.9), tm = timers();
   const panners = DOGS.map((d) => { const p = ctx.createStereoPanner(); p.pan.value = d.pan; p.connect(bus); return p; });
-  const SOUND = { bark: 'WOOF', yip: 'ARF', whine: '*WHINE*', growl: 'GRRRR' };
+  const SOUND = { bark: 'Woof!', yip: 'Arf!', whine: '*whines*', growl: 'Grrrr.' };
+  let buf = null;
+  loadBarks().then((b) => { buf = b; });
   const loop = runLoop(stepper(2.6, (k, t) => {
     const r = rng(k * 7919);
+    const pickSeg = (pool) => DOG_SPRITE.segs[pool][Math.floor(r() * DOG_SPRITE.segs[pool].length)];
     if (r() < 0.07) {
       // both dogs howl together
-      howl(panners[0], t + 0.1, 330, 1.9); howl(panners[1], t + 0.3, 520, 1.7);
-      tm.at(t, () => setLcdBase('BISCUIT & PICKLES: AWOOOOOO [TRANSLATION: A SIREN WENT BY. WE HAD TO.]'));
+      if (buf) { playBark(panners[0], buf, t + 0.1, pickSeg('cry'), 0.9, 0.9); playBark(panners[1], buf, t + 0.35, pickSeg('cry'), 1.15, 0.8); }
+      else { howl(panners[0], t + 0.1, 330, 1.9); howl(panners[1], t + 0.3, 520, 1.7); }
+      tm.at(t, () => setCC('>> BISCUIT & PICKLES: Awoooooo!\n[A siren went by. We had to.]'));
       return;
     }
     const who = k % 2, dog = DOGS[who], out = panners[who];
@@ -1422,13 +1530,21 @@ function dogGen() {
     let tt = t + 0.08;
     for (let i = 0; i < n && tt < t + 2.2; i++) {
       const x = r();
+      if (buf) {
+        // Biscuit gets the big dogs a touch lower, Pickles the small ones a touch higher
+        const cry = !dog.big && x < 0.15;
+        const rate = dog.big ? 0.86 + r() * 0.12 : 1.02 + r() * 0.16;
+        tt += playBark(out, buf, tt, pickSeg(cry ? 'cry' : dog.big ? 'big' : 'small'), rate, dog.big ? 0.9 : 0.75) + 0.08 + r() * 0.2;
+        said.push(cry ? SOUND.whine : dog.big ? SOUND.bark : SOUND.yip);
+        continue;
+      }
       if (dog.big && i === 0 && x < 0.15) { growl(out, tt, 0.8); said.push(SOUND.growl); tt += 0.95; continue; }
       if (!dog.big && x < 0.18) { whine(out, tt, 700, 0.6); said.push(SOUND.whine); tt += 0.7; continue; }
       if (dog.big) { bark(out, tt, dog.f * (0.9 + r() * 0.2), 0.2, 0.55); said.push(SOUND.bark); tt += 0.32 + r() * 0.25; }
       else { bark(out, tt, dog.f * (0.9 + r() * 0.25), 0.09, 0.4); said.push(SOUND.yip); tt += 0.17 + r() * 0.2; }
     }
-    const line = `${dog.name}: ${said.join(' ')} [TRANSLATION: ${TRANSLATIONS[Math.floor(r() * TRANSLATIONS.length)].toUpperCase()}]`;
-    tm.at(t, () => setLcdBase(line));
+    const line = `>> ${dog.name}: ${said.join(' ')}\n[${TRANSLATIONS[Math.floor(r() * TRANSLATIONS.length)]}]`;
+    tm.at(t, () => setCC(line));
   }));
   return { bus, stop() { loop(); tm.clear(); fadeOut(bus); } };
 }
@@ -1449,8 +1565,9 @@ function fileGen(ch, fallback) {
     if (dead || !isFinite(el.duration) || !el.duration) return;
     // Seek with the channel's fixed loop length, not this file's own duration: over
     // ~500,000 loops since 1970 a 0.01 s difference between encodes adds up to an hour.
-    el.currentTime = Math.min(loopPos(ch.loopLen || el.duration), el.duration - 0.25);
+    el.currentTime = Math.min(loopPos(ch.loopLen || el.duration, ch.offset), el.duration - 0.25);
     el.play().catch(() => {});
+    lastCaption = undefined;
     if (ch.captions) cc = setInterval(() => showCaption(ch.captions, el.currentTime), 250);
   });
   el.addEventListener('error', () => { if (!dead) next(); });
@@ -1461,20 +1578,19 @@ function fileGen(ch, fallback) {
   };
 }
 
-// Closed captions on the LCD: [start, end, text] rows sorted by start.
+// Closed captions from [start, end, text] rows sorted by start; cleared in the gaps.
 let lastCaption = null;
 function showCaption(rows, t) {
   let lo = 0, hi = rows.length - 1, k = -1;
   while (lo <= hi) { const mid = (lo + hi) >> 1; if (rows[mid][0] <= t) { k = mid; lo = mid + 1; } else hi = mid - 1; }
-  const row = k >= 0 && t < rows[k][1] + 2 ? rows[k] : null;
-  if (!row || row === lastCaption) return;
+  const row = k >= 0 && t < rows[k][1] + 1.5 ? rows[k] : null;
+  if (row === lastCaption) return;
   lastCaption = row;
-  const text = row[2].startsWith('♪') ? row[2] : `CC▸ ${row[2].toUpperCase()}`;
-  setLcdBase(text, Math.max(1.5, row[1] - t));
+  setCC(row ? row[2] : '');
 }
 
 function makeGen(ch) {
-  const synth = () => (ch.gen === 'midi' ? midiGen(ch) : ch.gen === 'dogs' ? dogGen(ch) : bedGen(ch));
+  const synth = () => (ch.gen === 'midi' ? midiGen(ch) : ch.gen === 'dogs' ? dogGen(ch) : ch.gen === 'wind' ? windGen(ch) : bedGen(ch));
   return ch.src ? fileGen(ch, synth) : synth();
 }
 
@@ -1497,7 +1613,7 @@ function duck(on) {
 function say(ch, text) {
   if (!playing) return;
   const ms = Math.max(4000, text.length * 85);
-  flashLcd(`${ch.dj}: ${text.toUpperCase()}`, ms);
+  setCC(`>> ${ch.dj}: ${text}`, ms);
   if (!('speechSynthesis' in window)) return;
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US';
@@ -1509,6 +1625,7 @@ function say(ch, text) {
 }
 const djLine = (ch) => say(ch, pick(ch.lines));
 function startTalk(ch) {
+  if (!ch.lines?.length) return () => {};
   let id = setTimeout(function next(first) {
     if (first === true) say(ch, ch.idLine); else djLine(ch);
     const [a, b] = ch.talkEvery;
@@ -1544,8 +1661,7 @@ async function startAudio() {
   document.body.classList.add('is-playing');
   playBtn.setAttribute('aria-pressed', 'true');
   playBtn.setAttribute('aria-label', 'Stop');
-  $('#play-text').textContent = "YOU'RE LIVE";
-  $('#play-sub').textContent = 'TAP TO STOP';
+  $('#play-sub').textContent = 'LISTENING';
   startChannel(true);
 }
 function stopAudio() {
@@ -1554,8 +1670,8 @@ function stopAudio() {
   document.body.classList.remove('is-playing');
   playBtn.setAttribute('aria-pressed', 'false');
   playBtn.setAttribute('aria-label', 'Listen live');
-  $('#play-text').textContent = 'LISTEN LIVE';
-  $('#play-sub').textContent = 'TAP TO TUNE IN';
+  $('#play-sub').textContent = 'PRESS PLAY TO LISTEN';
+  setCC('');
   setLcdBase(idleText());
 }
 
@@ -1593,24 +1709,28 @@ function flashLcd(text, ms) {
   setLcd(text);
   lcdTimer = setTimeout(() => { lcdTimer = 0; setLcd(lcdBase); }, ms);
 }
-const idleText = () => `PRESS PLAY TO TUNE IN · ${current.name} · ${current.tagline}`;
+const idleText = () => current.tagline;
+
+// ---------- closed captions (big, on the stage) ----------
+let ccTimer = 0;
+function setCC(text, ms) {
+  clearTimeout(ccTimer);
+  const box = $('#cc');
+  box.hidden = !text;
+  document.body.classList.toggle('cc-on', !!text);
+  if (!text) return;
+  $('#cc-text').textContent = text;
+  if (ms) ccTimer = setTimeout(() => setCC(''), ms);
+}
 function nowPlaying(ch) {
   const [artist, title] = ch.songs[Math.floor(Date.now() / 210000) % ch.songs.length];
   return `♪ NOW PLAYING: ${artist} · "${title}"`;
 }
 
-// ---------- dial ----------
-const fmX = (f) => ((f - 87.5) / (108.5 - 87.5)) * 100;
-const amX = (f) => ((f - 520) / (1710 - 520)) * 100;
-const dialX = (ch) => (ch.band === 'AM' ? amX(Number(ch.freq)) : fmX(Number(ch.freq)));
-$('#scale-fm').innerHTML = [88, 92, 96, 100, 104, 108].map((f) => `<span style="left:${fmX(f)}%">${f}</span>`).join('');
-$('#scale-am').innerHTML = [530, 700, 900, 1100, 1300, 1500, 1700].map((f) => `<span style="left:${amX(f)}%">${f}</span>`).join('');
-$('#marks').innerHTML = CHANNELS.map((c) => `<i class="mark" style="left:${dialX(c)}%;top:${c.band === 'AM' ? 66 : 34}%"></i>`).join('');
-
-// ---------- channel buttons ----------
+// ---------- channel tiles ----------
 const nav = $('#channels');
 nav.innerHTML = CHANNELS.map((c) => `
-  <a class="ch btn" href="?ch=${c.id}" data-ch="${c.id}" style="--a:${c.sun[0]};--b:${c.sun[1]}">
+  <a class="ch" href="?ch=${c.id}" data-ch="${c.id}" style="--a:${c.sun[0]};--b:${c.sun[1]}">
     <i class="ch-sun"></i>
     <span class="ch-freq">${c.freq}<small> ${c.band}</small></span>
     <span class="ch-name">${c.name}</span>
@@ -1633,8 +1753,8 @@ function tune(id, user = false) {
   $('#host').textContent = ch.host;
   $('#next').textContent = studioLine(ch);
   $('#lcd-freq').textContent = `${ch.freq} ${ch.band}`;
-  $('#lcd-call').textContent = `${ch.call}-${ch.band}`;
-  $('#needle').style.left = `${dialX(ch)}%`;
+  $('#now-title').textContent = ch.name;
+  setCC('');
   listeners = ch.listeners;
   $('#listeners').textContent = fmt(listeners);
   nav.querySelectorAll('a[data-ch]').forEach((a) => a.setAttribute('aria-current', String(a.dataset.ch === ch.id)));
@@ -1644,13 +1764,15 @@ function tune(id, user = false) {
     history.replaceState(null, '', u);
   } catch {}
   window.dispatchEvent(new CustomEvent('shrimp:channel', { detail: { channel: ch, user } }));
-  if (!user) { setLcdBase(idleText()); return; }
+  setLcdBase(ch.guests ? showLine(ch) : idleText());
+  if (!user) return;
   if (playing) { stopChannel(); startChannel(true); } else startAudio();
 }
 
 playBtn.addEventListener('click', () => (playing ? stopAudio() : startAudio()));
 $('#vol').addEventListener('input', (e) => {
   vol = Number(e.target.value) / 100;
+  e.target.style.setProperty('--v', `${e.target.value}%`);
   if (master) master.gain.setTargetAtTime(vol * vol, ctx.currentTime, 0.03);
 });
 
@@ -1720,7 +1842,7 @@ async function playClip(key) {
   try { await el.play(); } catch { return false; }
   duck(true);
   const ms = (clip.t[1] - clip.t[0]) * 1000;
-  flashLcd(`${clip.who}: ${clip.text}`, ms + 1500);
+  setCC(`>> ${clip.who}: ${clip.text}`, ms + 1500);
   clipTimer = setTimeout(() => { el.pause(); duck(false); }, ms);
   return true;
 }
@@ -1731,7 +1853,7 @@ const EGGS = {
   chicken: { clip: 'chicken', note: 'CHICKEN WATER. IT TASTES LIKE WHAT IT IS.' },
   yeehaw: { clip: 'yeehaw', note: 'YEE-HAW, RUBBER BUCKET.' },
   dirty: { clip: 'dirtyboyz', note: 'DIRTY BOYZ. WITH A Z AT THE END, FOLKS.' },
-  felon: { clip: 'felon', note: "I'M A CONVICTED FELON AND YOU'RE LISTENING TO SHRIMP TECH RADIO." },
+  felon: { clip: 'felon', note: "I'M A CONVICTED FELON AND YOU'RE LISTENING TO SHRIMPTECH RADIO." },
   cringe: { clip: 'cringe', note: 'LIFE AFTER DEATH IS NO LONGER CRINGE, FOLKS.' },
   raisin: { clip: 'raisin', note: 'RAISIN RECYCLING SYSTEM. OLD RAISINS, MADE EVEN OLDER.' },
   jamie: { clip: 'jamie', note: 'JAMIE, BRING THAT UP ON THE SCREEN.', screen: true },
@@ -1763,7 +1885,7 @@ function findEgg(key) {
     clearTimeout(jamieTimer);
     jamieTimer = setTimeout(() => { $('#jamie').hidden = true; }, 5000);
   }
-  playClip(egg.clip).then((ok) => { if (!ok) flashLcd(egg.note, 5000); });
+  playClip(egg.clip).then((ok) => { if (!ok) setCC(egg.note, 5000); });
 }
 let typed = '';
 window.addEventListener('keydown', (e) => {
@@ -1819,17 +1941,27 @@ document.querySelectorAll('.burst-bg').forEach((el) => { el.style.clipPath = bur
 // ---------- clock, listeners, now playing ----------
 const clockFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', second: '2-digit' });
 let lastSongSlot = -1;
-// For the show channel: who is in the studio at this point of the loop.
+// For the show channels: who is in the studio at this point of the loop...
 function studioLine(ch) {
   if (!ch.guests) return ch.next.toUpperCase();
-  const pos = loopPos(ch.loopLen);
+  const pos = loopPos(ch.loopLen, ch.offset);
   return `IN THE STUDIO: ${ch.guests.filter((g) => g[0] <= pos).pop()[1]}`;
+}
+// ...and for the player: the song that is on, or the studio line during talk.
+function showLine(ch) {
+  const pos = loopPos(ch.loopLen, ch.offset);
+  const song = ch.captions.find((r) => r[0] <= pos && pos < r[1] && r[2].startsWith('♪'));
+  return song ? `Now playing: ${song[2].replace(/♪/g, '').trim()}` : studioLine(ch);
 }
 function everySecond() {
   const clock = `${clockFmt.format(new Date())} ET`;
   // 4:20 on 106.9420
   $('#clock').textContent = /^4:20:/.test(clock) ? `${clock} ★ 106.9420` : clock;
-  if (current.guests) $('#next').textContent = studioLine(current);
+  if (current.guests) {
+    $('#next').textContent = studioLine(current);
+    const line = showLine(current);
+    if (line !== lcdBase) setLcdBase(line);
+  }
   if (Math.random() < 0.5) {
     listeners = Math.max(1, listeners + (Math.random() - 0.45) * Math.max(2, current.listeners * 0.003));
     $('#listeners').textContent = fmt(listeners);
@@ -1861,7 +1993,9 @@ function frame(now) {
     const target = s / (6 * 255);
     level += (target - level) * (target > level ? 0.5 : 0.08);
   } else level *= 0.95;
-  const W = spec.width, H = spec.height, n = 16, gap = W * 0.025, bw = (W - gap * (n - 1)) / n, rows = 7, rh = H / rows;
+  // thin centered bars, the loudest ones in red
+  const W = spec.width, H = spec.height, n = Math.max(12, Math.round(W / (6 * (window.devicePixelRatio || 1))));
+  const step = W / n, bw = step * 0.55;
   sctx.clearRect(0, 0, W, H);
   for (let i = 0; i < n; i++) {
     let v;
@@ -1870,12 +2004,11 @@ function frame(now) {
       let s = 0;
       for (let j = lo; j <= hi; j++) s += bins[j];
       v = s / ((hi - lo + 1) * 255);
-    } else v = 0.06 + 0.05 * Math.sin(now / 400 + i * 0.7);
-    const lit = Math.round(v * rows * 1.15);
-    for (let r = 0; r < rows; r++) {
-      sctx.fillStyle = r < lit ? (r >= rows - 1 ? CREAM : RED) : 'rgba(232,17,45,0.14)';
-      sctx.fillRect(i * (bw + gap), H - (r + 1) * rh + 1, bw, rh - 2);
-    }
+    } else v = 0.05 + 0.04 * Math.sin(now / 500 + i * 0.6);
+    const h = Math.max(bw, Math.min(1, v * 1.2) * H);
+    sctx.fillStyle = !live ? 'rgba(244,239,228,.25)' : v > 0.7 ? RED : CREAM;
+    const x = i * step + (step - bw) / 2, y = (H - h) / 2;
+    if (sctx.roundRect) { sctx.beginPath(); sctx.roundRect(x, y, bw, h, bw / 2); sctx.fill(); } else sctx.fillRect(x, y, bw, h);
   }
   requestAnimationFrame(frame);
 }
@@ -2225,9 +2358,8 @@ ringBack.renderOrder = 1;
 ringFront.renderOrder = 3;
 ring.add(ringBack, ringFront);
 (async () => {
-  try { await document.fonts.load('80px Bungee'); } catch {}
   const text = ' ★ LIVE ★ 24/7 ★ SHRIMPTECH RADIO ★ ON AIR ';
-  const font = '80px Bungee, "Arial Black", Impact, sans-serif';
+  const font = 'bold 80px "Helvetica Neue", Helvetica, Arial, sans-serif';
   const cv = document.createElement('canvas'), g = cv.getContext('2d');
   g.font = font;
   cv.width = Math.ceil(g.measureText(text).width);
