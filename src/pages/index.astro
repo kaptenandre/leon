@@ -4,13 +4,15 @@ import Release from "../components/Release.astro";
 import Newsletter from "../components/Newsletter.astro";
 import Links from "../components/Links.astro";
 import Credit from "../components/Credit.astro";
+import Dropdown from "../components/Dropdown.astro";
 import { site } from "../site";
 ---
 
 <Base>
-  <Links title="Follow" links={site.socials} />
-  <Release />
-  <Links title="Listen" links={site.streaming} />
+  <nav aria-label="Follow and listen" class="nav">
+    <Dropdown label="Follow" links={site.socials} />
+    <Release />
+  </nav>
   <Newsletter />
   <Links title="Contact" links={site.contact} variant="text" />
   <Credit />

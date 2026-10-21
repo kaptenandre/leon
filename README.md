@@ -7,7 +7,7 @@ Artist site for LÉON at https://leon.site. Astro on Netlify, same stack as gran
 Everything lives in `src/site.ts`:
 
 - `release`: release time (`outAt`), pre-save/smart link and optional video. Before `outAt` the top button reads "Pre-save" and flips to "Listen now" on its own at release time.
-- `streaming` / `socials`: the Listen and Follow buttons.
+- `streaming` / `socials`: the links inside the "Listen now" and "Follow" dropdowns.
 - `background`: image or video (webm/mp4 + mobile version) behind everything.
 
 ## Signup (Mailchimp)

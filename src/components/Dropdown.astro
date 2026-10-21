@@ -1,0 +1,79 @@
+---
+import type { Link } from "../site";
+
+interface Props {
+  label: string;
+  links: Link[];
+  /** Marks the label so a script can update it (e.g. Pre-save to Listen now). */
+  cta?: boolean;
+}
+
+const { label, links, cta = false } = Astro.props;
+const external = (href: string) => (href.startsWith("http") ? { target: "_blank", rel: "me noopener" } : {});
+---
+
+<!-- Shared name: opening one closes the other (native exclusive accordion). -->
+<details class="dropdown" name="menu">
+  <summary class="button primary">
+    <span {...cta ? { "data-cta": "" } : {}}>{label}</span>
+    <svg class="chevron" viewBox="0 0 12 8" aria-hidden="true"
+      ><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg
+    >
+  </summary>
+  <ul class="buttons">
+    {
+      links.map((l) => (
+        <li>
+          <a class="button" href={l.href} {...external(l.href)}>
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</details>
+
+<style>
+  summary {
+    position: relative;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .chevron {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    width: 12px;
+    height: 8px;
+    margin-top: -4px;
+    transition: transform 0.2s;
+  }
+  .dropdown[open] .chevron {
+    transform: rotate(180deg);
+  }
+  .dropdown ul {
+    padding-top: 6px;
+  }
+  .dropdown[open] ul {
+    animation: drop 0.25s ease-out;
+  }
+  @keyframes drop {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dropdown[open] ul,
+    .chevron {
+      animation: none;
+      transition: none;
+    }
+  }
+</style>

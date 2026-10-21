@@ -1,34 +1,17 @@
 ---
 import { site } from "../site";
+import Dropdown from "./Dropdown.astro";
 
 const r = site.release;
 const isOut = Date.now() >= Date.parse(r.outAt);
-// Pre-save/smart link when set, otherwise the artist page on the first streaming service.
-const cta = r.smartLink ?? site.streaming[0]?.href;
+// A pre-save/smart link, when set, sits first; then the artist pages.
+const links = [...(r.smartLink ? [{ label: r.title, href: r.smartLink }] : []), ...site.streaming];
+if (r.video) links.push({ label: "Watch video", href: r.video });
 ---
 
-<section aria-label={r.title} data-release data-out-at={r.outAt}>
-  <ul class="buttons">
-    {
-      cta && (
-        <li>
-          <a class="button primary" href={cta} target="_blank" rel="noopener" data-cta>
-            {isOut ? "Listen now" : "Pre-save"}
-          </a>
-        </li>
-      )
-    }
-    {
-      r.video && (
-        <li>
-          <a class="button" href={r.video} target="_blank" rel="noopener">
-            Watch video
-          </a>
-        </li>
-      )
-    }
-  </ul>
-</section>
+<div data-release data-out-at={r.outAt}>
+  <Dropdown label={isOut ? "Listen now" : "Pre-save"} links={links} cta />
+</div>
 
 <script>
   // Flip "Pre-save" to "Listen now" at release time without a rebuild.
