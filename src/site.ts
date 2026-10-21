@@ -69,7 +69,7 @@ export const site = {
   ] as Link[],
 
   newsletter: {
-    title: "Get updates",
+    title: "Join the community",
     success: "You’re in. Talk soon.",
     consent:
       "By signing up you agree to receive email and/or SMS updates from LÉON. Unsubscribe at any time. Message & data rates may apply.",
