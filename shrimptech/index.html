@@ -6,27 +6,22 @@
 <title>Shrimptech Radio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Shrimptech Radio. Live 24/7 from downtown Shrimpville, USA. The tri-state's #1 shrimp station.">
-<meta name="theme-color" content="#060818">
+<meta name="theme-color" content="#0a0c16">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bungee&family=Monoton&family=VT323&display=swap">
 <style>
   :root {
-    /* Layout: flag bands top and bottom, sunburst stage in the middle, car-stereo faceplate under it */
-    --night: #060818;
-    --navy: #0c1747;
-    --navy-hi: #1b2b7a;
-    --red: #e3102c;
-    --red-deep: #7d0015;
-    --white: #f5f7ff;
-    --star: #ffd23f;
-    --steel: #aab4c8;
-    --lcd: #a8ff52;
-    --lcd-bg: #08140a;
-    /* channel colors, swapped by tune() */
-    --ch: #ff2a4d;
-    --ch-deep: #3f0512;
-    --ch-ink: #ffffff;
+    /* Layout: flag bands top and bottom, rising-sun stage in the middle, flat console under it.
+       Palette: three colors (sun red, paper cream, ink). Chrome is only for the logo. */
+    --red: #e8112d;
+    --cream: #f4efe4;
+    --ink: #0a0c16;
+    /* tints of the three, not extra colors */
+    --red-deep: #7a0918;
+    --ink-2: #141826;
+    --cream-dim: rgba(244,239,228,.64);
+    --line: rgba(244,239,228,.2);
     --font-display: "Anton", Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif;
     --font-badge: "Bungee", "Arial Black", Impact, sans-serif;
     --font-neon: "Monoton", "Bungee", "Arial Black", sans-serif;
@@ -40,48 +35,42 @@
   html, body { height: 100%; }
   body {
     margin: 0;
-    background: var(--night);
-    color: var(--white);
+    background: var(--ink);
+    color: var(--cream);
     font-family: var(--font-body);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
-  :focus-visible { outline: 3px solid var(--star); outline-offset: 3px; }
+  :focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 
   #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
   .app { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; }
   .band-in { padding-left: var(--gut-l); padding-right: var(--gut-r); }
+  .star { color: var(--red); }
 
   /* ---------- top bar ---------- */
   .topbar {
-    background: linear-gradient(180deg, var(--navy-hi), var(--navy));
+    background: var(--ink);
     border-bottom: 4px solid transparent;
-    border-image: repeating-linear-gradient(90deg, var(--red) 0 22px, var(--white) 22px 44px) 4;
+    border-image: repeating-linear-gradient(90deg, var(--red) 0 22px, var(--cream) 22px 44px) 4;
     font-family: var(--font-badge);
     font-size: 12px;
     letter-spacing: .06em;
   }
   .topbar .band-in { display: flex; align-items: center; gap: 14px; min-height: 42px; padding-block: 6px; }
-  .live-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--red); color: var(--white);
-    padding: 3px 10px 3px 8px; border-radius: 4px;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 16px rgba(227,16,44,.6);
-  }
-  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--white); animation: blink 1s steps(2, start) infinite; }
+  .live-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--red); color: var(--cream); padding: 3px 10px 3px 8px; border-radius: 3px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--cream); animation: blink 1s steps(2, start) infinite; }
   @keyframes blink { to { visibility: hidden; } }
   .onair {
-    font-family: var(--font-neon); font-size: 17px; line-height: 1.35; color: #ffe9ec;
-    padding: 0 8px; border: 2px solid #ff4d64; border-radius: 6px;
-    text-shadow: 0 0 4px var(--white), 0 0 10px var(--red), 0 0 22px var(--red), 0 0 40px var(--red);
-    box-shadow: 0 0 12px var(--red), inset 0 0 10px rgba(227,16,44,.55);
+    font-family: var(--font-neon); font-size: 17px; line-height: 1.35; color: var(--cream);
+    padding: 0 8px; border: 2px solid var(--red); border-radius: 6px;
+    text-shadow: 0 0 4px var(--cream), 0 0 12px var(--red), 0 0 26px var(--red);
+    box-shadow: 0 0 12px var(--red), inset 0 0 10px rgba(232,17,45,.5);
     animation: flicker 6s infinite;
   }
   @keyframes flicker { 0%, 19%, 21%, 62%, 64%, 100% { opacity: 1; } 20%, 63% { opacity: .45; } }
-  .network { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #dfe5ff; }
-  .star { color: var(--star); }
+  .network { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--cream-dim); }
   .tb-right { display: flex; gap: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .clock { color: var(--star); }
   @media (max-width: 760px) { .network, .tb-wx { display: none; } .tb-right { margin-left: auto; } }
 
   /* ---------- marquees (stocks + news) ---------- */
@@ -94,16 +83,13 @@
   .half { display: inline-flex; }
   @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-  .stocks { background: #000; border-bottom: 1px solid rgba(255,255,255,.12); font-family: var(--font-lcd); font-size: 21px; }
+  .stocks { background: var(--ink); border-bottom: 1px solid var(--line); font-family: var(--font-lcd); font-size: 21px; }
   .stocks .band-in { display: flex; align-items: center; gap: 12px; height: 34px; }
-  .stocks-label {
-    font-family: var(--font-badge); font-size: 11px; line-height: 1; white-space: nowrap;
-    color: #000; background: var(--star); padding: 5px 8px; border-radius: 3px;
-  }
-  .tk { padding-right: 30px; color: #cfd6e6; font-variant-numeric: tabular-nums; }
-  .tk b { color: var(--white); font-weight: 400; }
-  .up { color: #3dff7a; }
-  .down { color: #ff4d5e; }
+  .stocks-label { font-family: var(--font-badge); font-size: 11px; line-height: 1; white-space: nowrap; color: var(--cream); background: var(--red); padding: 5px 8px; border-radius: 3px; }
+  .tk { padding-right: 30px; color: var(--cream-dim); font-variant-numeric: tabular-nums; }
+  .tk b { color: var(--cream); font-weight: 400; }
+  .up { color: var(--cream); }
+  .down { color: var(--red); }
 
   /* ---------- deck ---------- */
   .deck {
@@ -136,7 +122,7 @@
     .stage { height: clamp(290px, 88vw, 430px); }
   }
 
-  /* ---------- brand ---------- */
+  /* ---------- brand: the one place with chrome ---------- */
   .brand { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding-top: 6px; }
   .logo { position: relative; display: inline-flex; flex-direction: column; align-items: center; }
   .wordmark {
@@ -147,7 +133,7 @@
     background: linear-gradient(180deg, #fff 0%, #eef2fb 26%, #9aa7c2 47%, #222a46 50%, #59678a 60%, #d9e1f0 84%, #fff 100%);
     -webkit-background-clip: text; background-clip: text;
     color: transparent; -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 1px 0 #fff) drop-shadow(0 2px 0 #10183d) drop-shadow(0 2px 0 var(--red)) drop-shadow(0 2px 0 var(--red-deep)) drop-shadow(0 8px 14px rgba(0,0,0,.6));
+    filter: drop-shadow(0 1px 0 #fff) drop-shadow(0 2px 0 var(--ink)) drop-shadow(0 2px 0 var(--red)) drop-shadow(0 2px 0 var(--red-deep)) drop-shadow(0 8px 14px rgba(0,0,0,.6));
   }
   .wordmark::after {
     content: attr(data-text);
@@ -161,25 +147,28 @@
   @keyframes shine { 0%, 55% { background-position: 150% 0; } 100% { background-position: -50% 0; } }
   .logo-row { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
   .radio-banner {
-    font-family: var(--font-badge); font-size: clamp(16px, 2.1vw, 26px); letter-spacing: .12em; color: var(--white);
-    background: linear-gradient(180deg, #ff5a6e, var(--red) 50%, #b50a22 51%, var(--red));
-    padding: 4px 16px; border: 2px solid var(--white);
+    font-family: var(--font-badge); font-size: clamp(15px, 2vw, 24px); letter-spacing: .12em;
+    color: var(--cream); background: var(--red);
+    padding: 4px 16px; border: 2px solid var(--cream);
     transform: skewX(-12deg);
-    box-shadow: 0 4px 0 var(--red-deep), 0 8px 16px rgba(0,0,0,.5);
+    box-shadow: 4px 4px 0 var(--ink);
   }
   .freq {
     font-family: var(--font-display); font-size: clamp(32px, 3.8vw, 50px); line-height: 1;
-    color: var(--ch); transform: skewX(-9deg);
-    text-shadow: 0 0 18px color-mix(in srgb, var(--ch) 65%, transparent), 0 3px 0 #000;
-    transition: color .4s;
+    color: var(--cream); transform: skewX(-9deg);
+    text-shadow: 3px 3px 0 var(--ink);
   }
   .freq small { font-size: .45em; margin-left: 4px; letter-spacing: .05em; }
-  .slogan { margin: 6px 0 0; font-family: var(--font-badge); font-size: clamp(11px, 1.3vw, 15px); letter-spacing: .14em; text-shadow: 0 2px 0 #000; text-wrap: balance; }
+  .slogan {
+    margin: 8px 0 0; padding: 4px 14px; border-radius: 999px;
+    background: var(--ink); color: var(--cream);
+    font-family: var(--font-badge); font-size: clamp(11px, 1.3vw, 14px); letter-spacing: .14em; text-wrap: balance;
+  }
 
   /* starburst stickers */
-  .burst { position: absolute; display: grid; place-items: center; width: 92px; aspect-ratio: 1; pointer-events: none; filter: drop-shadow(0 4px 0 #b36b00) drop-shadow(0 8px 10px rgba(0,0,0,.45)); }
-  .burst-bg { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff7b0, var(--star) 45%, #f0a400); animation: spin 14s linear infinite; }
-  .burst-txt { position: relative; font-family: var(--font-badge); font-size: 15px; line-height: 1.02; color: var(--red); text-align: center; transform: rotate(-12deg); text-shadow: 0 1px 0 #fff; animation: throb 1.2s ease-in-out infinite; }
+  .burst { position: absolute; display: grid; place-items: center; width: 92px; aspect-ratio: 1; pointer-events: none; filter: drop-shadow(3px 3px 0 var(--ink)); }
+  .burst-bg { position: absolute; inset: 0; border-radius: 50%; background: var(--cream); animation: spin 14s linear infinite; }
+  .burst-txt { position: relative; font-family: var(--font-badge); font-size: 15px; line-height: 1.02; color: var(--red); text-align: center; transform: rotate(-12deg); animation: throb 1.2s ease-in-out infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes throb { 50% { transform: rotate(-12deg) scale(1.1); } }
   .burst-live { top: -20px; right: -70px; }
@@ -193,7 +182,7 @@
   .stage { position: relative; min-height: 300px; cursor: pointer; border-radius: 18px; -webkit-tap-highlight-color: transparent; }
   .stage::before {
     content: ""; position: absolute; inset: 10px; pointer-events: none;
-    --c: rgba(255,255,255,.55); --l: 28px; --w: 2px;
+    --c: rgba(244,239,228,.6); --l: 28px; --w: 2px;
     background:
       linear-gradient(var(--c), var(--c)) top left / var(--l) var(--w) no-repeat,
       linear-gradient(var(--c), var(--c)) top left / var(--w) var(--l) no-repeat,
@@ -204,21 +193,17 @@
       linear-gradient(var(--c), var(--c)) bottom right / var(--l) var(--w) no-repeat,
       linear-gradient(var(--c), var(--c)) bottom right / var(--w) var(--l) no-repeat;
   }
-  .bug { position: absolute; top: 20px; left: 20px; display: flex; font-family: var(--font-badge); font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.45); }
+  .bug { position: absolute; top: 20px; left: 20px; display: flex; font-family: var(--font-badge); font-size: 12px; }
   .bug-live { display: inline-flex; align-items: center; gap: 6px; background: var(--red); padding: 4px 8px; }
-  .bug-cam { background: rgba(0,0,0,.65); padding: 4px 8px; }
+  .bug-cam { background: var(--ink); padding: 4px 8px; }
   .badges { position: absolute; top: 20px; right: 20px; display: flex; gap: 4px; }
-  .badges span { font-family: var(--font-badge); font-size: 11px; padding: 3px 6px; border: 1.5px solid rgba(255,255,255,.8); border-radius: 4px; background: rgba(0,0,0,.4); }
+  .badges span { font-family: var(--font-badge); font-size: 11px; padding: 3px 6px; border: 1.5px solid var(--cream); border-radius: 4px; background: var(--ink); }
   .burst-3d { right: 7%; bottom: 26%; width: 88px; }
   .burst-3d .burst-bg { animation-direction: reverse; }
-  .lower-third {
-    position: absolute; left: 20px; right: 20px; bottom: 20px; max-width: 470px;
-    display: grid; grid-template-columns: auto minmax(0, 1fr);
-    box-shadow: 0 8px 20px rgba(0,0,0,.5);
-  }
-  .lt-tag { grid-row: 1 / 3; display: grid; place-items: center; padding: 0 12px; background: var(--ch); color: var(--ch-ink); font-family: var(--font-badge); font-size: 14px; transition: background .4s, color .4s; }
-  .lt-main { background: linear-gradient(180deg, #fff, #dfe4f0); color: var(--navy); font-family: var(--font-display); font-size: 24px; line-height: 1.2; padding: 2px 12px; letter-spacing: .02em; }
-  .lt-sub { background: var(--navy); font-family: var(--font-badge); font-size: 11px; letter-spacing: .08em; padding: 4px 12px; }
+  .lower-third { position: absolute; left: 20px; right: 20px; bottom: 20px; max-width: 470px; display: grid; grid-template-columns: auto minmax(0, 1fr); }
+  .lt-tag { grid-row: 1 / 3; display: grid; place-items: center; padding: 0 12px; background: var(--red); color: var(--cream); font-family: var(--font-badge); font-size: 14px; }
+  .lt-main { background: var(--cream); color: var(--ink); font-family: var(--font-display); font-size: 24px; line-height: 1.2; padding: 2px 12px; letter-spacing: .02em; }
+  .lt-sub { background: var(--ink); font-family: var(--font-badge); font-size: 11px; letter-spacing: .08em; padding: 4px 12px; }
   .stage-fallback { position: absolute; inset: 0; display: grid; place-items: center; font-size: 120px; opacity: 0; animation: fbIn .4s 2.5s forwards, spinY 3s linear infinite; pointer-events: none; }
   .gl-on .stage-fallback { display: none; }
   @keyframes fbIn { to { opacity: 1; } }
@@ -229,152 +214,111 @@
     .lt-main { font-size: 20px; }
   }
 
+  /* "Jamie, pull that up": the screen the studio doesn't have */
+  .jamie { position: absolute; top: 56px; right: 20px; width: min(300px, 72%); background: var(--cream); color: var(--ink); border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--red); animation: jamieIn .25s ease-out; }
+  .jamie-tag { display: block; padding: 4px 8px; background: var(--red); color: var(--cream); font-family: var(--font-badge); font-size: 11px; letter-spacing: .08em; }
+  .jamie b { display: block; padding: 10px 12px 12px; font-family: var(--font-display); font-size: 24px; font-weight: 400; line-height: 1.05; }
+  @keyframes jamieIn { from { transform: scale(.6) rotate(-4deg); opacity: 0; } }
+
   /* ---------- cards ---------- */
   .card {
-    position: relative; overflow: hidden;
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; gap: 8px; overflow: hidden;
     padding: 0 16px 16px;
-    background: linear-gradient(180deg, rgba(27,43,122,.94), rgba(8,13,44,.95));
-    border: 1px solid rgba(255,255,255,.22); border-radius: 14px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 14px 30px rgba(0,0,0,.5);
+    background: var(--ink-2); border: 1px solid var(--line); border-radius: 12px;
   }
-  .card::before { content: ""; position: absolute; inset: 0 0 55% 0; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0)); pointer-events: none; }
-  .card-head {
-    display: flex; align-items: center; gap: 8px;
-    margin: 0 -16px 4px; padding: 8px 16px;
-    background: linear-gradient(180deg, #ff4b61, var(--red) 50%, #c00a24 51%, var(--red));
-    border-bottom: 2px solid var(--white);
-  }
+  .card-head { display: flex; align-items: center; gap: 8px; margin: 0 -16px 4px; padding: 8px 16px; background: var(--red); }
   .card-head h2 { margin: 0; font-family: var(--font-badge); font-size: 14px; font-weight: 400; letter-spacing: .1em; }
-  .rec { width: 10px; height: 10px; border-radius: 50%; background: var(--white); box-shadow: 0 0 8px var(--white); animation: blink 1s steps(2, start) infinite; }
+  .rec { width: 10px; height: 10px; border-radius: 50%; background: var(--cream); animation: blink 1s steps(2, start) infinite; }
   .show { margin: 0; font-family: var(--font-display); font-size: 28px; line-height: 1.04; text-transform: uppercase; text-wrap: balance; }
-  .host { margin: 0; color: #c9d2f2; font-size: 14px; }
-  .rating { margin: 0; color: var(--star); font-family: var(--font-badge); font-size: 10px; letter-spacing: .08em; }
+  .host { margin: 0; color: var(--cream-dim); font-size: 14px; }
+  .rating { margin: 0; color: var(--red); font-family: var(--font-badge); font-size: 10px; letter-spacing: .08em; }
   .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 2px 0 0; }
-  .stats div, .wx-card { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 6px 8px; }
-  .stats dt { font-family: var(--font-badge); font-size: 10px; letter-spacing: .08em; color: var(--star); }
+  .stats div, .wx-card { background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+  .stats dt { font-family: var(--font-badge); font-size: 10px; letter-spacing: .08em; color: var(--red); }
   .stats dd { margin: 0; font-family: var(--font-lcd); font-size: 26px; line-height: 1; font-variant-numeric: tabular-nums; }
-  .next { margin: 0; font-family: var(--font-badge); font-size: 11px; letter-spacing: .05em; line-height: 1.35; color: #9fb0ea; }
-  .phone { margin: 0; font-family: var(--font-display); font-size: 36px; line-height: 1; letter-spacing: .02em; color: var(--star); text-shadow: 0 3px 0 #000, 0 0 18px rgba(255,210,63,.35); white-space: nowrap; }
-  .call-btn { font-size: 13px; padding: 12px 14px; }
-  .call-status { margin: 0; min-height: 1.2em; font-family: var(--font-lcd); font-size: 21px; line-height: 1.05; color: var(--lcd); }
-  .contest { margin: 0; font-size: 13px; line-height: 1.4; color: #dfe5ff; }
-  .contest b { font-family: var(--font-badge); font-weight: 400; color: var(--white); }
-  .wx-card { display: flex; align-items: center; gap: 10px; font-size: 12px; line-height: 1.3; color: #dfe5ff; }
-  .wx-temp { font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--white); }
+  .next { margin: 0; font-family: var(--font-badge); font-size: 11px; letter-spacing: .05em; line-height: 1.35; color: var(--cream-dim); }
+  .phone { margin: 0; font-family: var(--font-display); font-size: 36px; line-height: 1; letter-spacing: .02em; color: var(--red); white-space: nowrap; }
+  .call-btn { font-size: 13px; padding: 11px 14px; }
+  .call-status { margin: 0; min-height: 1.2em; font-family: var(--font-lcd); font-size: 21px; line-height: 1.05; color: var(--cream); }
+  .contest { margin: 0; font-size: 13px; line-height: 1.4; color: var(--cream-dim); }
+  .contest b { font-family: var(--font-badge); font-weight: 400; color: var(--cream); }
+  .wx-card { display: flex; align-items: center; gap: 10px; font-size: 12px; line-height: 1.3; color: var(--cream-dim); }
+  .wx-temp { font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--cream); }
 
-  /* ---------- glossy buttons ---------- */
-  .gloss {
-    --btn: var(--red); --ink: var(--white);
+  /* ---------- flat buttons ---------- */
+  .btn {
     position: relative;
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    border: 1px solid color-mix(in srgb, var(--btn) 55%, #000); border-radius: 12px;
-    color: var(--ink); text-decoration: none; cursor: pointer;
-    font-family: var(--font-badge);
-    background: linear-gradient(180deg, color-mix(in srgb, var(--btn) 55%, #fff) 0%, var(--btn) 48%, color-mix(in srgb, var(--btn) 78%, #000) 52%, var(--btn) 100%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.75), inset 0 -3px 8px rgba(0,0,0,.3), 0 4px 0 color-mix(in srgb, var(--btn) 45%, #000), 0 10px 18px rgba(0,0,0,.45);
-    transition: transform .08s, box-shadow .08s, filter .2s;
+    border: 2px solid var(--cream); border-radius: 8px;
+    background: var(--ink); color: var(--cream);
+    font-family: var(--font-badge); text-decoration: none; cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s, transform .08s;
   }
-  .gloss::after {
-    content: ""; position: absolute; left: 6px; right: 6px; top: 2px; height: 45%;
-    border-radius: 9px 9px 40% 40% / 9px 9px 12px 12px;
-    background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.06));
-    pointer-events: none;
-  }
-  .gloss:hover { filter: brightness(1.08) saturate(1.1); }
-  .gloss:active { transform: translateY(3px); box-shadow: inset 0 1px 0 rgba(255,255,255,.75), inset 0 -3px 8px rgba(0,0,0,.3), 0 1px 0 color-mix(in srgb, var(--btn) 45%, #000), 0 4px 8px rgba(0,0,0,.45); }
+  .btn:hover { background: var(--cream); color: var(--ink); }
+  .btn:active { transform: translateY(1px); }
+  .btn-red { background: var(--red); border-color: var(--red); }
+  .btn-red:hover { background: var(--cream); border-color: var(--cream); color: var(--red); }
 
-  /* ---------- console (car stereo) ---------- */
-  .console {
-    position: relative;
-    display: flex; flex-direction: column; gap: 10px;
-    padding: 12px 16px 14px;
-    border-radius: 20px;
-    background:
-      radial-gradient(circle at 12px 12px, #c9d0dd 0 3px, #3a4152 4px, transparent 5px),
-      radial-gradient(circle at calc(100% - 12px) 12px, #c9d0dd 0 3px, #3a4152 4px, transparent 5px),
-      radial-gradient(circle at 12px calc(100% - 12px), #c9d0dd 0 3px, #3a4152 4px, transparent 5px),
-      radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), #c9d0dd 0 3px, #3a4152 4px, transparent 5px),
-      linear-gradient(180deg, #343c50, #161b28 45%, #0c1019);
-    border: 1px solid rgba(255,255,255,.16);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.33), inset 0 -2px 0 rgba(0,0,0,.5), 0 18px 40px rgba(0,0,0,.65);
-  }
+  /* ---------- console ---------- */
+  .console { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px; border-radius: 14px; background: var(--ink-2); border: 1px solid var(--line); }
   .faceplate { display: grid; grid-template-columns: auto auto minmax(0, 1fr) minmax(150px, 210px); align-items: center; gap: 16px; }
   @media (max-width: 820px) {
     .faceplate { grid-template-columns: auto minmax(0, 1fr); }
     .lcd, .vol { grid-column: 1 / -1; }
   }
-  .play {
-    position: relative; width: 78px; height: 78px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
-    display: grid; place-items: center;
-    background: conic-gradient(from 210deg, #fff, #8d97ab, #f6f8fc, #5b6479, #fff, #9aa4b8, #fff);
-    box-shadow: 0 6px 0 #05070d, 0 12px 24px rgba(0,0,0,.6);
-  }
-  .play::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--red); animation: pulse 1.6s ease-out infinite; pointer-events: none; }
-  .is-playing .play::before { border-color: var(--ch); }
+  .play { position: relative; width: 72px; height: 72px; padding: 0; border: 3px solid var(--cream); border-radius: 50%; cursor: pointer; display: grid; place-items: center; background: var(--red); }
+  .play::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 2px solid var(--red); animation: pulse 1.6s ease-out infinite; pointer-events: none; }
   @keyframes pulse { from { transform: scale(.95); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
-  .play-ring {
-    position: relative; width: 64px; height: 64px; border-radius: 50%;
-    display: grid; place-items: center;
-    background: radial-gradient(circle at 50% 30%, #ff8494, var(--red) 45%, #8c0018 100%);
-    box-shadow: inset 0 2px 2px rgba(255,255,255,.55), inset 0 -6px 12px rgba(0,0,0,.4);
-  }
-  .play-ring::after { content: ""; position: absolute; left: 12px; right: 12px; top: 4px; height: 40%; border-radius: 50%; background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0)); }
-  .play-ico { width: 0; height: 0; margin-left: 6px; border-left: 22px solid var(--white); border-top: 14px solid transparent; border-bottom: 14px solid transparent; filter: drop-shadow(0 2px 0 rgba(0,0,0,.4)); }
-  .is-playing .play-ico { width: 22px; height: 26px; margin: 0; border: 0; background: linear-gradient(90deg, var(--white) 0 36%, transparent 36% 64%, var(--white) 64%); }
+  .play-ring { display: grid; place-items: center; }
+  .play-ico { width: 0; height: 0; margin-left: 6px; border-left: 22px solid var(--cream); border-top: 14px solid transparent; border-bottom: 14px solid transparent; }
+  .is-playing .play-ico { width: 22px; height: 26px; margin: 0; border: 0; background: linear-gradient(90deg, var(--cream) 0 36%, transparent 36% 64%, var(--cream) 64%); }
   .play-label b { display: block; font-family: var(--font-display); font-size: 30px; font-weight: 400; line-height: 1; letter-spacing: .02em; white-space: nowrap; }
-  .play-label span { font-family: var(--font-badge); font-size: 11px; letter-spacing: .08em; color: var(--star); white-space: nowrap; }
+  .play-label span { font-family: var(--font-badge); font-size: 11px; letter-spacing: .08em; color: var(--red); white-space: nowrap; }
 
+  /* LED display */
   .lcd {
     position: relative; min-width: 0; overflow: hidden;
     display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: center;
-    padding: 8px 12px; border-radius: 10px; border: 2px solid #000;
-    background: radial-gradient(120% 140% at 50% 0%, #12301a, var(--lcd-bg) 70%);
-    box-shadow: inset 0 0 0 1px #2b4d2b, inset 0 6px 14px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.2);
+    padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--ink);
     font-family: var(--font-lcd); font-size: 22px; line-height: 1.1;
-    color: var(--lcd); text-shadow: 0 0 6px color-mix(in srgb, var(--lcd) 60%, transparent);
+    color: var(--red); text-shadow: 0 0 6px rgba(232,17,45,.7);
   }
-  .lcd::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px); pointer-events: none; }
+  .lcd::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.3) 0 1px, transparent 1px 3px); pointer-events: none; }
   .lcd-lines { min-width: 0; }
   .lcd-l1 { display: flex; gap: 12px; white-space: nowrap; overflow: hidden; }
-  .lcd-live { color: #ff5a6a; visibility: hidden; }
+  .lcd-live { color: var(--cream); visibility: hidden; }
   .is-playing .lcd-live { visibility: visible; animation: blink 1s steps(2, start) infinite; }
   .lcd-l2 { white-space: nowrap; overflow: hidden; }
   .lcd-l2 span { display: inline-block; }
   .lcd-l2.scroll span { padding-left: 100%; animation: lcdScroll var(--d, 12s) linear infinite; }
+  .lcd-l2.pan span { animation: lcdPan var(--d, 4s) linear forwards; }
   @keyframes lcdScroll { to { transform: translateX(-100%); } }
+  @keyframes lcdPan { 0%, 12% { transform: translateX(0); } 100% { transform: translateX(var(--shift, 0)); } }
   #spectrum { width: 150px; height: 46px; display: block; }
   @media (max-width: 820px) { #spectrum { width: 90px; } }
 
-  .vol { display: flex; align-items: center; gap: 10px; font-family: var(--font-badge); font-size: 11px; color: var(--steel); }
-  .vol input { flex: 1; min-width: 0; accent-color: var(--ch); }
+  .vol { display: flex; align-items: center; gap: 10px; font-family: var(--font-badge); font-size: 11px; color: var(--cream-dim); }
+  .vol input { flex: 1; min-width: 0; accent-color: var(--red); }
 
-  .dial {
-    position: relative; height: 48px; overflow: hidden;
-    border-radius: 10px; border: 1px solid #000;
-    background: linear-gradient(180deg, #0b0f1a, #121a2e);
-    box-shadow: inset 0 2px 10px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.14);
-  }
-  .dial-band { position: absolute; left: 6px; font-family: var(--font-badge); font-size: 10px; color: var(--steel); }
+  .dial { position: relative; height: 48px; overflow: hidden; border-radius: 8px; border: 1px solid var(--line); background: var(--ink); }
+  .dial-band { position: absolute; left: 6px; font-family: var(--font-badge); font-size: 10px; color: var(--cream-dim); }
   .dial-band.fm { top: 6px; }
-  .dial-band.am { bottom: 6px; color: #ffcf7a; }
+  .dial-band.am { bottom: 6px; }
   .dial-track { position: absolute; inset: 0 26px 0 34px; }
-  .scale { position: absolute; left: 0; right: 0; height: 50%; font-family: var(--font-lcd); font-size: 16px; line-height: 1; color: #e8ecff; }
-  .scale::before { content: ""; position: absolute; left: 0; right: 0; height: 6px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.4) 0 1px, transparent 1px 9px); }
+  .scale { position: absolute; left: 0; right: 0; height: 50%; font-family: var(--font-lcd); font-size: 16px; line-height: 1; color: var(--cream-dim); }
+  .scale::before { content: ""; position: absolute; left: 0; right: 0; height: 6px; background: repeating-linear-gradient(90deg, rgba(244,239,228,.35) 0 1px, transparent 1px 9px); }
   .scale.fm { top: 0; }
   .scale.fm::before { bottom: 0; }
-  .scale.am { bottom: 0; color: #ffcf7a; }
+  .scale.am { bottom: 0; }
   .scale.am::before { top: 0; }
   .scale span { position: absolute; transform: translateX(-50%); }
   .scale.fm span { top: 6px; }
   .scale.am span { bottom: 6px; }
-  .mark { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
-  .needle {
-    position: absolute; top: 3px; bottom: 3px; width: 3px; margin-left: -1.5px; border-radius: 2px;
-    background: var(--ch); box-shadow: 0 0 10px var(--ch), 0 0 2px #fff;
-    transition: left .8s cubic-bezier(.3, 1.5, .5, 1), background .4s;
-  }
+  .mark { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--cream); }
+  .needle { position: absolute; top: 3px; bottom: 3px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--red); box-shadow: 0 0 10px var(--red); transition: left .8s cubic-bezier(.3, 1.5, .5, 1); }
 
+  /* channel buttons: same page, the three colors in a different order */
   .channels { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
   @media (max-width: 980px) { .channels { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 480px) { .channels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -382,60 +326,45 @@
   .ch-freq { font-family: var(--font-display); font-size: 25px; line-height: 1; }
   .ch-freq small { font-size: .5em; }
   .ch-name { font-family: var(--font-badge); font-size: 11px; line-height: 1.1; letter-spacing: .03em; }
-  .ch-led { position: absolute; right: 10px; top: 10px; width: 10px; height: 10px; border-radius: 50%; background: rgba(0,0,0,.4); box-shadow: inset 0 1px 2px rgba(0,0,0,.6); }
-  .ch[aria-current="true"] { box-shadow: 0 0 0 3px var(--white), 0 0 26px var(--btn), inset 0 1px 0 rgba(255,255,255,.75), 0 4px 0 color-mix(in srgb, var(--btn) 45%, #000); }
-  .ch[aria-current="true"] .ch-led { background: var(--white); box-shadow: 0 0 6px var(--white), 0 0 14px var(--btn); }
-  .is-playing .ch[aria-current="true"] .ch-led { animation: blink 1s steps(2, start) infinite; }
+  .ch-sun { position: absolute; right: 9px; top: 9px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid currentColor; background: repeating-conic-gradient(var(--a) 0 11.25deg, var(--b) 11.25deg 22.5deg); }
+  .ch[aria-current="true"] { background: var(--red); border-color: var(--red); color: var(--cream); }
+  .ch[aria-current="true"]:hover { background: var(--cream); border-color: var(--cream); color: var(--red); }
+  .is-playing .ch[aria-current="true"] .ch-sun { animation: spin 4s linear infinite; }
 
   /* ---------- news crawl ---------- */
   .news {
     position: sticky; bottom: 0; z-index: 5;
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: linear-gradient(180deg, #101c58, #0a1240); border-block: 2px solid var(--red);
-    box-shadow: 0 -10px 24px rgba(0,0,0,.45);
+    background: var(--ink); border-block: 2px solid var(--red);
   }
   .news .band-in { display: flex; align-items: center; gap: 14px; height: 48px; }
-  .news-label {
-    font-family: var(--font-badge); font-size: 12px; line-height: 1; white-space: nowrap;
-    background: var(--red); color: var(--white); padding: 6px 10px;
-    transform: skewX(-10deg); box-shadow: 0 0 18px rgba(227,16,44,.55);
-    animation: newsPulse 1.2s ease-in-out infinite;
-  }
-  @keyframes newsPulse { 50% { box-shadow: 0 0 4px rgba(227,16,44,.2); filter: brightness(1.25); } }
+  .news-label { font-family: var(--font-badge); font-size: 12px; line-height: 1; white-space: nowrap; background: var(--red); color: var(--cream); padding: 6px 10px; transform: skewX(-10deg); animation: newsPulse 1.2s steps(2, start) infinite; }
+  @keyframes newsPulse { 50% { background: var(--cream); color: var(--red); } }
   .news .track { font-family: var(--font-display); font-size: 23px; letter-spacing: .02em; }
   .item { padding-right: 34px; }
-  .item::before { content: "\2605"; color: var(--star); margin-right: 14px; }
+  .item::before { content: "\2605"; color: var(--red); margin-right: 14px; }
 
   /* ---------- sponsors ---------- */
-  .sponsors { background: linear-gradient(180deg, #f3f5fb, #cdd4e4); color: var(--navy); }
+  .sponsors { background: var(--cream); color: var(--ink); }
   .sponsors .band-in { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-block: 12px 14px; }
-  .sp-label { margin: 0; font-family: var(--font-badge); font-size: 11px; letter-spacing: .14em; color: #46507a; text-align: center; }
+  .sp-label { margin: 0; font-family: var(--font-badge); font-size: 11px; letter-spacing: .14em; text-align: center; }
   .sp-row { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-  .sp { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 56px; padding: 6px 14px; border-radius: 10px; text-align: center; line-height: 1; box-shadow: 0 3px 0 rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.5); }
+  .sp { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 56px; padding: 6px 14px; border-radius: 8px; text-align: center; line-height: 1; border: 2px solid var(--ink); }
   .sp b { font-weight: 400; }
   .sp small { margin-top: 5px; font-family: var(--font-badge); font-size: 9px; letter-spacing: .07em; }
-  .sp-law { background: var(--navy); color: var(--star); }
-  .sp-law b { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 21px; letter-spacing: .06em; }
-  .sp-mattress { background: linear-gradient(#ffe04a, #ffb800); color: #c4001d; }
-  .sp-mattress b { font-family: var(--font-display); font-size: 22px; }
-  .sp-bait { background: #1f5d2b; color: #f1ffe8; }
-  .sp-bait b { font-family: var(--font-badge); font-size: 15px; }
-  .sp-coin { background: #111; color: #ffcf3f; flex-direction: row; gap: 8px; }
-  .sp-coin i { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff2a8, #ffc21a 55%, #b97b00); color: #5a3a00; font-family: var(--font-badge); font-style: normal; font-size: 16px; }
-  .sp-coin span { display: flex; flex-direction: column; align-items: flex-start; }
-  .sp-coin b { font-family: var(--font-badge); font-size: 16px; }
-  .sp-cars { background: var(--red); color: var(--white); }
-  .sp-cars b { font-family: var(--font-display); font-size: 22px; transform: skewX(-10deg); }
-  .sp-gumbo { background: #6b2c0f; color: #ffd9a8; }
-  .sp-gumbo b { font-family: var(--font-neon); font-size: 17px; }
-  .sp-sauce { background: var(--white); color: #b30016; border: 2px solid #b30016; }
-  .sp-sauce b { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 20px; }
-  .sp-plumb { background: #2a7bff; color: var(--white); }
-  .sp-plumb b { font-family: var(--font-display); font-size: 21px; letter-spacing: .03em; }
-  .fine { margin: 0; font-family: var(--font-badge); font-size: 10px; letter-spacing: .06em; color: #5a6388; text-align: center; text-wrap: balance; }
+  .sp.ink { background: var(--ink); color: var(--cream); }
+  .sp.red { background: var(--red); border-color: var(--red); color: var(--cream); }
+  .sp.paper { background: var(--cream); color: var(--ink); }
+  .sp.paper-red { background: var(--cream); border-color: var(--red); color: var(--red); }
+  .sp .f-serif { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 20px; letter-spacing: .04em; }
+  .sp .f-italic { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 20px; }
+  .sp .f-display { font-family: var(--font-display); font-size: 22px; letter-spacing: .02em; }
+  .sp .f-badge { font-family: var(--font-badge); font-size: 15px; }
+  .sp .f-neon { font-family: var(--font-neon); font-size: 17px; }
+  .fine { margin: 0; font-family: var(--font-badge); font-size: 10px; letter-spacing: .06em; color: rgba(10,12,22,.6); text-align: center; text-wrap: balance; }
 
   @media (prefers-reduced-motion: reduce) {
-    .burst-bg, .burst-txt, .onair, .wordmark::after, .play::before, .news-label, .stage-fallback { animation: none; }
+    .burst-bg, .burst-txt, .onair, .wordmark::after, .play::before, .news-label, .stage-fallback, .ch-sun { animation: none !important; }
     .stage-fallback { opacity: 1; }
     .track { animation-duration: calc(var(--dur, 60s) * 2.5); }
   }
@@ -449,7 +378,7 @@
     <div class="band-in">
       <span class="live-pill"><i class="dot"></i>LIVE</span>
       <span class="onair">ON AIR</span>
-      <span class="network">SHRIMPTECH RADIO NETWORK <span class="star">&#9733;</span> BROADCASTING LIVE FROM BEAUTIFUL DOWNTOWN SHRIMPVILLE, USA <span class="star">&#9733;</span> 100,000 WATTS OF SHRIMP</span>
+      <span class="network">SHRIMP TECH ENTERPRISES PRESENTS <span class="star">&#9733;</span> SHRIMP TECH RADIO 106.9420 <span class="star">&#9733;</span> FOR YOU, BY US <span class="star">&#9733;</span> IN YOUR HOME OR AT YOUR HOUSE, EVERY DAY</span>
       <span class="tb-right">
         <span class="clock" id="clock">--:--:-- ET</span>
         <span class="tb-wx">74&deg;F SUNNY</span>
@@ -471,22 +400,22 @@
         <h1 class="wordmark" data-text="SHRIMPTECH">SHRIMPTECH</h1>
         <div class="logo-row">
           <span class="radio-banner">&#9733; RADIO &#9733;</span>
-          <span class="freq"><span id="freq-num">104.7</span><small id="freq-band">FM</small></span>
+          <span class="freq"><span id="freq-num">106.9420</span><small id="freq-band">FM</small></span>
         </div>
       </div>
-      <p class="slogan"><span class="star">&#9733;&#9733;&#9733;</span> <span id="slogan">THE TRI-STATE'S #1 SHRIMP STATION</span> <span class="star">&#9733;&#9733;&#9733;</span></p>
+      <p class="slogan"><span class="star">&#9733;&#9733;&#9733;</span> <span id="slogan">FOR YOU, BY US. IN YOUR HOME OR AT YOUR HOUSE.</span> <span class="star">&#9733;&#9733;&#9733;</span></p>
     </section>
 
     <aside class="card onair-card" aria-labelledby="onair-h">
       <div class="card-head"><span class="rec"></span><h2 id="onair-h">ON AIR NOW</h2></div>
-      <p class="show" id="show">The Morning Shrimp Zoo</p>
-      <p class="host" id="host">with Big Tony &amp; Kelly</p>
-      <p class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; RATED #1 BY SHRIMP MAGAZINE</p>
+      <p class="show" id="show">Shrimp Tech Radio</p>
+      <p class="host" id="host">with your host Ron Dangle</p>
+      <p class="rating">&#9733;&#9733;&#9733;&#9733;&#9733; "IT TASTES LIKE WHAT IT IS"</p>
       <dl class="stats">
-        <div><dt>LISTENERS</dt><dd id="listeners">12,847</dd></div>
+        <div><dt>LISTENERS</dt><dd id="listeners">106,942</dd></div>
         <div><dt>SIGNAL</dt><dd>100 KW</dd></div>
       </dl>
-      <p class="next" id="next">UP NEXT 4PM: THE DRIVE-TIME SHRIMP SHACK</p>
+      <p class="next" id="next">IN THE STUDIO: RON DANGLE</p>
     </aside>
 
     <div class="stage" id="stage" title="Click the shrimp">
@@ -496,18 +425,19 @@
       <div class="lower-third">
         <span class="lt-tag">LIVE</span>
         <span class="lt-main">THE SHRIMP</span>
-        <span class="lt-sub">ROTATING CONTINUOUSLY SINCE 1997</span>
+        <span class="lt-sub" id="lt-sub">ROTATING CONTINUOUSLY SINCE 1997</span>
       </div>
+      <div class="jamie" id="jamie" hidden><span class="jamie-tag">JAMIE, PULL THAT UP</span><b id="jamie-text"></b></div>
       <div class="stage-fallback" aria-hidden="true">&#129424;</div>
     </div>
 
     <aside class="card hotline" aria-labelledby="hot-h">
       <div class="card-head"><span class="rec"></span><h2 id="hot-h">REQUEST LINE</h2></div>
       <p class="phone">1-800-SHRIMP-1</p>
-      <button class="gloss call-btn" id="call" type="button">CALL THE STUDIO</button>
+      <button class="btn btn-red call-btn" id="call" type="button">CALL THE STUDIO</button>
       <p class="call-status" id="call-status" aria-live="polite">LINES ARE OPEN</p>
-      <p class="contest"><b>CALLER #9</b> WINS TWO TICKETS TO <b>SHRIMPFEST '26</b>. MUST BE A SHRIMP TO WIN.</p>
-      <div class="wx-card"><span class="wx-temp">74&deg;</span><span>SHRIMPVILLE: HUMID.<br>100% CHANCE OF SHRIMP.</span></div>
+      <p class="contest"><b>CALLER #9</b> WINS A 60 OZ CAN OF <b>CHICKEN WATER</b>. NOT A SUBSTITUTE FOR SPIRITUALITY.</p>
+      <div class="wx-card"><span class="wx-temp">74&deg;</span><span>IT'S GETTING COLDER.<br>YOU CAN TELL IF YOU LOOK OUTSIDE.</span></div>
     </aside>
 
     <section class="console" aria-label="Radio">
@@ -545,18 +475,18 @@
 
   <footer class="sponsors">
     <div class="band-in">
-      <p class="sp-label">SHRIMPTECH RADIO IS BROUGHT TO YOU BY</p>
+      <p class="sp-label">SHRIMP TECH RADIO IS BROUGHT TO YOU BY SHRIMP TECH ENTERPRISES &amp; SHRIMP TECH MICROSYSTEMS</p>
       <ul class="sp-row">
-        <li class="sp sp-law"><b>DR. PRAWN</b><small>ATTORNEY AT LAW &middot; 1-800-PRAWN-LAW</small></li>
-        <li class="sp sp-mattress"><b>KRILL BILL'S MATTRESS KINGDOM</b><small>HIS PRICES ARE INSANE</small></li>
-        <li class="sp sp-bait"><b>BAYOU BOB'S BAIT &amp; TACKLE</b><small>OPEN 25 HOURS</small></li>
-        <li class="sp sp-coin"><i>S</i><span><b>SHRIMPCOIN</b><small>NOT FINANCIAL ADVICE</small></span></li>
-        <li class="sp sp-cars"><b>CRUSTY'S USED CARS</b><small>WE'LL SHELL YOU A DEAL</small></li>
-        <li class="sp sp-gumbo"><b>GUMBO KING</b><small>ALL YOU CAN EAT TUESDAYS</small></li>
-        <li class="sp sp-sauce"><b>Cocktail Sauce Co.</b><small>EST. 1952</small></li>
-        <li class="sp sp-plumb"><b>PINCH &amp; SONS PLUMBING</b><small>WE GO WHERE SHRIMP WON'T</small></li>
+        <li class="sp red"><b class="f-display">CHICKEN WATER</b><small>HOMEGROWN AMERICAN CHICKEN JUICE &middot; 60 OZ</small></li>
+        <li class="sp ink"><b class="f-serif">RAISIN RECYCLING SYSTEM</b><small>OLD RAISINS, MADE EVEN OLDER</small></li>
+        <li class="sp paper"><b class="f-badge">RUBBER BUCKET</b><small>FOLDS INTO YOUR TRAINING SHOES &middot; YEE-HAW</small></li>
+        <li class="sp paper-red"><b class="f-italic">Useless Bread</b><small>MADE WITH ABSOLUTELY NO FOOD</small></li>
+        <li class="sp ink"><b class="f-display">SAUCE SLAMMERS!</b><small>THE DARKER SAUCE WINS. ALWAYS.</small></li>
+        <li class="sp red"><b class="f-badge">SHRIMP TECH FROZEN SHRIMP</b><small>SHRIMPS WITH FACES. SHRIMPS WITH IDEAS.</small></li>
+        <li class="sp ink"><b class="f-neon">SHRIMPSCAPES</b><small>THE NEW ALBUM BY BOGDAN</small></li>
+        <li class="sp paper"><b class="f-serif">MILK TOKENS</b><small>ONE TOKEN, $652</small></li>
       </ul>
-      <p class="fine">&copy; 2026 SHRIMPTECH RADIO NETWORK. A PARODY. ALL SPONSORS ARE FAKE. NO SHRIMP WERE HARMED IN THE MAKING OF THIS BROADCAST.</p>
+      <p class="fine">&copy; 2026 SHRIMP TECH ENTERPRISES. A PARODY. THIS WEBSITE IS NOT A SUBSTITUTE FOR SPIRITUALITY. TRY TYPING SOMETHING YOU HEARD ON AIR.</p>
     </div>
   </footer>
 </div>
@@ -573,39 +503,60 @@
 // Station data
 // ============================================================================
 
-// `src`: put an mp3 in ./audio and point a channel at it. The file loops and every
-// visitor joins at the same spot (wall clock % duration), so it plays like a live
-// stream without a streaming server. Channels without a file are synthesized here.
+// The whole page uses three colors. Each channel arranges them differently:
+// `sun` is [ray, base] for the rising-sun backdrop, `accent` is the third color.
+const RED = '#e8112d', CREAM = '#f4efe4', INK = '#0a0c16', RED_DEEP = '#7a0918';
+
+// ---------- the show ----------
+// The Shrimp Tech Radio episode loops on 106.9420. Sources are tried in order: the
+// full-quality file, then small preview encodes (used where the Dropbox host is
+// blocked), then the synth bed.
+const SHOW_SRC = [
+  { url: 'https://dl.dropboxusercontent.com/scl/fi/zpqxtk2hz7lj90rg07met/Shrimptech-Radio-edit2.mp3?rlkey=niekuv5bfma230pzholloe7lv&dl=1', type: 'audio/mpeg' },
+  { url: 'audio/shrimptech-radio-preview.webm', type: 'audio/webm; codecs=opus' },
+  { url: 'audio/shrimptech-radio-preview.mp3', type: 'audio/mpeg' },
+];
+const SHOW_LEN = 3497.01;
+// Who is in the studio, by position in the episode (seconds).
+const SHOW_GUESTS = [
+  [0, 'RON DANGLE, WARMING UP'],
+  [191, "BOGDAN, YOUR DOG'S VETERINARIAN"],
+  [1704, 'A 17,000-YEAR-OLD BOG BODY'],
+  [2626, 'RON DANGLE, ON A MORE SERIOUS NOTE'],
+  [2703, 'BEN FROM THE DIRTY BOYZ (WITH A Z)'],
+  [3160, 'WATER BOY, AKA NIÑO DEL AGUA'],
+  [3257, 'USELESS BREAD (SPONSOR)'],
+];
+// Closed captions [start, end, text] and sound clips, both from the episode transcript.
+const SHOW_CC = [/*CC*/];
+const SHOW_CLIPS = {/*CLIPS*/};
+
+// `src`: a list of { url, type } to loop. Every visitor joins at the same spot
+// (wall clock % duration), so it plays like a live stream without a streaming
+// server. Channels without a file are synthesized here.
 const CHANNELS = [
   {
-    id: 'shrimp-fm', band: 'FM', freq: '104.7', call: 'WSHR', name: 'SHRIMP FM',
-    tagline: "THE TRI-STATE'S #1 SHRIMP STATION",
-    color: '#ff2a4d', deep: '#3f0512', ink: '#ffffff', shrimp: 'natural',
-    src: null, gen: 'bed', bed: { bpm: 96, prog: 'jazz', style: 'smooth', level: 0.7 },
-    show: 'The Morning Shrimp Zoo', host: 'with Big Tony & Kelly', next: 'Up next 4PM: The Drive-Time Shrimp Shack', listeners: 12847,
-    dj: 'BIG TONY', voice: { pitch: 0.75, rate: 1.12 }, talkEvery: [32, 55],
-    idLine: "You're locked in to Shrimp FM. One oh four point seven. The tri-state's number one shrimp station!",
+    id: 'shrimp-fm', band: 'FM', freq: '106.9420', call: 'WSHR', name: 'SHRIMP TECH RADIO',
+    tagline: 'FOR YOU, BY US. IN YOUR HOME OR AT YOUR HOUSE.',
+    sun: [RED, RED_DEEP], accent: CREAM, shrimp: 'natural',
+    src: SHOW_SRC, captions: SHOW_CC, guests: SHOW_GUESTS,
+    gen: 'bed', bed: { bpm: 96, prog: 'jazz', style: 'smooth', level: 0.7 },
+    show: 'Shrimp Tech Radio', host: 'with your host Ron Dangle', next: '', listeners: 106942,
+    dj: 'RON DANGLE', voice: { pitch: 0.75, rate: 1.12 }, talkEvery: [32, 55],
+    idLine: 'You are listening to Shrimp Tech Radio. One oh six point nine four two oh.',
     lines: [
-      "That was a great one. Here's another great one. We only play great ones.",
-      'Traffic and weather together on the eights. Traffic is bad. Weather is humid. The shrimp is fine.',
-      "Caller number nine, you're our winner! Wait. Caller nine, are you a dog? This is a shrimp station.",
-      'Seventy four degrees in Shrimpville, and a hundred percent chance of shrimp.',
-      "Kelly's out sick today. Kelly is a shrimp. Shrimp don't get sick. Kelly, call the station.",
-      "This hour is brought to you by Krill Bill's Mattress Kingdom. His prices are insane. Clinically.",
-      'Shrimptech Radio. Commercial free for the next forty five seconds.',
+      "I'm a convicted felon and you're listening to Shrimp Tech Radio.",
+      'Shrimp Tech Radio. For you, by us. In your home, or at your house. Every day.',
+      'Shrimps with faces. Shrimps with conscience. Shrimps with ideas. Shrimp Tech frozen shrimp.',
+      'Chicken water. It tastes like what it is.',
+      'Life after death is no longer cringe, folks. Book your tickets now.',
     ],
-    songs: [
-      ['THE BOILED ONES', 'SHELLS ON FIRE'],
-      ['KELLY & THE KRILL', 'TAIL FAN FOREVER'],
-      ['DJ SCAMPI', 'DEVEINED (RADIO EDIT)'],
-      ['SHRIMPTECH ALL-STARS', 'LOVE IN THE TIME OF COCKTAIL SAUCE'],
-      ['THE TIDE POOLS', 'LOW TIDE, HIGH HOPES'],
-    ],
+    songs: [['SHRIMP TECH RADIO', 'FOR YOU, BY US']],
   },
   {
     id: 'midi-mania', band: 'FM', freq: '88.1', call: 'WMID', name: 'MIDI MANIA',
     tagline: 'ALL MIDI. ALL THE TIME.',
-    color: '#1ff07a', deep: '#021a0d', ink: '#00230f', shrimp: 'wire',
+    sun: [CREAM, INK], accent: RED, shrimp: 'wire',
     src: null, gen: 'midi',
     show: 'The MIDI Marathon', host: 'Hour 41,212 with DJ General MIDI', next: 'Up next: more MIDI', listeners: 341,
     dj: 'DJ GENERAL MIDI', voice: { pitch: 1.1, rate: 1.0 }, talkEvery: [45, 75],
@@ -615,12 +566,13 @@ const CHANNELS = [
       'We are now entering hour forty one thousand of the MIDI marathon. Send help.',
       'Request line is open. We will play it in MIDI. We will play everything in MIDI.',
       'That was General MIDI patch number eighty one. A listener favorite.',
+      'Coming up, the MIDI version of Sauce Slammers. The darker sauce wins. Always.',
     ],
   },
   {
     id: 'k-dog', band: 'FM', freq: '99.5', call: 'KDOG', name: 'K-DOG',
     tagline: 'THE DOG CONVERSATION CHANNEL',
-    color: '#ffd21f', deep: '#3a2b00', ink: '#1a1200', shrimp: 'dog',
+    sun: [RED, CREAM], accent: INK, shrimp: 'dog',
     src: null, gen: 'dogs',
     show: 'Dog Talk Live', host: 'with Biscuit & Pickles', next: 'Up next: Dog Talk Live (it never ends)', listeners: 98113,
     dj: 'K-DOG', voice: { pitch: 0.9, rate: 1.05 }, talkEvery: [75, 120],
@@ -629,12 +581,14 @@ const CHANNELS = [
       'K-Dog. Twenty four seven dog talk. Please stop calling to ask who is a good boy.',
       'You are listening to K-Dog. Biscuit and Pickles will be right back after this. They will not stop.',
       'This conversation is unscripted. It is also untranslated.',
+      'Biscuit and Pickles recently saw a veterinarian named Bogdan. They no longer have teeth.',
+      'Should dogs be allowed to vote? Biscuit and Pickles say yes. Loudly.',
     ],
   },
   {
     id: 'shrimp-gold', band: 'FM', freq: '101.1', call: 'WGLD', name: 'SHRIMP GOLD',
     tagline: 'CLASSIC SHRIMP. TIMELESS HITS.',
-    color: '#ffae2b', deep: '#3d2200', ink: '#2a1600', shrimp: 'gold',
+    sun: [CREAM, RED], accent: INK, shrimp: 'lacquer',
     src: null, gen: 'bed', bed: { bpm: 70, prog: 'doowop', style: 'doowop', crackle: true, level: 0.7 },
     show: 'Golden Shrimp Oldies', host: "with 'Smooth' Rick Shellby", next: 'Up next: The Sock Hop at the Seafood Shack', listeners: 4420,
     dj: 'SMOOTH RICK', voice: { pitch: 0.65, rate: 0.95 }, talkEvery: [35, 60],
@@ -643,6 +597,7 @@ const CHANNELS = [
       'That one came out in nineteen fifty nine. Same year the shrimp started spinning.',
       'Smooth Rick Shellby with you until midnight. Or until the shrimp stops spinning. It will not stop spinning.',
       'Remember when shrimp cost a nickel? Neither do I. But my dad told me about it.',
+      'That record is older than the raisins in the Raisin Recycling System. And those are old.',
     ],
     songs: [
       ['THE CRUSTONES', 'SHRIMP SHRIMP SHRIMP SHRIMP (1959)'],
@@ -654,7 +609,7 @@ const CHANNELS = [
   {
     id: 'the-prawn', band: 'FM', freq: '95.5', call: 'WPRN', name: 'THE PRAWN',
     tagline: 'HIP HOP & CRUSTACEAN R&B',
-    color: '#c63bff', deep: '#2c0544', ink: '#ffffff', shrimp: 'disco',
+    sun: [INK, RED], accent: CREAM, shrimp: 'pearl',
     src: null, gen: 'bed', bed: { bpm: 88, prog: 'rnb', style: 'boom', level: 0.75 },
     show: 'The Drive Home', host: 'with DJ Scampi', next: 'Up next 7PM: The Quiet Storm Surge', listeners: 23009,
     dj: 'DJ SCAMPI', voice: { pitch: 0.7, rate: 1.15 }, talkEvery: [30, 50],
@@ -663,6 +618,8 @@ const CHANNELS = [
       'DJ Scampi in the mix. Shout out to everybody stuck on the interstate.',
       "This is the part where the bass drops. The bass is a shrimp. Shrimp can't drop. It's complicated.",
       'If you can hear this, you are already the main character.',
+      'Big shout out to Water Boy. Niño del Agua. Up and coming, folks.',
+      "This one goes out to the Dirty Boyz. With a Z. Lock up your bicycles.",
     ],
     songs: [
       ['LIL SCAMPI', 'DRIP (COCKTAIL SAUCE)'],
@@ -674,7 +631,7 @@ const CHANNELS = [
   {
     id: 'shrimp-talk', band: 'AM', freq: '1260', call: 'WTLK', name: 'SHRIMP TALK',
     tagline: 'TALK, TRAFFIC & TIDES',
-    color: '#3d8bff', deep: '#061d4a', ink: '#ffffff', shrimp: 'chrome',
+    sun: [RED, INK], accent: CREAM, shrimp: 'chrome',
     src: null, gen: 'bed', bed: { bpm: 80, prog: 'jazz', style: 'smooth', am: true, level: 0.35 },
     show: 'Shrimp Talk Tonight', host: 'with Dr. Barb Krillson', next: 'Up next: Traffic & Tides on the 8s', listeners: 7,
     dj: 'DR. BARB', voice: { pitch: 0.85, rate: 1.0 }, talkEvery: [14, 24],
@@ -685,31 +642,36 @@ const CHANNELS = [
       'We have a caller on line two. Go ahead, caller. Caller? Okay. Line two is a dog again.',
       'Traffic on the eights. The interstate is backed up six miles due to an overturned shrimp truck. Drivers report the traffic smells delicious.',
       'Remember, if your shrimp is not spinning, consult your shrimp.',
+      'Do you think dogs should be allowed to vote? Contact us now. Send a letter to Shrimp Tech.',
+      "Jamie, bring that up on the screen. Jamie? We don't have a screen. This is radio.",
     ],
     songs: [['NOW', "TODAY'S TOPIC: IS A PRAWN JUST A SHRIMP WITH A BETTER PUBLICIST?"]],
   },
 ];
 
+// Headlines, tickers and dog translations all come from things said on the show.
 const NEWS = [
-  "Local man insists shrimp is 'basically a sea bug', family asks him to leave Thanksgiving",
-  'Shrimp prices up 400% after shrimp learns about inflation',
-  'Tri-State forecast: 70% chance of shrimp, light krill in the evening',
-  'Mantis shrimp can see 16 colors, scientists confirm none of them impressed it',
-  "Senate votes 51-49 to recognize the shrimp as 'pretty cool'",
-  "Overturned shrimp truck backs up I-95 for six miles. Drivers report 'delicious traffic'",
-  "Area dog has 'a lot to say' on 99.5 K-DOG, listeners report",
-  'Shrimptech unveils Shrimp 2.0. Now with more legs',
-  "Florida man arrested for teaching shrimp to drive. Shrimp 'better than most', says officer",
-  '$SHRMP soars on rumors of cocktail sauce merger',
-  "Local DJ has not slept since 1997: 'The shrimp never sleeps'",
-  '9 out of 10 dentists recommend shrimp. The tenth dentist is a lobster',
-  "MIDI MANIA listeners hear 'The Entertainer' 4,000 times this week, request one more",
-  "NASA confirms no shrimp on the moon 'yet'",
+  'Eggs scheduled to be free again on the Fourth of July, says local veterinarian',
+  'Veterinarian confirms shrimp have no feelings. They do have teeth',
+  'Chicken Water drops this April: 60 ounces of homegrown American chicken juice',
+  'Raisins not going out of style, thanks to the Raisin Recycling System',
+  'Local man leaves dog with vet for one night. Dog wakes up with absolutely no teeth',
+  "New sports powder revealed to be 'just crushed-up teeth'",
+  'UN will not help with the milking problem in Europe, sources confirm',
+  'Milk tokens proposed. One token: $652',
+  "'It's getting colder,' says man holding ice in a glass",
+  '17,000-year-old bog body visits the studio, asks host to stop flirting',
+  'Dirty Boyz (with a Z) can steal four bicycles at once. Should be bigger than the Super Bowl, says host',
+  'Life after death no longer cringe. Book your tickets now',
+  'Sauce Slammers final ends. The darker sauce won. It always does',
+  "Bogdan's new album 'Shrimpscapes' explores shrimp travelling through space and time",
+  "Useless Bread: you can't eat it, it doesn't go bad",
+  'Should dogs be allowed to vote? Send a letter to Shrimp Tech Radio',
 ];
 
 const STOCKS = [
-  ['SHRMP', 42.69], ['PRAWN', 18.2], ['KRILL', 0.42], ['LBSTR', 311.07], ['CRAB', 27.55], ['SCMPI', 64.1],
-  ['GUMBO', 9.99], ['COCKTL', 13.37], ['TRTR', 5.05], ['KDOG', 99.5], ['MIDI', 8.81], ['BARK', 1.01],
+  ['SHRMP', 106.94], ['CHKNW', 60.0], ['RRS', 3.17], ['RBBKT', 16.0], ['USLSB', 0.01], ['SAUCE', 37.48],
+  ['MILKT', 652.0], ['TEETH', 0.32], ['DRTYZ', 4.2], ['BOGDN', 19.7], ['KDOG', 99.5], ['MIDI', 8.81],
 ];
 
 const DOGS = [
@@ -731,6 +693,9 @@ const TRANSLATIONS = [
   'Disagree. Cats are a scam.',
   "That's above my pay grade. I am paid in treats.",
   'Sources say the shrimp is still spinning.',
+  'Bogdan took my teeth. I would like them back.',
+  'I would like to vote.',
+  'This bark is not a substitute for spirituality.',
 ];
 
 // Public domain tunes in a compact format: NOTE/length in 16th notes, "-" is a rest.
@@ -1153,23 +1118,42 @@ function dogGen() {
   return { bus, stop() { loop(); tm.clear(); fadeOut(bus); } };
 }
 
-// A real file, looped and joined at the wall-clock position. Falls back to the synth.
+// A real file, looped and joined at the wall-clock position. Tries each source in
+// order (the next one on error) and falls back to the synth when none plays.
 function fileGen(ch, fallback) {
   const el = new Audio();
-  el.crossOrigin = 'anonymous'; el.loop = true; el.preload = 'auto'; el.src = ch.src;
+  el.crossOrigin = 'anonymous'; el.loop = true; el.preload = 'auto';
   const node = ctx.createMediaElementSource(el), bus = makeBus(1);
   node.connect(bus);
-  let dead = false, sub = null;
+  const sources = ch.src.filter((s) => !s.type || el.canPlayType(s.type));
+  let dead = false, sub = null, i = 0, cc = 0;
+  const next = () => {
+    if (i < sources.length) { el.src = sources[i++].url; el.load(); } else sub = fallback();
+  };
   el.addEventListener('loadedmetadata', () => {
     if (dead || !isFinite(el.duration) || !el.duration) return;
     el.currentTime = (Date.now() / 1000) % el.duration;
     el.play().catch(() => {});
-  }, { once: true });
-  el.addEventListener('error', () => { if (!dead) sub = fallback(); }, { once: true });
+    if (ch.captions) cc = setInterval(() => showCaption(ch.captions, el.currentTime), 250);
+  });
+  el.addEventListener('error', () => { if (!dead) next(); });
+  next();
   return {
     get bus() { return sub ? sub.bus : bus; },
-    stop() { dead = true; el.pause(); el.removeAttribute('src'); el.load(); fadeOut(bus); sub?.stop(); },
+    stop() { dead = true; clearInterval(cc); el.pause(); el.removeAttribute('src'); el.load(); fadeOut(bus); sub?.stop(); },
   };
+}
+
+// Closed captions on the LCD: [start, end, text] rows sorted by start.
+let lastCaption = null;
+function showCaption(rows, t) {
+  let lo = 0, hi = rows.length - 1, k = -1;
+  while (lo <= hi) { const mid = (lo + hi) >> 1; if (rows[mid][0] <= t) { k = mid; lo = mid + 1; } else hi = mid - 1; }
+  const row = k >= 0 && t < rows[k][1] + 2 ? rows[k] : null;
+  if (!row || row === lastCaption) return;
+  lastCaption = row;
+  const text = row[2].startsWith('♪') ? row[2] : `CC▸ ${row[2].toUpperCase()}`;
+  setLcdBase(text, Math.max(1.5, row[1] - t));
 }
 
 function makeGen(ch) {
@@ -1224,8 +1208,9 @@ function startChannel(withStatic) {
     if (!playing || ch !== current) return;
     gen = makeGen(ch);
     zap(ctx.currentTime + 0.05);
-    talkStop = startTalk(ch);
-    if (ch.gen === 'bed') setLcdBase(nowPlaying(ch));
+    // a real show brings its own hosts, so the synth DJ only talks over synth channels
+    if (!ch.src) talkStop = startTalk(ch);
+    if (ch.gen === 'bed' && !ch.src) setLcdBase(nowPlaying(ch));
   }, withStatic ? 450 : 0);
 }
 function stopChannel() {
@@ -1260,25 +1245,32 @@ function stopAudio() {
 // ============================================================================
 // UI
 // ============================================================================
-const root = document.documentElement;
 const playBtn = $('#play');
 let current = CHANNELS[0];
 let listeners = current.listeners;
 
 // ---------- LCD ----------
 let lcdBase = '', lcdTimer = 0;
-function setLcd(text) {
+// Text wider than the display either loops as a marquee or, with `pan` seconds
+// (captions), slides once to its end so it finishes before the next line.
+function setLcd(text, pan) {
   const box = $('#lcd-l2'), span = $('#lcd-text');
   span.textContent = text;
-  box.classList.remove('scroll');
+  box.classList.remove('scroll', 'pan');
   requestAnimationFrame(() => {
-    if (span.scrollWidth > box.clientWidth + 2) {
+    const over = span.scrollWidth - box.clientWidth;
+    if (over <= 2) return;
+    if (pan) {
+      box.style.setProperty('--shift', `${-over}px`);
+      box.style.setProperty('--d', `${pan}s`);
+      box.classList.add('pan');
+    } else {
       box.style.setProperty('--d', `${Math.max(7, text.length * 0.2)}s`);
       box.classList.add('scroll');
     }
   });
 }
-function setLcdBase(text) { lcdBase = text; if (!lcdTimer) setLcd(text); }
+function setLcdBase(text, pan) { lcdBase = text; if (!lcdTimer) setLcd(text, pan); }
 function flashLcd(text, ms) {
   clearTimeout(lcdTimer);
   setLcd(text);
@@ -1296,13 +1288,13 @@ const amX = (f) => ((f - 520) / (1710 - 520)) * 100;
 const dialX = (ch) => (ch.band === 'AM' ? amX(Number(ch.freq)) : fmX(Number(ch.freq)));
 $('#scale-fm').innerHTML = [88, 92, 96, 100, 104, 108].map((f) => `<span style="left:${fmX(f)}%">${f}</span>`).join('');
 $('#scale-am').innerHTML = [530, 700, 900, 1100, 1300, 1500, 1700].map((f) => `<span style="left:${amX(f)}%">${f}</span>`).join('');
-$('#marks').innerHTML = CHANNELS.map((c) => `<i class="mark" style="left:${dialX(c)}%;top:${c.band === 'AM' ? 66 : 34}%;background:${c.color};color:${c.color}"></i>`).join('');
+$('#marks').innerHTML = CHANNELS.map((c) => `<i class="mark" style="left:${dialX(c)}%;top:${c.band === 'AM' ? 66 : 34}%"></i>`).join('');
 
 // ---------- channel buttons ----------
 const nav = $('#channels');
 nav.innerHTML = CHANNELS.map((c) => `
-  <a class="ch gloss" href="?ch=${c.id}" data-ch="${c.id}" style="--btn:${c.color};--ink:${c.ink}">
-    <i class="ch-led"></i>
+  <a class="ch btn" href="?ch=${c.id}" data-ch="${c.id}" style="--a:${c.sun[0]};--b:${c.sun[1]}">
+    <i class="ch-sun"></i>
     <span class="ch-freq">${c.freq}<small> ${c.band}</small></span>
     <span class="ch-name">${c.name}</span>
   </a>`).join('');
@@ -1316,15 +1308,13 @@ nav.addEventListener('click', (e) => {
 function tune(id, user = false) {
   const ch = CHANNELS.find((c) => c.id === id) || CHANNELS[0];
   current = ch;
-  root.style.setProperty('--ch', ch.color);
-  root.style.setProperty('--ch-deep', ch.deep);
-  root.style.setProperty('--ch-ink', ch.ink);
+  document.body.dataset.ch = ch.id;
   $('#freq-num').textContent = ch.freq;
   $('#freq-band').textContent = ch.band;
   $('#slogan').textContent = ch.tagline;
   $('#show').textContent = ch.show;
   $('#host').textContent = ch.host;
-  $('#next').textContent = ch.next.toUpperCase();
+  $('#next').textContent = studioLine(ch);
   $('#lcd-freq').textContent = `${ch.freq} ${ch.band}`;
   $('#lcd-call').textContent = `${ch.call}-${ch.band}`;
   $('#needle').style.left = `${dialX(ch)}%`;
@@ -1361,19 +1351,118 @@ $('#call').addEventListener('click', async () => {
     for (const f of DTMF[d]) { const o = osc('sine', f, t), g = env(t, 0.07, 0.005, 0.09); o.connect(g).connect(master); o.start(t); o.stop(t + 0.12); }
     t += 0.15;
   }
-  t += 0.4;
-  const busyAt = t;
-  for (let i = 0; i < 4; i++) {
-    for (const f of [480, 620]) {
-      const o = osc('sine', f, t), g = ctx.createGain();
-      g.gain.setValueAtTime(0.08, t); g.gain.setValueAtTime(0, t + 0.5);
-      o.connect(g).connect(master); o.start(t); o.stop(t + 0.52);
+  const done = (msg, ms) => setTimeout(() => { calling = false; status.textContent = msg; }, ms);
+  setTimeout(async () => {
+    // Sometimes Ron picks up (a clip from the episode), otherwise it's busy.
+    const clip = pick(PHONE_CLIPS);
+    if (Math.random() < 0.6 && await playClip(clip)) {
+      status.textContent = 'RON DANGLE PICKED UP!';
+      const c = SHOW_CLIPS[clip];
+      done('HE HUNG UP. LINES ARE OPEN.', (c.t[1] - c.t[0]) * 1000 + 1200);
+      return;
     }
-    t += 1;
-  }
-  setTimeout(() => { status.textContent = 'BUSY! ALL SHRIMP ARE ON THE OTHER LINE.'; }, (busyAt - ctx.currentTime) * 1000);
-  setTimeout(() => { calling = false; status.textContent = 'LINES ARE OPEN. TRY AGAIN!'; }, (t - ctx.currentTime) * 1000 + 1500);
+    let bt = ctx.currentTime + 0.02;
+    for (let i = 0; i < 4; i++) {
+      for (const f of [480, 620]) {
+        const o = osc('sine', f, bt), g = ctx.createGain();
+        g.gain.setValueAtTime(0.08, bt); g.gain.setValueAtTime(0, bt + 0.5);
+        o.connect(g).connect(master); o.start(bt); o.stop(bt + 0.52);
+      }
+      bt += 1;
+    }
+    status.textContent = 'BUSY! ALL SHRIMP ARE ON THE OTHER LINE.';
+    done('LINES ARE OPEN. TRY AGAIN!', 5500);
+  }, (t + 0.4 - ctx.currentTime) * 1000);
 });
+
+// ---------- clips from the episode ----------
+const PHONE_CLIPS = [/*PHONE*/];
+let clipReady = null, clipTimer = 0;
+// One audio element for clips, loaded from the first show source that plays here.
+function clipAudio() {
+  clipReady ??= new Promise((resolve, reject) => {
+    const el = new Audio();
+    el.preload = 'auto';
+    const list = SHOW_SRC.filter((s) => el.canPlayType(s.type));
+    let i = 0;
+    const next = () => { if (i < list.length) el.src = list[i++].url; else reject(new Error('no playable show source')); };
+    el.addEventListener('loadedmetadata', () => resolve(el), { once: true });
+    el.addEventListener('error', next);
+    next();
+  });
+  return clipReady;
+}
+async function playClip(key) {
+  const clip = SHOW_CLIPS[key];
+  if (!clip || !ensureCtx()) return false;
+  let el;
+  try { el = await clipAudio(); } catch { return false; }
+  clearTimeout(clipTimer);
+  el.volume = Math.min(1, vol + 0.15);
+  el.currentTime = clip.t[0];
+  try { await el.play(); } catch { return false; }
+  duck(true);
+  const ms = (clip.t[1] - clip.t[0]) * 1000;
+  flashLcd(`${clip.who}: ${clip.text}`, ms + 1500);
+  clipTimer = setTimeout(() => { el.pause(); duck(false); }, ms);
+  return true;
+}
+
+// ---------- easter eggs: type something you heard on air ----------
+const EGGS = {
+  sauce: { clip: 'sauce', note: 'SAUCE SLAMMERS! THE DARKER SAUCE WINS. ALWAYS.' },
+  chicken: { clip: 'chicken', note: 'CHICKEN WATER. IT TASTES LIKE WHAT IT IS.' },
+  yeehaw: { clip: 'yeehaw', note: 'YEE-HAW, RUBBER BUCKET.' },
+  dirty: { clip: 'dirtyboyz', note: 'DIRTY BOYZ. WITH A Z AT THE END, FOLKS.' },
+  felon: { clip: 'felon', note: "I'M A CONVICTED FELON AND YOU'RE LISTENING TO SHRIMP TECH RADIO." },
+  cringe: { clip: 'cringe', note: 'LIFE AFTER DEATH IS NO LONGER CRINGE, FOLKS.' },
+  raisin: { clip: 'raisin', note: 'RAISIN RECYCLING SYSTEM. OLD RAISINS, MADE EVEN OLDER.' },
+  jamie: { clip: 'jamie', note: 'JAMIE, BRING THAT UP ON THE SCREEN.', screen: true },
+  caller9: { clip: 'chicken', note: 'CALLER #9! YOU WIN A 60 OZ CAN OF CHICKEN WATER.' },
+};
+const JAMIE = [
+  'ICE IN A GLASS: THE EXPERIMENT',
+  "THE BOG LADY'S NAILS. ALL INTACT.",
+  'A BIKE ON A BIKE ON A BIKE',
+  'MILK TOKEN EXCHANGE RATE: 1 TOKEN = $652',
+  'SHRIMP TEETH. THEY HAVE THEM.',
+  'A 60 OZ CAN OF CHICKEN WATER',
+];
+const found = new Set();
+try { JSON.parse(localStorage.getItem('shrimp-eggs') || '[]').forEach((k) => EGGS[k] && found.add(k)); } catch {}
+let burstTimer = 0, jamieTimer = 0;
+function findEgg(key) {
+  const egg = EGGS[key];
+  found.add(key);
+  try { localStorage.setItem('shrimp-eggs', JSON.stringify([...found])); } catch {}
+  window.dispatchEvent(new CustomEvent('shrimp:egg'));
+  const txt = document.querySelector('.burst-3d .burst-txt');
+  txt.innerHTML = `EGG<br>${found.size}/${Object.keys(EGGS).length}`;
+  clearTimeout(burstTimer);
+  burstTimer = setTimeout(() => { txt.innerHTML = 'NOW IN<br>3D!'; }, 5000);
+  if (egg.screen) {
+    $('#jamie-text').textContent = pick(JAMIE);
+    $('#jamie').hidden = false;
+    clearTimeout(jamieTimer);
+    jamieTimer = setTimeout(() => { $('#jamie').hidden = true; }, 5000);
+  }
+  playClip(egg.clip).then((ok) => { if (!ok) flashLcd(egg.note, 5000); });
+}
+let typed = '';
+window.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1 || e.target.closest?.('input, textarea')) return;
+  typed = (typed + e.key.toLowerCase()).slice(-12);
+  const hit = Object.keys(EGGS).find((k) => typed.endsWith(k));
+  if (hit) { typed = ''; findEgg(hit); }
+});
+// Caller #9: the ninth click on the shrimp wins.
+let shrimpClicks = 0;
+$('#stage').addEventListener('click', () => { if (++shrimpClicks % 9 === 0) findEgg('caller9'); });
+
+// ---------- lower third ----------
+const LOWER_THIRD = ['ROTATING CONTINUOUSLY SINCE 1997', 'SHRIMPS WITH FACES.', 'SHRIMPS WITH CONSCIENCE.', 'SHRIMPS WITH IDEAS.', 'POUNDS OF FROZEN SHRIMP DIRECTLY AT YOUR DOORSTEP'];
+let ltIndex = 0;
+setInterval(() => { $('#lt-sub').textContent = LOWER_THIRD[++ltIndex % LOWER_THIRD.length]; }, 3500);
 
 // ---------- stock ticker ----------
 const stocks = STOCKS.map(([sym, px]) => ({ sym, px, chg: Math.random() * 9 - 3 }));
@@ -1413,14 +1502,23 @@ document.querySelectorAll('.burst-bg').forEach((el) => { el.style.clipPath = bur
 // ---------- clock, listeners, now playing ----------
 const clockFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', second: '2-digit' });
 let lastSongSlot = -1;
+// For the show channel: who is in the studio at this point of the loop.
+function studioLine(ch) {
+  if (!ch.guests) return ch.next.toUpperCase();
+  const pos = (Date.now() / 1000) % SHOW_LEN;
+  return `IN THE STUDIO: ${ch.guests.filter((g) => g[0] <= pos).pop()[1]}`;
+}
 function everySecond() {
-  $('#clock').textContent = `${clockFmt.format(new Date())} ET`;
+  const clock = `${clockFmt.format(new Date())} ET`;
+  // 4:20 on 106.9420
+  $('#clock').textContent = /^4:20:/.test(clock) ? `${clock} ★ 106.9420` : clock;
+  if (current.guests) $('#next').textContent = studioLine(current);
   if (Math.random() < 0.5) {
     listeners = Math.max(1, listeners + (Math.random() - 0.45) * Math.max(2, current.listeners * 0.003));
     $('#listeners').textContent = fmt(listeners);
   }
   const slot = Math.floor(Date.now() / 210000);
-  if (playing && current.gen === 'bed' && gen && slot !== lastSongSlot) setLcdBase(nowPlaying(current));
+  if (playing && current.gen === 'bed' && !current.src && gen && slot !== lastSongSlot) setLcdBase(nowPlaying(current));
   lastSongSlot = slot;
 }
 everySecond();
@@ -1458,7 +1556,7 @@ function frame(now) {
     } else v = 0.06 + 0.05 * Math.sin(now / 400 + i * 0.7);
     const lit = Math.round(v * rows * 1.15);
     for (let r = 0; r < rows; r++) {
-      sctx.fillStyle = r < lit ? (r >= rows - 1 ? '#ff5a6a' : r >= rows - 3 ? '#ffd23f' : '#a8ff52') : 'rgba(168,255,82,0.08)';
+      sctx.fillStyle = r < lit ? (r >= rows - 1 ? CREAM : RED) : 'rgba(232,17,45,0.14)';
       sctx.fillRect(i * (bw + gap), H - (r + 1) * rh + 1, bw, rh - 2);
     }
   }
@@ -1510,14 +1608,14 @@ scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
 const key = new THREE.DirectionalLight(0xffffff, 2.2);
 key.position.set(3, 5, 6);
-const rim = new THREE.DirectionalLight(0xff2a4d, 4);
+const rim = new THREE.DirectionalLight(0xe8112d, 4);
 rim.position.set(-5, 2, -4);
 scene.add(key, rim, new THREE.HemisphereLight(0x8899ff, 0x220011, 0.4));
 
 // ---------- sunburst backdrop, centered on the stage ----------
 const bgU = {
   uTime: { value: 0 }, uCenter: { value: new THREE.Vector2() }, uScale: { value: 800 },
-  uA: { value: C('#ff2a4d') }, uB: { value: C('#3f0512') }, uN: { value: C('#060818') }, uPulse: { value: 0 },
+  uA: { value: C('#e8112d') }, uB: { value: C('#7a0918') }, uN: { value: C('#0a0c16') }, uPulse: { value: 0 },
 };
 const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
   uniforms: bgU, depthTest: false, depthWrite: false,
@@ -1531,13 +1629,14 @@ const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMateria
       vec2 p = (gl_FragCoord.xy - uCenter) / uScale;
       float r = length(p);
       float a = atan(p.y, p.x);
-      float rays = smoothstep(0.3, 0.7, 0.5 + 0.5 * sin(a * 14.0 + uTime * 0.35));
-      vec3 col = mix(uB, mix(uB, uA, 0.55), rays * 0.6);
-      col = mix(uN, col, smoothstep(1.7, 0.05, r));
-      col += uA * exp(-r * r * 7.0) * (0.22 + 0.5 * uPulse);
+      // 16 hard-edged rays, like the rising-sun flag; they widen a little with the bass
+      float s = sin(a * 16.0 + uTime * 0.3);
+      float rays = smoothstep(-0.04, 0.04, s + 0.15 * uPulse);
+      vec3 col = mix(uB, uA, rays);
+      col = mix(uN, col, smoothstep(1.85, 0.35, r));
       float h = hash(floor(gl_FragCoord.xy / 4.0));
-      col += vec3(step(0.9975, h) * (0.5 + 0.5 * sin(uTime * 3.0 + h * 100.0))) * 0.5 * smoothstep(0.4, 1.4, r);
-      col *= 0.96 + 0.04 * sin(gl_FragCoord.y * 1.4);
+      col = mix(col, vec3(0.9), step(0.9975, h) * (0.5 + 0.5 * sin(uTime * 3.0 + h * 100.0)) * smoothstep(1.2, 1.8, r));
+      col *= 0.82 * (0.97 + 0.03 * sin(gl_FragCoord.y * 1.4));
       gl_FragColor = vec4(col, 1.0);
     }`,
 }));
@@ -1767,20 +1866,21 @@ function buildShrimp(q, mats) {
 // ---------- materials, one per channel look ----------
 const MATS = {
   natural: new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08, sheen: 0.2, sheenColor: C('#ffb3a0'), sheenRoughness: 0.4 }),
-  gold: new THREE.MeshPhysicalMaterial({ color: '#ffc85a', metalness: 1, roughness: 0.17, clearcoat: 0.5 }),
+  // black urushi lacquer, cream porcelain, chrome: all inside the three-color palette
+  lacquer: new THREE.MeshPhysicalMaterial({ color: '#0a0c16', roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.03 }),
+  pearl: new THREE.MeshPhysicalMaterial({ color: '#f4efe4', roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.05, sheen: 0.4, sheenColor: C('#e8112d') }),
   chrome: new THREE.MeshPhysicalMaterial({ color: '#f2f5fa', metalness: 1, roughness: 0.06 }),
-  disco: new THREE.MeshPhysicalMaterial({ color: '#d68cff', metalness: 0.5, roughness: 0.14, clearcoat: 1, iridescence: 1, iridescenceIOR: 1.7, iridescenceThicknessRange: [180, 820] }),
 };
 MATS.dog = MATS.natural;
 // MIDI MANIA: a flat-shaded low-poly shrimp with a wire cage, like 1996 screensaver 3D
-const polyMat = new THREE.MeshStandardMaterial({ color: '#1ff07a', flatShading: true, roughness: 0.35, metalness: 0.15 });
-const wireMat = new THREE.MeshBasicMaterial({ color: '#022b12', wireframe: true });
+const polyMat = new THREE.MeshStandardMaterial({ color: '#e8112d', flatShading: true, roughness: 0.35, metalness: 0.15 });
+const wireMat = new THREE.MeshBasicMaterial({ color: '#0a0c16', wireframe: true });
 
 const hi = buildShrimp({ tub: 200, rad: 40, seg: 12 }, {
   shell: MATS.natural,
   eye: new THREE.MeshPhysicalMaterial({ color: '#050505', roughness: 0.04, clearcoat: 1 }),
-  ear: new THREE.MeshPhysicalMaterial({ color: '#8b5a2b', roughness: 0.65, sheen: 1, sheenColor: C('#d9a066') }),
-  tongue: new THREE.MeshPhysicalMaterial({ color: '#ff6f91', roughness: 0.35, clearcoat: 0.6 }),
+  ear: new THREE.MeshPhysicalMaterial({ color: '#0a0c16', roughness: 0.6, sheen: 1, sheenColor: C('#f4efe4') }),
+  tongue: new THREE.MeshPhysicalMaterial({ color: '#e8112d', roughness: 0.35, clearcoat: 0.6 }),
 });
 const lo = buildShrimp({ tub: 36, rad: 9, seg: 4 }, { shell: polyMat, eye: new THREE.MeshBasicMaterial({ color: '#000000' }) });
 const cage = new THREE.Mesh(lo.shell[0].geometry, wireMat);
@@ -1850,7 +1950,7 @@ const sparkTex = (() => {
 })();
 const sparkMat = new THREE.ShaderMaterial({
   uniforms: { uTime: { value: 0 }, uTex: { value: sparkTex }, uColor: { value: C('#ffffff') }, uSize: { value: 26 * PR } },
-  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  transparent: true, depthWrite: false,
   vertexShader: `
     attribute float aPhase;
     uniform float uTime, uSize;
@@ -1865,7 +1965,7 @@ const sparkMat = new THREE.ShaderMaterial({
     uniform sampler2D uTex;
     uniform vec3 uColor;
     varying float vA;
-    void main() { vec4 t = texture2D(uTex, gl_PointCoord); gl_FragColor = vec4(uColor * t.rgb * 2.2, t.a * vA); }`,
+    void main() { vec4 t = texture2D(uTex, gl_PointCoord); gl_FragColor = vec4(uColor, t.a * vA); }`,
 });
 const sparks = new THREE.Points(sparkGeo, sparkMat);
 world.add(sparks);
@@ -1873,22 +1973,20 @@ world.add(sparks);
 // ---------- post ----------
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.55, 0.5, 0.82);
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.5, 0.5, 0.95);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
 // ---------- channel looks ----------
-const targetA = C('#ff2a4d'), targetB = C('#3f0512');
+const targetA = C('#e8112d'), targetB = C('#7a0918');
 let boost = 0, bounce = 0, bounceV = 0;
 function applyChannel(ch, user) {
-  targetA.set(ch.color);
-  targetB.set(ch.deep);
-  rim.color.set(ch.color);
-  const glow = C(ch.color).multiplyScalar(1.6);
-  ringFront.material.color.copy(glow);
-  ringBack.material.color.copy(glow);
-  sparkMat.uniforms.uColor.value.set(ch.color).lerp(C('#ffffff'), 0.55);
-  polyMat.color.set(ch.color);
+  targetA.set(ch.sun[0]);
+  targetB.set(ch.sun[1]);
+  // the ring and sparkles take the one palette color the backdrop isn't using
+  ringFront.material.color.set(ch.accent);
+  ringBack.material.color.set(ch.accent);
+  sparkMat.uniforms.uColor.value.set(ch.accent);
   const wire = ch.shrimp === 'wire';
   hi.holder.visible = !wire;
   lo.holder.visible = wire;
@@ -1897,8 +1995,9 @@ function applyChannel(ch, user) {
   hi.dogParts.forEach((o) => { o.visible = ch.shrimp === 'dog'; });
   if (user) boost += 9;
 }
-applyChannel(radio?.channel ?? { color: '#ff2a4d', deep: '#3f0512', shrimp: 'natural' }, false);
+applyChannel(radio?.channel ?? { sun: ['#e8112d', '#7a0918'], accent: '#f4efe4', shrimp: 'natural' }, false);
 window.addEventListener('shrimp:channel', (e) => applyChannel(e.detail.channel, e.detail.user));
+window.addEventListener('shrimp:egg', () => { boost += 22; bounceV += 3; });
 
 let px = 0, py = 0;
 window.addEventListener('pointermove', (e) => { px = (e.clientX / window.innerWidth) * 2 - 1; py = (e.clientY / window.innerHeight) * 2 - 1; });
