@@ -64,8 +64,8 @@ export const site = {
 
   contact: [
     { label: "Management", href: "mailto:oskar@arketyp.se" },
-    // TODO: real booking contact (The Team)
-    { label: "Booking", href: "mailto:info@leon.site" },
+    { label: "Booking EU", href: "mailto:tessie.lammle@the.team" },
+    { label: "Booking Americas & ROW", href: "mailto:ryan.soroka@the.team,twindish@the.team" },
   ] as Link[],
 
   newsletter: {
