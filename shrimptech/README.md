@@ -12,7 +12,8 @@ npx serve shrimptech   # then open the printed URL
 
 - **Look**: three colors only (sun red, paper cream, ink) plus chrome on the logo, and Helvetica only, in different weights (Helvetica Neue on Apple devices, Arial where Helvetica isn't installed). Buttons are flat. Each channel arranges the three colors differently in the 16-ray rising-sun backdrop; the channel tile's little sun icon shows which.
 - **3D shrimp**: Three.js 0.170 from jsDelivr through an import map. The shrimp is built in code (a segmented body swept along a curve, legs, swimmerets, antennae, rostrum, tail fan) with a clearcoat `MeshPhysicalMaterial` and a `RoomEnvironment` for reflections. Each channel swaps the look: natural, chrome, red wireframe, floppy ears and tongue (K-DOG), black lacquer. The canvas covers the window and the camera offset keeps the shrimp centered on `#stage` wherever it sits on the page. If WebGL or the CDN fails, a spinning emoji takes its place.
-- **Player**: play button, now playing, a live spectrum, volume and the five channel tiles. `?ch=wind` or `#wind` opens a channel.
+- **Player**: play button, now playing, a live spectrum, volume and the five channel tiles. `?ch=wind` or `#wind` opens a channel. On phones the play row docks at the bottom of the screen and the channels become a swipeable row.
+- **Phones**: no bloom pass, a lower pixel ratio, and the 3D canvas scrolls with the page (ending in a fade under the stage) instead of chasing it from a fixed position. Rendering pauses while it is scrolled out of view.
 - **Fake live**: the episode loops from Dropbox (`SHOW_SRC`). Every visitor joins at `(now + offset) % SHOW_LEN`, so it plays like a live broadcast with no streaming server and each visitor downloads the file progressively. The host has to answer HTTP Range requests and send CORS headers; the `dl.dropboxusercontent.com` link does both. Sources are tried in order, so the small preview encodes in `audio/` take over when the full file can't play. `SHOW_LEN` is fixed so every source lands on the same second.
 - **Closed captions**: a TV-style CC box on the stage shows what is being said right now (`SHOW_CC`, transcribed with Whisper) and the song title during music. The ON AIR card shows who is in the studio at this point of the loop (`SHOW_GUESTS`).
 
@@ -50,6 +51,14 @@ Shown in the captions while they play. Blocks marked unidentified show "MUSIC".
 | 55:01 | unidentified |
 
 Edit the titles in `SHOW_CC` (the `♪` rows) when the missing ones are known.
+
+## Fan gate
+
+After ten minutes of listening (counted across visits in `localStorage`), a sheet asks: WANT TO LISTEN MORE? Subscribe to Shrimptech Enterprises with email and phone, or CONTINUE IN EXTREME LOW QUALITY AUDIO.
+
+- **Subscribing** posts to Mailchimp's JSONP endpoint as `EMAIL` and `PHONE`, so nobody leaves the page. Paste the embedded form's action URL (Audience > Signup forms > Embedded forms) into `MAILCHIMP_URL`. Until then the form unlocks full quality but sends nothing, and says so in the console. "Already subscribed" counts as success.
+- **Extreme low quality**: mono, band-limited, crushed to about 5 kHz and under 4 bits in an AudioWorklet, with hiss, holes in the signal and the odd buffering. Captions get garbled, the 3D renders at a few pixels, and the badges read 2D LQ MONO. GET FULL QUALITY in the player opens the sheet again.
+- `?gate=20` opens the gate after 20 seconds and ignores earlier visits, for testing.
 
 ## Easter eggs
 

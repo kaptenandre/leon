@@ -46,6 +46,9 @@
   :focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 
   #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+  /* stacked layouts scroll, so the canvas scrolls with the page and fades out under the stage */
+  @media (max-width: 980px) { #gl { position: absolute; height: var(--gl-h, 100vh); } }
+  .lofi #gl { image-rendering: pixelated; }
   .app { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; }
   .band-in { padding-left: var(--gut-l); padding-right: var(--gut-r); }
   .star { color: var(--red); }
@@ -138,6 +141,8 @@
     animation: shine 5s ease-in-out infinite;
   }
   @keyframes shine { 0%, 55% { background-position: 150% 0; } 100% { background-position: -50% 0; } }
+  /* the shine repaints the whole drop-shadow stack every frame, too much for a phone */
+  @media (hover: none) { .wordmark::after { display: none; } }
   .logo-row { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
   .radio-banner {
     font-size: clamp(13px, 1.6vw, 18px); font-weight: var(--bold); letter-spacing: .3em;
@@ -159,8 +164,10 @@
   }
 
   /* starburst stickers */
-  .burst { position: absolute; display: grid; place-items: center; width: 92px; aspect-ratio: 1; pointer-events: none; filter: drop-shadow(3px 3px 0 var(--ink)); }
+  .burst { position: absolute; display: grid; place-items: center; width: 92px; aspect-ratio: 1; pointer-events: none; }
   .burst-bg { position: absolute; inset: 0; border-radius: 50%; background: var(--cream); animation: spin 14s linear infinite; }
+  /* the shadow is a second star rather than a filter, so the spin stays on the compositor */
+  .burst-sh { background: var(--ink); translate: 3px 3px; }
   .burst-txt { position: relative; font-size: 14px; font-weight: var(--bold); letter-spacing: -.02em; line-height: 1; color: var(--red); text-align: center; transform: rotate(-12deg); animation: throb 1.2s ease-in-out infinite; }
   @keyframes throb { 50% { transform: rotate(-12deg) scale(1.1); } }
   .burst-live { top: -20px; right: -70px; }
@@ -285,6 +292,8 @@
   .now { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
   .now-meta { display: flex; align-items: center; gap: 10px; font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); color: var(--cream-dim); white-space: nowrap; overflow: hidden; }
   @media (max-width: 480px) { #lcd-freq { display: none; } }
+  .hq { flex: none; padding: 3px 8px; border: 0; border-radius: 999px; background: var(--cream); color: var(--red); font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); cursor: pointer; }
+  .hq:hover { background: var(--red); color: var(--cream); }
   .live-tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--cream-dim); }
   .live-tag i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .is-playing .live-tag { background: var(--red); border-color: var(--red); color: var(--cream); }
@@ -323,6 +332,29 @@
   .ch[aria-current="true"] { background: var(--red); }
   .ch[aria-current="true"] .ch-name { color: var(--cream); }
   .is-playing .ch[aria-current="true"] .ch-sun { animation: spin 4s linear infinite; }
+
+  /* phones: the player docks at the bottom of the screen and the channels become a swipeable row */
+  @media (max-width: 620px) {
+    .player { padding: 10px; border-radius: 16px; }
+    .player-main {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+      grid-template-columns: auto minmax(0, 1fr) 56px; gap: 12px;
+      padding: 10px var(--gut-r) calc(10px + env(safe-area-inset-bottom, 0px)) var(--gut-l);
+      background: var(--ink-2); border-top: 2px solid var(--red);
+      box-shadow: 0 -12px 28px rgba(10,12,22,.55);
+    }
+    .play { width: 56px; height: 56px; }
+    .now-title { font-size: 18px; }
+    .now-line { font-size: 13px; }
+    #spectrum { grid-column: auto; width: 56px; height: 34px; }
+    .vol { display: none; }
+    .app { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+    .news { position: static; }
+    .channels { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+    .channels::-webkit-scrollbar { display: none; }
+    .ch { flex: 0 0 46%; padding-right: 34px; scroll-snap-align: start; }
+    .ch-freq { font-size: 19px; white-space: nowrap; }
+  }
 
   /* ---------- news crawl ---------- */
   .news {
@@ -364,8 +396,38 @@
   .credit.vb svg { width: 30px; height: 30px; }
   .fine { margin: 0; font-size: 9px; font-weight: var(--bold); letter-spacing: .1em; color: rgba(10,12,22,.6); text-align: center; text-wrap: balance; }
 
+  /* ---------- fan gate ---------- */
+  .gate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(10,12,22,.86); }
+  .gate[hidden] { display: none; }
+  .gate-box {
+    width: min(100%, 460px); max-height: 100%; overflow-y: auto;
+    padding: 22px 22px 16px; border-radius: 18px; border-top: 10px solid var(--red);
+    background: var(--cream); color: var(--ink); box-shadow: 8px 8px 0 var(--red);
+    text-align: center; outline: none;
+    animation: gateIn .3s cubic-bezier(.2, 1.4, .4, 1);
+  }
+  @keyframes gateIn { from { transform: scale(.85) rotate(-2deg); opacity: 0; } }
+  .gate-kicker { margin: 0; font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); color: var(--red); }
+  .gate-h { margin: 8px 0 6px; font-size: clamp(34px, 9vw, 46px); font-weight: var(--bold); font-style: italic; letter-spacing: -.045em; line-height: .95; }
+  .gate-sub { margin: 0 0 16px; font-size: 13px; font-weight: var(--medium); line-height: 1.35; }
+  .gate-sub b { font-weight: var(--bold); color: var(--red); }
+  .gate-form { display: grid; gap: 10px; text-align: left; }
+  .gate-form label { display: grid; gap: 4px; font-size: 10px; font-weight: var(--bold); letter-spacing: var(--label); }
+  .gate-form input { width: 100%; height: 48px; padding: 0 14px; border: 2px solid var(--ink); border-radius: 10px; background: #fff; color: var(--ink); font: var(--medium) 16px/1 var(--font); }
+  .gate-form input:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,17,45,.25); }
+  .gate-go { height: 54px; margin-top: 4px; border-radius: 10px; font-size: 14px; letter-spacing: var(--label); }
+  .gate-go:disabled { opacity: .6; cursor: progress; }
+  .gate-msg { margin: 0; min-height: 1em; font-size: 11px; font-weight: var(--bold); letter-spacing: .06em; color: var(--red); text-align: center; }
+  .gate-lofi { margin-top: 4px; padding: 10px; border: 0; background: none; color: var(--ink); font-size: 11px; font-weight: var(--bold); letter-spacing: var(--label); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .gate-lofi:hover { color: var(--red); }
+  .gate-fine { margin: 4px 0 0; font-size: 9px; font-weight: var(--bold); letter-spacing: .08em; color: rgba(10,12,22,.55); }
+  @media (max-width: 620px) {
+    .gate { place-items: end center; padding: 0; }
+    .gate-box { width: 100%; border-radius: 18px 18px 0 0; box-shadow: none; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .burst-bg, .burst-txt, .wordmark::after, .play::before, .news-label, .stage-fallback, .ch-sun { animation: none !important; }
+    .burst-bg, .burst-txt, .wordmark::after, .play::before, .news-label, .stage-fallback, .ch-sun, .gate-box { animation: none !important; }
     .stage-fallback { opacity: 1; }
     .track { animation-duration: calc(var(--dur, 60s) * 2.5); }
   }
@@ -396,7 +458,7 @@
   <main class="deck">
     <section class="brand" aria-label="Shrimptech Radio">
       <div class="logo">
-        <span class="burst burst-live" aria-hidden="true"><span class="burst-bg"></span><span class="burst-txt">LIVE!<br>24/7</span></span>
+        <span class="burst burst-live" aria-hidden="true"><span class="burst-bg burst-sh"></span><span class="burst-bg"></span><span class="burst-txt">LIVE!<br>24/7</span></span>
         <h1 class="wordmark" data-text="SHRIMPTECH">SHRIMPTECH</h1>
         <div class="logo-row">
           <span class="radio-banner">&#9733; RADIO &#9733;</span>
@@ -421,7 +483,7 @@
     <div class="stage" id="stage" title="Click the shrimp">
       <div class="bug"><span class="bug-live"><i class="dot"></i>LIVE</span><span class="bug-cam">SHRIMPCAM 1</span></div>
       <div class="badges" aria-hidden="true"><span>3D</span><span>HD</span><span>STEREO</span></div>
-      <span class="burst burst-3d" aria-hidden="true"><span class="burst-bg"></span><span class="burst-txt">NOW IN<br>3D!</span></span>
+      <span class="burst burst-3d" aria-hidden="true"><span class="burst-bg burst-sh"></span><span class="burst-bg"></span><span class="burst-txt">NOW IN<br>3D!</span></span>
       <div class="lower-third">
         <span class="lt-tag">LIVE</span>
         <span class="lt-main">THE SHRIMP</span>
@@ -445,7 +507,7 @@
       <div class="player-main">
         <button class="play" id="play" type="button" aria-pressed="false" aria-label="Listen live"><span class="play-ico"></span></button>
         <div class="now">
-          <div class="now-meta"><span class="live-tag"><i></i>LIVE</span><span id="lcd-freq">106.9420 FM</span><span id="play-sub">PRESS PLAY TO LISTEN</span></div>
+          <div class="now-meta"><span class="live-tag"><i></i>LIVE</span><button class="hq" id="hq" type="button" hidden>GET FULL QUALITY</button><span id="lcd-freq">106.9420 FM</span><span id="play-sub">PRESS PLAY TO LISTEN</span></div>
           <p class="now-title" id="now-title">Shrimptech Radio</p>
           <div class="now-line" id="lcd-l2"><span id="lcd-text">Press play to tune in</span></div>
         </div>
@@ -483,6 +545,22 @@
       </div>
     </div>
   </footer>
+
+  <div class="gate" id="gate" hidden>
+    <div class="gate-box" role="dialog" aria-modal="true" aria-labelledby="gate-h" tabindex="-1">
+      <p class="gate-kicker">&#9733; YOU'VE BEEN LISTENING FOR 10 MINUTES &#9733;</p>
+      <h2 class="gate-h" id="gate-h">WANT TO LISTEN MORE?</h2>
+      <p class="gate-sub">SUBSCRIBE TO <b>SHRIMPTECH ENTERPRISES</b> AND KEEP SHRIMPTECH RADIO IN FULL QUALITY. FOR YOU, BY US.</p>
+      <form class="gate-form" id="gate-form">
+        <label>EMAIL<input type="email" name="EMAIL" autocomplete="email" required placeholder="you@yourhouse.com"></label>
+        <label>PHONE<input type="tel" name="PHONE" autocomplete="tel" inputmode="tel" placeholder="+1 555 010 6942"></label>
+        <button class="btn btn-red gate-go" type="submit">SUBSCRIBE &amp; KEEP LISTENING</button>
+        <p class="gate-msg" id="gate-msg" aria-live="polite"></p>
+      </form>
+      <button class="gate-lofi" id="gate-lofi" type="button">CONTINUE IN EXTREME LOW QUALITY AUDIO</button>
+      <p class="gate-fine">NEWS, DROPS AND SHRIMP ALERTS FROM SHRIMPTECH ENTERPRISES &amp; VIAGRA BOYS. UNSUBSCRIBE ANYTIME.</p>
+    </div>
+  </div>
 </div>
 
 <script type="importmap">
@@ -1038,10 +1116,12 @@ function burstPath(points = 18, inner = 0.8) {
 // ============================================================================
 // Audio engine
 // ============================================================================
-let ctx = null, air = null, master = null, analyser = null, noiseBuf = null;
+let ctx = null, air = null, master = null, hqOut = null, analyser = null, noiseBuf = null;
 let offset = 0;            // wall clock seconds minus ctx.currentTime
 let playing = false, vol = 0.8;
 let gen = null, talkStop = null, pendingStart = 0;
+let startSeq = 0, resuming = false;  // a tap while the audio context wakes up must not start a second stream
+let lofi = false;                    // CONTINUE IN EXTREME LOW QUALITY AUDIO (see the fan gate)
 const wall = () => ctx.currentTime + offset;
 
 function ensureCtx() {
@@ -1058,7 +1138,10 @@ function ensureCtx() {
   analyser = ctx.createAnalyser();
   analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.72;
   air.connect(analyser);
-  air.connect(master).connect(ctx.destination);
+  air.connect(master);
+  // full quality goes straight out; extreme low quality takes a detour (setLofi)
+  hqOut = ctx.createGain();
+  master.connect(hqOut).connect(ctx.destination);
   noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
   const d = noiseBuf.getChannelData(0);
   for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -1627,6 +1710,7 @@ function startTalk(ch) {
 
 // ---------- transport ----------
 function startChannel(withStatic) {
+  stopChannel();
   const ch = current;
   if (withStatic) tuneStatic(ctx.currentTime + 0.02);
   pendingStart = setTimeout(() => {
@@ -1646,22 +1730,28 @@ function stopChannel() {
 }
 async function startAudio() {
   if (!ensureCtx()) { setLcdBase('NO AUDIO IN THIS BROWSER. TRY ANOTHER ONE.'); return; }
-  try { await ctx.resume(); } catch {}
-  offset = Date.now() / 1000 - ctx.currentTime;
-  playing = true;
+  // Show it as playing right away: waking the audio context can take a moment on a phone,
+  // and a second tap in that moment now stops instead of starting another stream.
+  const seq = ++startSeq;
+  playing = true; resuming = true;
   document.body.classList.add('is-playing');
   playBtn.setAttribute('aria-pressed', 'true');
   playBtn.setAttribute('aria-label', 'Stop');
-  $('#play-sub').textContent = 'LISTENING';
+  playSub();
+  try { await ctx.resume(); } catch {}
+  if (seq !== startSeq) return;
+  resuming = false;
+  offset = Date.now() / 1000 - ctx.currentTime;
   startChannel(true);
 }
 function stopAudio() {
-  playing = false;
+  startSeq++;
+  playing = false; resuming = false;
   stopChannel();
   document.body.classList.remove('is-playing');
   playBtn.setAttribute('aria-pressed', 'false');
   playBtn.setAttribute('aria-label', 'Listen live');
-  $('#play-sub').textContent = 'PRESS PLAY TO LISTEN';
+  playSub();
   setCC('');
   setLcdBase(idleText());
 }
@@ -1710,7 +1800,7 @@ function setCC(text, ms) {
   box.hidden = !text;
   document.body.classList.toggle('cc-on', !!text);
   if (!text) return;
-  $('#cc-text').textContent = text;
+  $('#cc-text').textContent = lofi ? garble(text) : text;
   if (ms) ccTimer = setTimeout(() => setCC(''), ms);
 }
 function nowPlaying(ch) {
@@ -1757,14 +1847,15 @@ function tune(id, user = false) {
   window.dispatchEvent(new CustomEvent('shrimp:channel', { detail: { channel: ch, user } }));
   setLcdBase(ch.guests ? showLine(ch) : idleText());
   if (!user) return;
-  if (playing) { stopChannel(); startChannel(true); } else startAudio();
+  // while the context is still waking up, startAudio starts whatever is current by then
+  if (playing) { if (!resuming) startChannel(true); } else startAudio();
 }
 
 playBtn.addEventListener('click', () => (playing ? stopAudio() : startAudio()));
 $('#vol').addEventListener('input', (e) => {
   vol = Number(e.target.value) / 100;
   e.target.style.setProperty('--v', `${e.target.value}%`);
-  if (master) master.gain.setTargetAtTime(vol * vol, ctx.currentTime, 0.03);
+  setMaster();
 });
 
 // ---------- request line: dial tones, then a busy signal ----------
@@ -1932,6 +2023,169 @@ document.querySelectorAll('.burst-bg').forEach((el) => { el.style.clipPath = bur
 // ---------- clock, listeners, now playing ----------
 const clockFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', second: '2-digit' });
 let lastSongSlot = -1;
+// ---------- fan gate ----------
+// After ten minutes of listening: subscribe to Shrimptech Enterprises (Mailchimp, email and
+// phone) or CONTINUE IN EXTREME LOW QUALITY AUDIO. Paste the form action from Mailchimp
+// (Audience > Signup forms > Embedded forms), for example
+// https://xxxx.us21.list-manage.com/subscribe/post?u=...&id=...&f_id=...
+// The fields go in as EMAIL and PHONE. `?gate=20` opens the gate after 20 seconds, for testing.
+const MAILCHIMP_URL = '';
+const GATE_TEST = Number(new URLSearchParams(location.search).get('gate')) || 0;
+const GATE_AFTER = GATE_TEST || 600;
+const store = {
+  get(k) { try { return localStorage.getItem(`shrimptech:${k}`); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(`shrimptech:${k}`, v); } catch {} },
+};
+let listened = GATE_TEST ? 0 : Number(store.get('listened')) || 0;
+let subscribed = !GATE_TEST && store.get('subscribed') === '1';
+const gate = $('#gate'), gateForm = $('#gate-form'), gateMsg = $('#gate-msg');
+
+function setMaster() {
+  if (master) master.gain.setTargetAtTime(vol * vol * (gate.hidden ? 1 : 0.12), ctx.currentTime, 0.05);
+}
+function playSub() {
+  $('#play-sub').textContent = !playing ? 'PRESS PLAY TO LISTEN' : lofi ? 'EXTREME LOW QUALITY · 8 KBPS' : 'LISTENING';
+}
+function openGate() {
+  gate.hidden = false;
+  gateMsg.textContent = '';
+  setMaster();
+  gate.querySelector('.gate-box').focus();
+}
+function closeGate() {
+  gate.hidden = true;
+  setMaster();
+}
+// Called once a second.
+function countListening() {
+  if (!playing || resuming || !gate.hidden) return;
+  listened++;
+  if (listened % 10 === 0) store.set('listened', listened);
+  if (listened >= GATE_AFTER && !subscribed && !lofi) openGate();
+}
+
+// Mailchimp's JSONP endpoint, so nobody leaves the page.
+function mailchimp(fields) {
+  return new Promise((resolve, reject) => {
+    const cb = `shrimptechMc${Date.now()}`, url = new URL(MAILCHIMP_URL.replace('/post?', '/post-json?'));
+    for (const [k, v] of Object.entries(fields)) if (v) url.searchParams.set(k, v);
+    url.searchParams.set('c', cb);
+    const script = document.createElement('script');
+    const done = (ok, value) => { clearTimeout(timer); delete window[cb]; script.remove(); (ok ? resolve : reject)(value); };
+    const timer = setTimeout(() => done(false, new Error('NO ANSWER FROM THE SUBSCRIPTION DESK. TRY AGAIN.')), 12000);
+    window[cb] = (r) => {
+      const msg = String(r?.msg || '').replace(/<[^>]*>/g, '').replace(/^\d+ - /, '');
+      if (r?.result === 'success' || /already subscribed/i.test(msg)) done(true, msg);
+      else done(false, new Error(msg || 'THAT DID NOT WORK. TRY AGAIN.'));
+    };
+    script.onerror = () => done(false, new Error('NO ANSWER FROM THE SUBSCRIPTION DESK. TRY AGAIN.'));
+    script.src = url;
+    document.head.append(script);
+  });
+}
+gateForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const go = gateForm.querySelector('.gate-go'), f = gateForm.elements;
+  go.disabled = true;
+  gateMsg.textContent = 'SUBSCRIBING...';
+  try {
+    if (MAILCHIMP_URL) await mailchimp({ EMAIL: f.EMAIL.value.trim(), PHONE: f.PHONE.value.trim() });
+    else console.warn('Shrimptech Radio: MAILCHIMP_URL is empty, so this signup was not sent anywhere.');
+    subscribed = true;
+    store.set('subscribed', '1');
+    closeGate();
+    setLofi(false);
+    setCC('>> SHRIMPTECH ENTERPRISES: Thank you for subscribing. Full quality restored.', 6000);
+  } catch (err) {
+    gateMsg.textContent = err.message.toUpperCase();
+  } finally {
+    go.disabled = false;
+  }
+});
+$('#gate-lofi').addEventListener('click', () => { closeGate(); setLofi(true); });
+gate.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeGate(); setLofi(true); } });
+$('#hq').addEventListener('click', openGate);
+
+// EXTREME LOW QUALITY: mono, band-limited, crushed to about 5 kHz and under 4 bits, with
+// holes in the signal and the odd buffering.
+const CRUSH = `registerProcessor('crush', class extends AudioWorkletProcessor {
+  constructor() { super(); this.n = 0; this.v = 0; }
+  process([input], [output]) {
+    const x = input[0];
+    if (x) for (let i = 0; i < x.length; i++) {
+      if (this.n++ % 9 === 0) this.v = Math.round(x[i] * 6) / 6;
+      for (const o of output) o[i] = this.v;
+    }
+    return true;
+  }
+});`;
+let lofiReady = null, lofiIn = null, lofiDrop = null, lofiOut = null, lofiTimer = 0, lofiHold = 0;
+const lofiChain = () => (lofiReady ??= (async () => {
+  const hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), clip = ctx.createWaveShaper();
+  hp.type = 'highpass'; hp.frequency.value = 450;
+  lp.type = 'lowpass'; lp.frequency.value = 2400; lp.Q.value = 6;
+  clip.curve = Float32Array.from({ length: 1024 }, (_, i) => Math.tanh((i / 511.5 - 1) * 4));
+  let crush;
+  try {
+    await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([CRUSH], { type: 'text/javascript' })));
+    crush = new AudioWorkletNode(ctx, 'crush');
+  } catch {
+    // no worklets in this browser: quantize only
+    crush = ctx.createWaveShaper();
+    crush.curve = Float32Array.from({ length: 1024 }, (_, i) => Math.round((i / 511.5 - 1) * 6) / 6);
+  }
+  lofiDrop = ctx.createGain();
+  lofiOut = ctx.createGain();
+  lofiOut.gain.value = 0;
+  hp.connect(lp).connect(crush).connect(clip).connect(lofiDrop).connect(lofiOut).connect(ctx.destination);
+  const hiss = ctx.createBufferSource(), hf = ctx.createBiquadFilter(), hg = ctx.createGain();
+  hiss.buffer = noiseBuf; hiss.loop = true;
+  hf.type = 'bandpass'; hf.frequency.value = 3200; hg.gain.value = 0.05;
+  hiss.connect(hf).connect(hg).connect(lofiDrop);
+  hiss.start();
+  lofiIn = hp;
+})());
+function lofiGlitch() {
+  const t = ctx.currentTime, r = Math.random(), g = lofiDrop.gain;
+  if (t < lofiHold) return;
+  const d = r < 0.03 ? 0.8 + Math.random() * 1.6 : r < 0.25 ? 0.04 + Math.random() * 0.22 : 0;
+  if (!d) return;
+  g.setValueAtTime(0, t);
+  g.setValueAtTime(1, t + d);
+  lofiHold = t + d;
+  if (d > 0.5) {
+    setCC('[BUFFERING...]', d * 1000);
+    setTimeout(() => { lastCaption = undefined; }, d * 1000 + 50);
+  }
+}
+const garble = (s) => s.replace(/[a-z]/gi, (c) => {
+  if (Math.random() > 0.3) return c;
+  const g = 'lakjdsh'[Math.floor(Math.random() * 7)];
+  return c === c.toUpperCase() ? g.toUpperCase() : g;
+});
+const BADGES = [['3D', 'HD', 'STEREO'], ['2D', 'LQ', 'MONO']];
+async function setLofi(on) {
+  lofi = on;
+  document.body.classList.toggle('lofi', on);
+  $('#hq').hidden = !on;
+  document.querySelectorAll('.badges span').forEach((el, i) => { el.textContent = BADGES[on ? 1 : 0][i]; });
+  playSub();
+  window.dispatchEvent(new CustomEvent('shrimp:lofi', { detail: { on } }));
+  clearInterval(lofiTimer);
+  if (!ctx) return;
+  if (on) await lofiChain();
+  if (lofi !== on || !lofiIn) return;  // switched again while the worklet loaded
+  const t = ctx.currentTime;
+  hqOut.gain.setTargetAtTime(on ? 0 : 1, t, 0.03);
+  lofiOut.gain.setTargetAtTime(on ? 0.8 : 0, t, 0.03);
+  if (on) {
+    master.connect(lofiIn);
+    lofiTimer = setInterval(lofiGlitch, 250);
+  } else {
+    try { master.disconnect(lofiIn); } catch {}
+  }
+}
+
 // For the show channels: who is in the studio at this point of the loop...
 function studioLine(ch) {
   if (!ch.guests) return ch.next.toUpperCase();
@@ -1960,6 +2214,7 @@ function everySecond() {
   const slot = Math.floor(Date.now() / 210000);
   if (playing && current.gen === 'bed' && !current.src && gen && slot !== lastSongSlot) setLcdBase(nowPlaying(current));
   lastSongSlot = slot;
+  countListening();
 }
 everySecond();
 setInterval(everySecond, 1000);
@@ -2035,8 +2290,11 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const V3 = THREE.Vector3;
 const C = (h) => new THREE.Color(h);
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-const PR = Math.min(window.devicePixelRatio || 1, 1.75);
+// Phones and small tablets skip the bloom pass and render straight to the screen.
+const lite = matchMedia('(hover: none), (max-width: 820px)').matches;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+const PR = Math.min(window.devicePixelRatio || 1, lite ? 1.5 : 1.75);
+let pr = PR;  // drops to a few pixels in EXTREME LOW QUALITY
 renderer.setPixelRatio(PR);
 renderer.toneMapping = THREE.NeutralToneMapping;
 renderer.toneMappingExposure = 1.05;
@@ -2057,12 +2315,13 @@ scene.add(key, rim, new THREE.HemisphereLight(0x8899ff, 0x220011, 0.4));
 const bgU = {
   uTime: { value: 0 }, uCenter: { value: new THREE.Vector2() }, uScale: { value: 800 },
   uA: { value: C('#e8112d') }, uB: { value: C('#7a0918') }, uN: { value: C('#0a0c16') }, uPulse: { value: 0 },
+  uFade: { value: 0 },
 };
 const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
   uniforms: bgU, depthTest: false, depthWrite: false,
   vertexShader: 'void main() { gl_Position = vec4(position.xy, 0.0, 1.0); }',
   fragmentShader: `
-    uniform float uTime, uScale, uPulse;
+    uniform float uTime, uScale, uPulse, uFade;
     uniform vec2 uCenter;
     uniform vec3 uA, uB, uN;
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -2079,6 +2338,10 @@ const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMateria
       col = mix(col, vec3(0.9), step(0.9975, h) * (0.5 + 0.5 * sin(uTime * 3.0 + h * 100.0)) * smoothstep(1.2, 1.8, r));
       col *= 0.82 * (0.97 + 0.03 * sin(gl_FragCoord.y * 1.4));
       gl_FragColor = vec4(col, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+      // where the page scrolls, the backdrop fades out into it just below the stage
+      if (uFade > 0.0) gl_FragColor *= smoothstep(0.0, uFade, gl_FragCoord.y);
     }`,
 }));
 bg.frustumCulled = false;
@@ -2405,17 +2668,24 @@ const sparkMat = new THREE.ShaderMaterial({
     uniform sampler2D uTex;
     uniform vec3 uColor;
     varying float vA;
-    void main() { vec4 t = texture2D(uTex, gl_PointCoord); gl_FragColor = vec4(uColor, t.a * vA); }`,
+    void main() {
+      vec4 t = texture2D(uTex, gl_PointCoord);
+      gl_FragColor = vec4(uColor, t.a * vA);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }`,
 });
 const sparks = new THREE.Points(sparkGeo, sparkMat);
 world.add(sparks);
 
 // ---------- post ----------
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.5, 0.5, 0.95);
-composer.addPass(bloom);
-composer.addPass(new OutputPass());
+let composer = null;
+if (!lite) {
+  composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(256, 256), 0.5, 0.5, 0.95));
+  composer.addPass(new OutputPass());
+}
 
 // ---------- channel looks ----------
 const targetA = C('#e8112d'), targetB = C('#7a0918');
@@ -2445,12 +2715,23 @@ stage.addEventListener('click', () => { boost += 14; bounceV += 2.2; radio?.sque
 
 // ---------- layout: keep the shrimp centered on #stage wherever it is on the page ----------
 let W = 0, H = 0, fit = 1;
+// Stacked layouts scroll. There the canvas scrolls with the page (a fixed one lags behind
+// touch scrolling) and ends FADE px below the stage.
+const stacked = matchMedia('(max-width: 980px)'), FADE = 140;
+let glH = 0;
 function layout() {
+  if (stacked.matches) {
+    const h = Math.round(stage.getBoundingClientRect().bottom + window.scrollY + FADE);
+    if (h !== glH) { glH = h; canvas.style.setProperty('--gl-h', `${h}px`); }
+  } else if (glH) {
+    glH = 0;
+    canvas.style.removeProperty('--gl-h');
+  }
   const cw = canvas.clientWidth, chh = canvas.clientHeight;
   if (cw !== W || chh !== H) {
     W = cw; H = chh;
     renderer.setSize(W, H, false);
-    composer.setSize(W, H);
+    composer?.setSize(W, H);
     camera.aspect = W / H;
   }
   const c = canvas.getBoundingClientRect(), r = stage.getBoundingClientRect();
@@ -2458,9 +2739,22 @@ function layout() {
   camera.setViewOffset(W, H, W / 2 - cx, H / 2 - cy, W, H);
   const unitPx = H / 2 / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z);
   fit = Math.min(r.width, r.height * 1.15) / 2 / (3.1 * unitPx);
-  bgU.uCenter.value.set(cx * PR, (H - cy) * PR);
-  bgU.uScale.value = Math.max(r.width, r.height, 320) * PR * 0.9;
+  bgU.uCenter.value.set(cx * pr, (H - cy) * pr);
+  bgU.uScale.value = Math.max(r.width, r.height, 320) * pr * 0.9;
+  bgU.uFade.value = glH ? FADE * pr : 0;
 }
+
+// Nothing to draw while the backdrop is scrolled out of view.
+let onScreen = true;
+new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; }).observe(canvas);
+
+window.addEventListener('shrimp:lofi', (e) => {
+  pr = e.detail.on ? 0.16 : PR;
+  renderer.setPixelRatio(pr);
+  composer?.setPixelRatio(pr);
+  sparkMat.uniforms.uSize.value = 26 * pr;
+  W = 0;
+});
 
 // ---------- loop ----------
 const clock = new THREE.Clock();
@@ -2501,7 +2795,7 @@ function tick() {
     a.tail.rotation.z = Math.sin(t * 2.4) * 0.12 + lvl * 0.2;
   }
 
-  composer.render();
+  if (onScreen) composer ? composer.render() : renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
 layout();
