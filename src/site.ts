@@ -15,7 +15,8 @@ export type Release = {
   /** Smart link (pre-save / listen). Falls back to the first platform link. */
   smartLink?: string;
   video?: string;
-  platforms: Link[];
+  /** Release-specific platform links (optional, not shown on the page). */
+  platforms?: Link[];
 };
 
 export type Background = {
@@ -40,10 +41,6 @@ export const site = {
     outAt: "2023-11-09T23:00:00.000Z",
     releaseDate: "2023-11-10",
     upcomingLabel: "Out 10 November",
-    platforms: [
-      { label: "Spotify", href: "https://open.spotify.com/album/193Hqvyp5LbPRv9jBd03uB" },
-      { label: "Apple Music", href: "https://music.apple.com/se/album/dirt-single/1713174486" },
-    ],
   } as Release,
 
   /** Artist-level streaming profiles. */
@@ -63,7 +60,7 @@ export const site = {
   ] as Link[],
 
   contact: [
-    { label: "Management", href: "mailto:oskar@arketyp.se" },
+    { label: "Management", href: "mailto:oskar@arketyp.se,ella@arketyp.se" },
     { label: "Booking EU", href: "mailto:tessie.lammle@the.team" },
     { label: "Booking Americas & ROW", href: "mailto:ryan.soroka@the.team,twindish@the.team" },
   ] as Link[],

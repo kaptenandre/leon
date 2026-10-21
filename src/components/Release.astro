@@ -3,7 +3,8 @@ import { site } from "../site";
 
 const r = site.release;
 const isOut = Date.now() >= Date.parse(r.outAt);
-const cta = r.smartLink ?? r.platforms[0]?.href;
+// Pre-save/smart link when set, otherwise the artist page on the first streaming service.
+const cta = r.smartLink ?? site.streaming[0]?.href;
 ---
 
 <section aria-label={r.title} data-release data-out-at={r.outAt}>
