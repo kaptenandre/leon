@@ -124,7 +124,7 @@ const jsonLd = {
   .buttons {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -132,8 +132,8 @@ const jsonLd = {
   .button {
     display: block;
     width: 100%;
-    padding: 15px 16px;
-    border: 1px solid var(--fg);
+    padding: 11px 16px;
+    border: 0;
     background: none;
     color: var(--fg);
     font: inherit;
@@ -145,14 +145,19 @@ const jsonLd = {
     text-decoration: none;
     border-radius: 0;
     cursor: pointer;
-    transition:
-      background-color 0.15s,
-      color 0.15s;
+    transition: opacity 0.15s;
   }
-  .button.primary,
-  .button:hover {
+  .button:not(.primary):hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .button.primary {
+    padding: 15px 16px;
     background: var(--fg);
     color: var(--bg);
+  }
+  .button.primary:hover {
+    opacity: 0.85;
   }
   .button:disabled {
     opacity: 0.5;
