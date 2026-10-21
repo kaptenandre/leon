@@ -16,13 +16,24 @@ const { image, video } = site.background;
         preload="metadata"
         poster={video.poster ?? image}
         data-bg-video
+        data-src={video.mp4}
         data-mobile-src={video.mobile}
-      >
-        {video.webm && <source src={video.webm} type="video/webm" />}
-        {video.mp4 && <source src={video.mp4} type="video/mp4" />}
-      </video>
+      />
     ) : (
       image && <img class="bg-media" src={image} alt="" decoding="async" fetchpriority="high" />
+    )
+  }
+  {
+    video && (
+      <script is:inline>
+        // Runs while the page is parsed, before the video starts loading, so phones
+        // get the mobile file from the start instead of swapping mid-load.
+        (function () {
+          var v = document.querySelector("[data-bg-video]");
+          var mobile = v.dataset.mobileSrc && matchMedia("(max-width: 700px)").matches;
+          v.src = mobile ? v.dataset.mobileSrc : v.dataset.src;
+        })();
+      </script>
     )
   }
   <div class="bg-overlay"></div>
@@ -35,9 +46,6 @@ const { image, video } = site.background;
   if (video && (matchMedia("(prefers-reduced-motion: reduce)").matches || saveData)) {
     video.removeAttribute("autoplay");
     video.pause();
-  } else if (video?.dataset.mobileSrc && matchMedia("(max-width: 700px) and (orientation: portrait)").matches) {
-    video.src = video.dataset.mobileSrc;
-    video.play().catch(() => {});
   }
 </script>
 
