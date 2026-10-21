@@ -28,7 +28,7 @@ const external = (href: string) => (href.startsWith("http") ? { target: "_blank"
   ) : (
     <section aria-label={title}>
       <h2 class="caps-label section-title">{title}</h2>
-      <ul class="buttons two-col">
+      <ul class="buttons">
         {links.map((l) => (
           <li>
             <a class="button" href={l.href} {...external(l.href)}>
@@ -42,14 +42,6 @@ const external = (href: string) => (href.startsWith("http") ? { target: "_blank"
 }
 
 <style>
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-  /* Odd one out: center it on its own row. */
-  .two-col li:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-  }
   .text-links {
     display: flex;
     justify-content: center;
