@@ -27,8 +27,8 @@ export type Background = {
 export const site = {
   name: "LÉON",
   url: "https://leon.site",
-  description: "LÉON. New music, updates and links.",
-  ogImage: "/release/dirt.jpg",
+  description: "Welcome to the official website for LÉON",
+  ogImage: "/og.jpg",
 
   /** Full-bleed background. Video wins over image when both are set. */
   background: {
