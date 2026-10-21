@@ -27,30 +27,41 @@ npx serve shrimptech   # then open the printed URL
 | 99.5 | K-DOG | The Dog Conversation Channel: two dogs, real barks, translated subtitles |
 | 87.7 | WIND | Just wind. 24/7. |
 
-- **VIAGRA BOYS IN MIDI** reads Standard MIDI Files listed in `MIDI_FILES` (title and url, for example `midi/pyramid-of-health.mid`). Drums go to a synthesized kit, bass and leads to simple oscillators, all on the shared wall clock. Until files are listed it plays public-domain placeholder tunes.
+- **VIAGRA BOYS IN MIDI** plays the album *viagr aboys* from General MIDI files in `midi/`, listed in `MIDI_FILES`. Drums go to a synthesized kit, bass, pianos and leads to simple oscillators, all on the shared wall clock. If the files can't be loaded it falls back to public-domain placeholder tunes. See [The MIDI files](#the-midi-files).
 - **K-DOG** plays single barks cut from `audio/k-dog-barks.mp3`, a sprite built by a small script (onset detection, about 90 barks in big, small and crying groups). Each dog has its own pitch and pan, and a random sequencer keeps the conversation from repeating. To swap the recordings, rebuild the sprite and paste the new `segs` table into `DOG_SPRITE`.
 - **WIND** is brown noise through moving band-pass filters with gusts. No file.
 
 ## Songs in the episode
 
-Shown in the captions while they play. Blocks marked unidentified show "MUSIC".
+Shown in the captions while they play. Each block was matched against the album masters (chroma features of a 40 s excerpt slid across every track; matches score 0.88 to 0.99, the runner-up never above 0.43). The block at 19:25 matches nothing on the album and shows "MUSIC".
 
 | Time | Song |
 | --- | --- |
 | 0:00 | Man Made of Meat |
 | 4:07 | UNO II |
 | 10:06 | Pyramid of Health |
-| 14:06 | "Sk8erbois" (as announced on air; unidentified) |
-| 19:25 | unidentified |
-| 25:37 | unidentified |
+| 14:06 | You N33d Me (announced on air as "Sk8erbois") |
+| 19:25 | not on the album |
+| 25:37 | Medicine for Horses |
 | 29:48 | The Bog Body |
 | 33:35 | Store Policy |
 | 38:14 | Best in Show Pt. IV |
 | 46:01 | Dirty Boyz |
 | 49:47 | Waterboy |
-| 55:01 | unidentified |
+| 55:01 | River King |
 
-Edit the titles in `SHOW_CC` (the `♪` rows) when the missing ones are known.
+## The MIDI files
+
+`midi/*.mid` are the eleven album tracks transcribed from the WAV masters, one Standard MIDI File each (type 1, one tempo, 4/4), so they open in any DAW too:
+
+| Channel | Program | Part | From |
+| --- | --- | --- | --- |
+| 10 | drums | kick 36, snare 38, closed hat 42 | onsets in the drum stem, classified by which bands jump (sub lows, snare body and crack, top) |
+| 2 | 33 Fingered Bass | bass, one note at a time | Basic Pitch on the bass stem |
+| 1 | 81 Saw Lead | the vocal line, moved up an octave or two | Basic Pitch on the vocal stem |
+| 3 | 4 Electric Piano | guitars, synths and sax, up to three notes | Basic Pitch on the rest |
+
+How they were made: [Demucs](https://github.com/adefossez/demucs) (`htdemucs`) splits each master into drums, bass, vocals and other; the beat comes from the drum stem; [Basic Pitch](https://github.com/spotify/basic-pitch) (ONNX model) turns the pitched stems into notes; everything is snapped to a 16th-note grid and the grid is turned so the snare lands on 2 and 4. As a check, each note's pitch class is compared with the two strongest chroma bins of its stem at that moment.
 
 ## Fan gate
 

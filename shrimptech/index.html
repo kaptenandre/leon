@@ -695,7 +695,7 @@ const SHOW_CC = [
   [833.11,837.53,"But it's so good. It is, I've been taking it for years now and actually"],
   [837.53,841.61,"my joints have locked themselves in place and I can't move my body"],
   [841.61,845.83,"whatsoever. OK, this next song is by Sk8erbois."],
-  [845.8,1079.6,"♪ SK8ERBOIS ♪"],
+  [845.8,1079.6,"♪ VIAGRA BOYS: YOU N33D ME ♪"],
   [1079.69,1084.73,"Bogdan, you moved here in the 70s or the 90s or the early 2000s"],
   [1085.37,1089.95,"and from somewhere around the Balkan area of Europe."],
   [1090.51,1095.15,"Can you tell me how your journey has been from a simple street vendor"],
@@ -767,7 +767,7 @@ const SHOW_CC = [
   [1528.96,1530.58,"Shrimps with ideas."],
   [1531.56,1532.14,"Shrimp day."],
   [1533.28,1536.74,"Frozen shrimp. Now on Amazon Prime."],
-  [1536.7,1699.5,"♪ MUSIC ♪"],
+  [1536.7,1699.5,"♪ VIAGRA BOYS: MEDICINE FOR HORSES ♪"],
   [1699.78,1705.98,"are listening to Shrimptech radio 106.9420 We're back."],
   [1706.34,1710.2,"Hell yeah, man, and we got that asshole bogged on out of the studio."],
   [1710.28,1713.76,"He was a square Nobody liked him and he's never touching my dog"],
@@ -914,15 +914,19 @@ const SHOW_CC = [
   [3289.52,3291.6,"Put anything between it. It's Useless."],
   [3292.02,3292.8,"Useless Bread."],
   [3294.08,3300.34,"You are listening to Shrimptech Radio 106.9420."],
-  [3300.6,3497.01,"♪ MUSIC ♪"],
+  [3300.6,3497.01,"♪ VIAGRA BOYS: RIVER KING ♪"],
 ];
 const SHOW_CLIPS = {"felon":{"who":"RON DANGLE","t":[243.73,247.43],"text":"I'M A CONVICTED FELON AND YOU'RE LISTENING TO SHRIMPTECH RADIO."},"sauce":{"who":"SHRIMPTECH ENTERPRISES","t":[2287.45,2293.09],"text":"PULL THE SAUCE OUT, THROW IT ON THE GROUND. THE DARKER SAUCE WINS. ALWAYS."},"chicken":{"who":"RON DANGLE","t":[479.43,486.49],"text":"OH MAN, THIS CHICKEN WATER IS SO GOOD. IT TASTES LIKE WHAT IT IS."},"yeehaw":{"who":"RUBBER BUCKET","t":[1508.99,1511.53],"text":"YEE-HAW! RUBBER BUCKET!"},"dirtyboyz":{"who":"RON DANGLE","t":[2679.78,2686.7],"text":"DIRTY BOYZ WITH A Z AT THE END, FOLKS. THAT'S D-I-R-T-Y B-O-Y-Z."},"cringe":{"who":"RON DANGLE","t":[3254.69,3259.63],"text":"LIFE AFTER DEATH IS NO LONGER CRINGE, FOLKS. YOU HEARD IT HERE, WE'RE ALL GOING TO HEAVEN."},"raisin":{"who":"SHRIMPTECH MICROSYSTEMS","t":[595.79,601.85],"text":"WE'VE CREATED A BRAND NEW TECHNOLOGY THAT IS ABLE TO TAKE OLD RAISINS AND MAKE THEM EVEN OLDER."},"jamie":{"who":"RON DANGLE","t":[523.67,528.73],"text":"JAMIE, BRING THAT EXPERIMENT UP ON THE SCREEN SO EVERYONE CAN SEE THE EXPERIMENT I MADE."},"host":{"who":"RON DANGLE","t":[1511.35,1516.81],"text":"LADIES AND GENTLEMEN, THIS IS YOUR HOST, RON DANGLE. WELCOME BACK TO SHRIMPTECH RADIO."},"back":{"who":"RON DANGLE","t":[1704.69,1707.39],"text":"WE'RE BACK! HELL YEAH, MAN."},"okayfolks":{"who":"RON DANGLE","t":[1769.43,1776.69],"text":"OKAY, OKAY, OKAY FOLKS. THAT WAS A WEIRD EXPERIENCE FOR ME AND I'VE GOT TO LEAVE THE ROOM RIGHT NOW."}};
 
-// Viagra Boys songs as Standard MIDI Files for VIAGRA BOYS IN MIDI, played in order and
-// looped like everything else. Put .mid files next to the page and list them here, e.g.
-// { title: 'PYRAMID OF HEALTH', url: 'midi/pyramid-of-health.mid' }. Until then the
-// channel plays its public-domain placeholder tunes.
-const MIDI_FILES = [];
+// VIAGRA BOYS IN MIDI: the album, transcribed from the masters into General MIDI files
+// (see the README), played in order and looped like everything else. The channel falls
+// back to its public-domain placeholder tunes when the files can't be loaded.
+const MIDI_FILES = [
+  ['MAN MADE OF MEAT', '01-man-made-of-meat'], ['THE BOG BODY', '02-the-bog-body'], ['UNO II', '03-uno-ii'],
+  ['PYRAMID OF HEALTH', '04-pyramid-of-health'], ['DIRTY BOYZ', '05-dirty-boyz'], ['MEDICINE FOR HORSES', '06-medicine-for-horses'],
+  ['WATERBOY', '07-waterboy'], ['STORE POLICY', '08-store-policy'], ['YOU N33D ME', '09-you-n33d-me'],
+  ['BEST IN SHOW PT. IV', '10-best-in-show-pt-iv'], ['RIVER KING', '11-river-king'],
+].slice(0, 3).map(([title, file]) => ({ title, url: `midi/${file}.mid` }));  // the rest are still being transcribed
 
 // `src`: a list of { url, type } to loop. Every visitor joins at the same spot
 // (wall clock + `offset`, modulo the loop length), so it plays like a live stream
@@ -1471,13 +1475,21 @@ function parseMidi(buf) {
   }
   return { notes, len: sec };
 }
-// Map General MIDI to the house sounds: channel 10 drums, bass programs and low notes to bass.
+// Map General MIDI to the house sounds: channel 10 drums, bass programs and low notes to bass,
+// pianos and pads to keys, everything else to the lead.
 function midiEvents(notes) {
   return notes.map((n) => {
     if (n.chn === 9) return { t: n.t, type: n.m <= 36 ? 'kick' : n.m <= 40 ? 'snare' : 'hat', vel: n.vel };
-    const isBass = (n.program >= 32 && n.program <= 39) || n.m < 45;
-    return { t: n.t, type: isBass ? 'bass' : 'lead', m: n.m, dur: n.dur, vel: n.vel };
+    const p = n.program;
+    const type = p >= 32 && p <= 39 ? 'bass' : p <= 7 || (p >= 88 && p <= 95) ? 'keys' : n.m < 45 ? 'bass' : 'lead';
+    return { t: n.t, type, m: n.m, dur: n.dur, vel: n.vel };
   }).sort((a, b) => a.t - b.t);
+}
+// Index of the first event at or after t (events sorted by t).
+function firstAt(ev, t) {
+  let lo = 0, hi = ev.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (ev[mid].t < t) lo = mid + 1; else hi = mid; }
+  return lo;
 }
 async function loadMidiSongs(files) {
   return Promise.all(files.map(async (f) => {
@@ -1505,19 +1517,19 @@ function midiGen(ch) {
     if (dead) return;
     const { ev, marks, L } = midiTimeline(songs);
     const showSong = (song) => {
-      setLcdBase(placeholder ? `♪ ${song.title} (${song.by}) · PLACEHOLDER UNTIL THE VIAGRA BOYS MIDI FILES ARRIVE` : `♪ ${song.title} · ${song.by} · IN MIDI`);
+      setLcdBase(placeholder ? `♪ ${song.title} (${song.by}) · IN MIDI` : `♪ ${song.title} · ${song.by} · IN MIDI`);
       setCC(`♪ ${song.title} (MIDI) ♪`);
     };
     showSong(marks.filter((m) => m.t <= loopPos(L)).pop().song);
     loop = runLoop((w0, w1) => {
       for (let k = Math.floor(w0 / L); k <= Math.floor(w1 / L); k++) {
         const base = k * L;
-        for (const e of ev) {
-          const tw = base + e.t;
-          if (tw < w0) continue;
+        for (let i = firstAt(ev, w0 - base); i < ev.length; i++) {
+          const e = ev[i], tw = base + e.t;
           if (tw >= w1) break;
           const t = tw - offset, v = e.vel ?? 1;
           if (e.type === 'lead') lead(bus, t, e.m, e.dur, v);
+          else if (e.type === 'keys') keys(bus, t, [e.m], e.dur, 0.05 * v);
           else if (e.type === 'bass') bass(bus, t, e.m, e.dur, 0.22 * v);
           else if (e.type === 'kick') kick(bus, t, 0.55 * v);
           else if (e.type === 'snare') snare(bus, t);
