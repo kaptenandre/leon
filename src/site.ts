@@ -54,7 +54,7 @@ export const site = {
 
   socials: [
     { label: "Instagram", href: "https://www.instagram.com/leon/" },
-    { label: "Facebook", href: "https://www.facebook.com/itsleonleon" },
+    { label: "Facebook", href: "https://www.facebook.com/itsleonmusic" },
     { label: "YouTube", href: "https://www.youtube.com/channel/UC8hod44yQ-t8eQuXxeK5-Yw" },
     { label: "Reddit", href: "https://www.reddit.com/r/itsleonleon/" },
     // TODO: TikTok
