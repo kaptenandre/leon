@@ -6,11 +6,26 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
 const ogImage = new URL(site.ogImage, site.url).href;
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "MusicGroup",
-  name: site.name,
-  url: site.url,
-  image: ogImage,
-  sameAs: [...site.socials, ...site.streaming].map((l) => l.href),
+  "@graph": [
+    {
+      "@type": "MusicGroup",
+      "@id": `${site.url}/#artist`,
+      name: site.name,
+      alternateName: site.alternateNames,
+      description: site.description,
+      genre: site.genre,
+      url: site.url,
+      image: ogImage,
+      sameAs: [...site.socials, ...site.streaming].map((l) => l.href),
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}/#website`,
+      name: site.name,
+      url: site.url,
+      about: { "@id": `${site.url}/#artist` },
+    },
+  ],
 };
 ---
 
@@ -19,10 +34,11 @@ const jsonLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{site.name}</title>
+    <title>{site.title}</title>
     <meta name="description" content={site.description} />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={site.name} />
@@ -37,6 +53,9 @@ const jsonLd = {
     <meta name="twitter:image" content={ogImage} />
     <meta name="theme-color" content="#000000" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    {site.background.video?.poster && <link rel="preload" as="image" href={site.background.video.poster} fetchpriority="high" />}
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body>
@@ -175,11 +194,9 @@ const jsonLd = {
       transform: none;
     }
   }
-  main > * {
+  /* The name paints immediately (it is the LCP element); the rest fades in. */
+  main > :not(:first-child) {
     animation: 1.6s both fade-in;
-  }
-  main > :nth-child(1) {
-    animation-delay: 0.2s;
   }
   main > :nth-child(2) {
     animation-delay: 0.4s;

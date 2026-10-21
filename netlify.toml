@@ -4,3 +4,19 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Static media keeps its file name, so cache for a week (revalidated after).
+[[headers]]
+  for = "/video/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/grain.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/og.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

@@ -26,6 +26,11 @@ export type Background = {
 
 export const site = {
   name: "LÉON",
+  /** <title> for search results; og/twitter titles use `name`. */
+  title: "LÉON | Official Website",
+  /** Spellings people search for. */
+  alternateNames: ["LEON", "Léon"],
+  genre: "Pop",
   url: "https://leon.site",
   description: "Welcome to the official website for LÉON",
   ogImage: "/og.jpg",
