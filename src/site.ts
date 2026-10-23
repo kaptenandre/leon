@@ -37,7 +37,8 @@ export const site = {
 
   /** Full-bleed background. Video wins over image when both are set. */
   background: {
-    video: { mp4: "/video/bg-1080.mp4", mobile: "/video/bg-mobile.mp4", poster: "/video/bg-poster.jpg" },
+    // Bump ?v= when the files change: they are cached for a week.
+    video: { mp4: "/video/bg-1080.mp4?v=2", mobile: "/video/bg-mobile.mp4?v=2", poster: "/video/bg-poster.jpg?v=2" },
   } as Background,
 
   release: {
