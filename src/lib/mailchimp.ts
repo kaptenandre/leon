@@ -8,6 +8,8 @@ export type Signup = {
   phone?: string;
   /** ISO 3166-1 alpha-2 from the visitor's IP, e.g. "SE" */
   country?: string;
+  /** Approximate coordinates from the visitor's IP; Mailchimp derives country and timezone. */
+  location?: { latitude: number; longitude: number };
   ip?: string;
   source?: string;
 };
@@ -47,8 +49,9 @@ export async function subscribe(signup: Signup, env: Env): Promise<void> {
     status_if_new: env.MAILCHIMP_DOUBLE_OPTIN === "true" ? "pending" : "subscribed",
     merge_fields: mergeFields,
   };
-  // Lets Mailchimp geolocate the contact for its built-in location segments.
   if (signup.ip) member.ip_signup = signup.ip;
+  // Mailchimp does not geolocate ip_signup from the API; coordinates fill its Location segments.
+  if (signup.location) member.location = signup.location;
 
   const withSms = !!signup.phone && env.MAILCHIMP_SMS === "true";
   const put = (body: Record<string, unknown>) =>

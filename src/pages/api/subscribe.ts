@@ -6,7 +6,8 @@ export const prerender = false;
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type NetlifyLocals = { netlify?: { context?: { geo?: { country?: { code?: string } }; ip?: string } } };
+type NetlifyGeo = { country?: { code?: string }; latitude?: number; longitude?: number };
+type NetlifyLocals = { netlify?: { context?: { geo?: NetlifyGeo; ip?: string } } };
 
 export const POST: APIRoute = async ({ request, redirect, locals, clientAddress }) => {
   const wantsJson = request.headers.get("accept")?.includes("application/json");
@@ -29,6 +30,10 @@ export const POST: APIRoute = async ({ request, redirect, locals, clientAddress 
   const ctx = (locals as NetlifyLocals).netlify?.context;
   const geoCountry = (ctx?.geo?.country?.code || request.headers.get("x-country") || "").toUpperCase();
   const country = /^[A-Z]{2}$/.test(geoCountry) ? geoCountry : undefined;
+  // Approximate visitor location; lets Mailchimp fill its own Location (country + timezone).
+  const { latitude, longitude } = ctx?.geo ?? {};
+  const location =
+    typeof latitude === "number" && typeof longitude === "number" ? { latitude, longitude } : undefined;
   let ip = ctx?.ip || request.headers.get("x-nf-client-connection-ip") || undefined;
   if (!ip) {
     try {
@@ -54,7 +59,7 @@ export const POST: APIRoute = async ({ request, redirect, locals, clientAddress 
   if (!form.get("consent")) return reply(false, "Please accept the terms to sign up.");
 
   try {
-    await subscribe({ email, phone, country, ip, source }, process.env);
+    await subscribe({ email, phone, country, location, ip, source }, process.env);
     return reply(true);
   } catch (err) {
     if (err instanceof SubscribeError) return reply(false, err.message, err.status);
