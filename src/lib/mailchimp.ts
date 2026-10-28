@@ -24,6 +24,18 @@ export class SubscribeError extends Error {
 
 type Env = Record<string, string | undefined>;
 
+const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+
+/** "SE" -> "Country: Sweden". A tag can be picked directly as a campaign's audience. */
+export function countryTag(code?: string): string | undefined {
+  if (!code) return undefined;
+  try {
+    return `Country: ${regionNames.of(code.toUpperCase()) ?? code}`;
+  } catch {
+    return `Country: ${code.toUpperCase()}`;
+  }
+}
+
 export async function subscribe(signup: Signup, env: Env): Promise<void> {
   const apiKey = env.MAILCHIMP_API_KEY;
   const audienceId = env.MAILCHIMP_AUDIENCE_ID;
@@ -79,7 +91,7 @@ export async function subscribe(signup: Signup, env: Env): Promise<void> {
     throw new SubscribeError("Something went wrong, please try again.", 502);
   }
 
-  const tags = [...(env.MAILCHIMP_TAGS || "website").split(","), signup.source]
+  const tags = [...(env.MAILCHIMP_TAGS || "website").split(","), signup.source, countryTag(signup.country)]
     .map((t) => t?.trim())
     .filter((t, i, all): t is string => !!t && all.indexOf(t) === i);
   if (tags.length) {
