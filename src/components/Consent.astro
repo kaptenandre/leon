@@ -1,0 +1,155 @@
+---
+import { site } from "../site";
+
+const id = site.analytics.ga4;
+---
+
+<!-- Google Analytics loads only after the visitor accepts. Nothing is sent and no cookies are set before. -->
+<div class="consent-banner" role="region" aria-label="Cookie notice" data-consent-banner hidden>
+  <p>
+    We use cookies to understand how the site is used. <a href="/privacy">Privacy notice</a>
+  </p>
+  <div class="actions">
+    <button type="button" class="decline" data-consent="denied">Decline</button>
+    <button type="button" class="accept" data-consent="granted">Accept</button>
+  </div>
+</div>
+
+<script is:inline define:vars={{ id }}>
+  (function () {
+    var KEY = "leon-consent";
+    var banner = document.querySelector("[data-consent-banner]");
+    var read = function () {
+      try {
+        return localStorage.getItem(KEY);
+      } catch (e) {
+        return null;
+      }
+    };
+    var write = function (v) {
+      try {
+        localStorage.setItem(KEY, v);
+      } catch (e) {}
+    };
+
+    var load = function () {
+      window["ga-disable-" + id] = false;
+      if (window.__leonGa) return;
+      window.__leonGa = true;
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () {
+        window.dataLayer.push(arguments);
+      };
+      window.gtag("js", new Date());
+      window.gtag("config", id);
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://www.googletagmanager.com/gtag/js?id=" + id;
+      document.head.appendChild(s);
+    };
+
+    var clearCookies = function () {
+      window["ga-disable-" + id] = true;
+      var host = location.hostname;
+      document.cookie.split(";").forEach(function (c) {
+        var name = c.split("=")[0].trim();
+        if (name.indexOf("_ga") !== 0) return;
+        [host, "." + host, "." + host.replace(/^www\./, "")].forEach(function (d) {
+          document.cookie = name + "=; Max-Age=0; path=/; domain=" + d;
+        });
+        document.cookie = name + "=; Max-Age=0; path=/";
+      });
+    };
+
+    var choice = read();
+    if (choice === "granted") load();
+    else if (!choice) banner.hidden = false;
+
+    banner.addEventListener("click", function (e) {
+      var v = e.target.getAttribute && e.target.getAttribute("data-consent");
+      if (!v) return;
+      write(v);
+      banner.hidden = true;
+      if (v === "granted") load();
+      else clearCookies();
+    });
+
+    // "Cookie settings" links reopen the banner.
+    document.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("[data-cookie-settings]")) {
+        e.preventDefault();
+        banner.hidden = false;
+      }
+    });
+  })();
+</script>
+
+<style>
+  .consent-banner {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    z-index: 10;
+    width: calc(100% - 32px);
+    max-width: 440px;
+    transform: translateX(-50%);
+    padding: 14px 16px;
+    background: #000;
+    border: 1px solid #ffffff33;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .consent-banner[hidden] {
+    display: none;
+  }
+  p {
+    margin: 0;
+    text-align: left;
+  }
+  a {
+    text-underline-offset: 3px;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+  button {
+    flex: 1;
+    padding: 10px 12px;
+    font: inherit;
+    font-size: 0.75rem;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: var(--caps-tracking);
+    border: 1px solid var(--fg);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .decline {
+    background: none;
+    color: var(--fg);
+  }
+  .accept {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 12px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .consent-banner {
+      animation: none;
+    }
+  }
+</style>

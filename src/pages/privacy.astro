@@ -1,0 +1,118 @@
+---
+import Base from "../layouts/Base.astro";
+import { site } from "../site";
+
+const { controller, contact, updated } = site.privacy;
+---
+
+<Base
+  title={`Privacy Notice | ${site.name}`}
+  description={`How ${controller} handles personal data on ${site.url.replace("https://", "")}.`}
+  heading="Privacy"
+>
+  <article class="prose">
+    <p class="meta caps-label">Last updated {updated}</p>
+
+    <h2>Who we are</h2>
+    <p>
+      This website is run by <strong>{controller}</strong>, which is the data controller for personal data collected
+      here. Questions or requests about your data: <a href={`mailto:${contact}`}>{contact}</a>.
+    </p>
+
+    <h2>Newsletter and SMS</h2>
+    <p>When you sign up to updates from {site.name} we collect:</p>
+    <ul>
+      <li>your email address</li>
+      <li>your phone number, if you choose to give it (optional, for SMS)</li>
+      <li>your country and approximate location, derived from your IP address</li>
+      <li>your IP address and the time you signed up</li>
+    </ul>
+    <p>
+      We use this to send you news about {site.name} by email and, if you gave your number, by SMS, and to send the right
+      news to the right countries. The legal basis is your consent (GDPR Art. 6(1)(a)). You can withdraw it at any time
+      with the unsubscribe link in every email, by replying STOP to an SMS, or by emailing us.
+    </p>
+    <p>We keep this data until you unsubscribe or ask us to delete it.</p>
+
+    <h2 id="cookies">Cookies and analytics</h2>
+    <p>
+      If you accept cookies, we use Google Analytics to understand how the site is used, such as visits, where visitors
+      come from and which links they click. It sets the cookies <code>_ga</code> and <code>_ga_*</code>, which last up to
+      two years. If you decline, Google Analytics is not loaded and no cookies are set. We store your choice in your
+      browser's local storage so we don't ask again.
+    </p>
+    <p>The legal basis is your consent. Analytics data is kept for up to 14 months.</p>
+    <p><button type="button" class="button primary" data-cookie-settings>Change cookie settings</button></p>
+
+    <h2>Service providers</h2>
+    <p>We use these providers to run the site. They process data on our behalf under data processing agreements:</p>
+    <ul>
+      <li><strong>Mailchimp</strong> (Intuit Inc., USA): email and SMS sending, subscriber list</li>
+      <li><strong>Netlify</strong> (Netlify Inc., USA): website hosting and signup handling</li>
+      <li><strong>Google Analytics</strong> (Google Ireland Ltd / Google LLC): analytics, only with your consent</li>
+    </ul>
+    <p>
+      Some of this data is transferred to the USA. These transfers rely on the EU-US Data Privacy Framework and the EU
+      Standard Contractual Clauses.
+    </p>
+
+    <h2>Your rights</h2>
+    <p>
+      You have the right to access, correct or delete your data, to restrict or object to its use, to get a copy of it,
+      and to withdraw your consent at any time. Email <a href={`mailto:${contact}`}>{contact}</a> and we will reply within
+      one month.
+    </p>
+    <p>
+      If you think we handle your data wrongly, you can complain to the Swedish Authority for Privacy Protection (IMY),
+      <a href="https://www.imy.se" target="_blank" rel="noopener">imy.se</a>.
+    </p>
+
+    <p class="back"><a href="/" class="caps-label">Back to {site.name}</a></p>
+  </article>
+</Base>
+
+<style>
+  .prose {
+    text-align: left;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    background: #000000b3;
+    padding: 24px 20px;
+  }
+  .meta {
+    margin: 0 0 8px;
+    font-size: 0.6875rem;
+    opacity: 0.7;
+  }
+  h2 {
+    margin: 28px 0 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--caps-tracking);
+  }
+  p,
+  ul {
+    margin: 0 0 12px;
+  }
+  ul {
+    padding-left: 18px;
+  }
+  a {
+    text-underline-offset: 3px;
+  }
+  code {
+    font-size: 0.8125rem;
+  }
+  .button {
+    margin-top: 4px;
+  }
+  .back {
+    margin: 28px 0 0;
+    text-align: center;
+    font-size: 0.75rem;
+  }
+  .back a {
+    text-decoration: none;
+  }
+</style>

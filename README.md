@@ -24,7 +24,11 @@ The form posts to `/api/subscribe` (Netlify function), which upserts the contact
 | `MAILCHIMP_COUNTRY_FIELD` | Merge field for the country code (default `COUNTRY`) |
 | `MAILCHIMP_TAGS` | Tags, comma separated (default `website`) |
 
-The provider sits in `src/lib/mailchimp.ts`. Switching provider later means replacing that module only.
+The provider sits in `src/lib/mailchimp.ts`. Switching provider later means replacing that module only. Each signup is also tagged with its country (e.g. `Country: Sweden`), so a campaign can target a country by picking its tag.
+
+## Analytics and privacy
+
+Google Analytics 4 (`site.analytics.ga4`) loads only after the visitor accepts the cookie banner (`src/components/Consent.astro`); before that nothing is sent and no cookies are set. The choice is kept in `localStorage` (`leon-consent`), and "Cookie settings" in the footer reopens the banner. Signups fire a GA `sign_up` event. The privacy notice lives at `/privacy` (`src/pages/privacy.astro`, controller and contact in `site.privacy`).
 
 ## Development
 

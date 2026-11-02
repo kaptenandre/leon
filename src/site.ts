@@ -72,6 +72,17 @@ export const site = {
     { label: "Booking Americas & ROW", href: "mailto:ryan.soroka@the.team,twindish@the.team" },
   ] as Link[],
 
+  analytics: {
+    /** Google Analytics 4, loaded only after cookie consent. */
+    ga4: "G-1TBG23C1LX",
+  },
+
+  privacy: {
+    controller: "Arketyp Artist Services AB",
+    contact: "info@leon.site",
+    updated: "2 November 2026",
+  },
+
   newsletter: {
     title: "Join the community",
     success: "You’re in. Talk soon.",
